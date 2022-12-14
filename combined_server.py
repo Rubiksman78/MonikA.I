@@ -20,21 +20,13 @@ from pydub import AudioSegment
 import time
 
 use_bb = False
-
+GAME_PATH = 'C:\SAMUEL\ddlc-win\DDLC-1.1.1-pc\DDLC.exe'
 # Global variables 
 clients = {}
 addresses = {}
 
-if not use_bb:
-    tokenizer = AutoTokenizer.from_pretrained("output-large-2")
-    chat_model = AutoModelForCausalLM.from_pretrained("output-large-2")
-
-else:
-    def _norm(x):
-        return ' '.join(x.strip().split())
-
-    tokenizer = BlenderbotTokenizer.from_pretrained('thu-coai/blenderbot-400M-esconv')
-    chat_model = BlenderbotForConditionalGeneration.from_pretrained('thu-coai/blenderbot-400M-esconv')
+tokenizer = AutoTokenizer.from_pretrained("output-large-2")
+chat_model = AutoModelForCausalLM.from_pretrained("output-large-2")
 
 HOST = '127.0.0.1'
 PORT = 12346
@@ -46,7 +38,7 @@ SERVER.bind(ADDRESS)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 #Launch DDLC Game and wait for it to load
-subprocess.Popen('C:\SAMUEL\ddlc-win\DDLC-1.1.1-pc\DDLC.exe')
+subprocess.Popen(GAME_PATH)
 
 emotion_model = keras.models.load_model('mobilenet_7.h5')
 
