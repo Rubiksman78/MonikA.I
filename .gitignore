@@ -1,4 +1,5 @@
-Monika_datasets
+Monika_datasets/script*
+Monika_datasets/monika_big.txt
 audacity_tracks
 .vscode
 audios
@@ -9,3 +10,4 @@ wav_audios
 server_bot.py
 Emotion-detection
 TTS
+.__pycache__
