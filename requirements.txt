@@ -1,0 +1,8 @@
+transformers
+torch
+opencv-python
+pydub
+asyncio
+playwright
+nest_asyncio
+tensorflow
