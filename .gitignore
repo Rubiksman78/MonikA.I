@@ -10,4 +10,8 @@ wav_audios
 server_bot.py
 Emotion-detection
 TTS
-.__pycache__
+__pycache__
+browser.py
+communicate.py
+log*
+
