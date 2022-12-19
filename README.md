@@ -14,21 +14,21 @@ It's using HuggingFace DialoGPT models, [TTS Coqui-AI](https://github.com/coqui-
 There is also an emotion detection with the webcam with a model from [HSEmotion](https://github.com/HSE-asavchenko/face-emotion-recognition).
 
 
-## Features
+## :fire: Features
 
 - Allow Monika to finally see you through the webcam and react to your emotions
 - Speak without scripted text with Monika using the latest chatbots from Character AI or HuggingFace DialoGPT
 - Hear Monika speak with a Text to Speech module using extracts of voiced dialogues (still in development)
 
-## Installation
+## ❓Installation
 
 Run the setup with ```bash setup.sh``` that will install the requirements for the project and the requirements for the TTS module.
 
-## Add to the game
+## :heavy_plus_sign: Add to the game
 
 The submod is the folder `AI_submod`. To add it to your game, you have to add it in your game folder to `game/Submods/`.
 
-## Usage
+## :loudspeaker: Usage
 
 To use it, you can launch the script `combined_server.py` that will automatically launch a server with chatbot and emotion recognitions models, it will also launch the game and initialize the client/server connection. 
 
