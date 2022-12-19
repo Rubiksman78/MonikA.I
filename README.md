@@ -50,3 +50,9 @@ You can change the voice used by replacing the extract `talk_13.wav` in the `aud
 
 The features are available in a specific `AI` Talk menu in the game.
 ![Talk menu](images/image_2.png)
+
+## :alarm_clock: To develop
+- Convert `playwright` browser simulator to python `requests` for faster run and no parasite window
+- Speech to text to convert your own voice in text and directly speak with Monika
+- Better face emotions detection for changes in weather, postures...etc
+- Face recognition for Monika only to recognize you
