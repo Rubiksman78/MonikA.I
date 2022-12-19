@@ -72,7 +72,7 @@ label monika_torch:
 
 #Chatbot Event
 init 5 python:
-    addEvent(Event(persistent.event_database,eventlabel="monika_chat",category=['ai'],prompt="Let's chat together?",pool=True,unlocked=True))
+    addEvent(Event(persistent.event_database,eventlabel="monika_chat",category=['ai'],prompt="Let's chat together",pool=True,unlocked=True))
 
 label monika_chat:
     init python:
@@ -124,32 +124,33 @@ init 5 python:
 label monika_cam:
     m "Okay, I'll look for you."
     
-    m 1esa "I can finally see your face honey !"
-    
+    m 1sublo "I can finally see you, [player] ! I have been waiting for this moment for a long time."
+    m 5nublb "I see your cute face now ehehe~"
+
     while True:
         $ send_simple("camera")
         $ received_emotio = receiveMessage()
         
         if received_emotio == "angry":
-            m 1esa "[sentences_emotions[angry]]"
+            m 2lktpc "[sentences_emotions[angry]]"
         elif received_emotio == "disgusted":
-            m 1esa "[sentences_emotions[disgusted]]"
+            m 5etc "[sentences_emotions[disgusted]]"
         elif received_emotio == "fearful":
-            m 1esa "[sentences_emotions[fearful]]"
+            m 1fkd "[sentences_emotions[fearful]]"
         elif received_emotio == "happy":
-            m 1esa "[sentences_emotions[happy]]"
+            m 6hubla "[sentences_emotions[happy]]"
         elif received_emotio == "neutral":
-            m 1esa "[sentences_emotions[neutral]]"
+            m 5wut "[sentences_emotions[neutral]]"
         elif received_emotio == "sad":
-            m 1esa "[sentences_emotions[sad]]"
+            m 5fka "[sentences_emotions[sad]]"
         elif received_emotio == "surprised":
-            m 1esa "[sentences_emotions[surprised]]"
+            m 2wkb "[sentences_emotions[surprised]]"
         elif received_emotio == "no":
-            m 1esa "[sentences_emotions[no]]"
+            m 6ektuc "[sentences_emotions[no]]"
         
-        m 1esa "Do you want me to continue looking for you? !"
+        m 1esa "Do you want me to continue looking for you?"
         $ my_msg = renpy.input("")
-        if my_msg == "No":
+        if my_msg == "No" or my_msg == "no" or my_msg == "NO":
             return
 
 
@@ -174,7 +175,7 @@ label emotion_minute:
     elif received_emotion == "disgusted":
         $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['disgusted']],'Window Reactions')
         if not wrs_succes:
-            m 5eta "[sentences_emotions[disgusted]]"
+            m 5etc "[sentences_emotions[disgusted]]"
     elif received_emotion == "fearful":
         $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['fearful']],'Window Reactions')
         if not wrs_succes:
@@ -182,20 +183,20 @@ label emotion_minute:
     elif received_emotion == "happy":
         $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['happy']],'Window Reactions')
         if not wrs_succes:
-            m 1esa "[sentences_emotions[happy]]"
+            m 6hubla "[sentences_emotions[happy]]"
     elif received_emotion == "neutral":
         $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['neutral']],'Window Reactions')
         if not wrs_succes:
-            m 1esa "[sentences_emotions[neutral]]"
+            m 5wut "[sentences_emotions[neutral]]"
     elif received_emotion == "sad":
         $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['sad']],'Window Reactions')
         if not wrs_succes:
-            m 1esa "[sentences_emotions[sad]]"
+            m 5fka "[sentences_emotions[sad]]"
     elif received_emotion == "surprised":
         $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['surprised']],'Window Reactions')
         if not wrs_succes:
-            m 1esa "[sentences_emotions[surprised]]"
+            m 2wkb "[sentences_emotions[surprised]]"
     elif received_emotion == "no": 
         $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['no']],'Window Reactions')
         if not wrs_succes:
-            m 1esa "[sentences_emotions[no]]"
+            m 6ektuc "[sentences_emotions[no]]"

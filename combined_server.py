@@ -92,7 +92,7 @@ async def launch():
     await page.fill("input#username",USERNAME)
     await page.fill("input#password",PASSWORD)
     #await page.click("button[type=submit]") #Now we have to click the button manually
-    await page.click('[href="/chats"]',delay=10000)
+    await page.click('[href="/chats"]',delay=5000)
     await page.click('[href="/chat?char=e9UVQuLURpLyCdhi8OjSKSLwKIiE0U-nEqXDeAjk538"]')
     await page.click('[class="col-auto px-2 dropdown"]')
     await page.click('text=Save and Start New Chat')
@@ -112,12 +112,11 @@ async def listenToClient(client):
     """ Get client username """
     name = "User"
     clients[client] = name
-    if USE_CHARACTER_AI:
-        page = asyncio.run(launch())
     while True:
         received_msg = client.recv(BUFSIZE).decode("utf-8")
         if received_msg == "chatbot":
-            
+            if USE_CHARACTER_AI:
+                page = asyncio.run(launch())
             received_msg = client.recv(BUFSIZE).decode("utf-8")
             received_msg , step = received_msg.split("/g")
             step = int(step)
