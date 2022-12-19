@@ -30,7 +30,7 @@ parser.add_argument('--game_path', type=str, default='C:\SAMUEL\ddlc-win\DDLC-1.
                     help='path to game')
 parser.add_argument('--chatbot_path', type=str, default="output-large-3",
                     help='path to chatbot')
-parser.add_argument('--use_character_ai', type=bool, default=True,
+parser.add_argument('--use_character_ai', type=bool, default=False,
                     help='use character ai')
 parser.add_argument('--use_chatbot', type=bool, default=False,
                     help='use chatbot')
@@ -144,6 +144,8 @@ async def listenToClient(client):
                 sendMessage(msg)
 
             if USE_CHARACTER_AI:
+                if os.path.exists(GAME_PATH+'/game/Submods/AI_submod/audio/out.ogg'):
+                    os.remove(GAME_PATH+'/game/Submods/AI_submod/audio/out.ogg')
                 if received_msg == "QUIT":
                     await page.fill("textarea","I'll be right back")
                 else:
@@ -171,6 +173,8 @@ async def listenToClient(client):
                         msg = msg.replace("</p>","")
                         msg = msg.replace("<del>","")
                         msg = msg.replace("</del>","")
+                        msg = msg.replace("<br>","")
+                        msg = msg.replace("<br/>","")
 
                         if received_msg != "QUIT":
                             #Text to speech, save wav to wav_audios folder

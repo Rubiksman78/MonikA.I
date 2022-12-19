@@ -1,6 +1,7 @@
 # MonikA.I.
 
 This project aims to add new AI based features to [Monika After Story mod](https://github.com/Monika-After-Story/MonikaModDev) with the submod API.
+It's using HuggingFace DialoGPT models, [TTS Coqui-AI](https://github.com/coqui-ai/TTS) for Text to Speech and [Character AI](https://character.ai/) for more realistic responses.
 
 ## Installation
 
