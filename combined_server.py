@@ -28,11 +28,11 @@ parser.add_argument('--game_path', type=str, default='C:\SAMUEL\ddlc-win\DDLC-1.
                     help='path to game')
 parser.add_argument('--chatbot_path', type=str, default="output-large-3",
                     help='path to chatbot')
-parser.add_argument('--use_character_ai', type=bool, default=True,
+parser.add_argument('--use_character_ai', type=bool, default=False,
                     help='use character ai')
 parser.add_argument('--use_chatbot', type=bool, default=False,
                     help='use chatbot')
-parser.add_argument('--use_emotion_detection', type=bool, default=True, 
+parser.add_argument('--use_emotion_detection', type=bool, default=False, 
                     help='use emotion detection')
 parser.add_argument('--use_audio', type=bool, default=False,
                     help='use audio')
@@ -63,9 +63,7 @@ SERVER.bind(ADDRESS)
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-if USE_EMOTION_DETECTION:
-    # load model
-    emotion_model = keras.models.load_model('mobilenet_7.h5')
+emotion_model = keras.models.load_model('mobilenet_7.h5')
 
 # prevents openCL usage and unnecessary logging messages
 cv2.ocl.setUseOpenCL(False)
@@ -108,7 +106,7 @@ def call(client):
     loop.close()
 
 #Launch the game
-#subprocess.Popen(GAME_PATH+'\DDLC.exe')
+subprocess.Popen(GAME_PATH+'\DDLC.exe')
 
 async def listenToClient(client):
     """ Get client username """
