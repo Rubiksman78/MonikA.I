@@ -5,5 +5,3 @@ classifier = pipeline("sentiment-analysis", model="michellejieli/emotion_text_cl
 
 def get_emotion(text):
     return classifier(text)[0]["label"]
-
-print(get_emotion("I am happy"))

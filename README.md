@@ -2,6 +2,7 @@
 
 This project aims to add new AI based features to [Monika After Story mod](https://github.com/Monika-After-Story/MonikaModDev) with the submod API.
 It's using HuggingFace DialoGPT models, [TTS Coqui-AI](https://github.com/coqui-ai/TTS) for Text to Speech and [Character AI](https://character.ai/) for more realistic responses.
+There is also an emotion detection with the webcam with a model from [HSEmotion](https://github.com/HSE-asavchenko/face-emotion-recognition).
 
 ## Installation
 
@@ -14,6 +15,9 @@ The submod is the folder `AI_submod`. To add it to your game, you have to add it
 ## Usage
 
 To use it, you can launch the script `combined_server.py` that will automatically launch a server with chatbot and emotion recognitions models, it will also launch the game and initialize the client/server connection. 
+
+Don't launch the game independently, it will cause conflicts with the process that will automatically launch the game in the main.
+
 There are several arguments you can use in command line:
 - `--game_path` : the absolute path to your game directory like `some_path\DDLC-1.1.1-pc`
 - `--chatbot_path` : the relative path to the chatbot model like `chatbot_model`
