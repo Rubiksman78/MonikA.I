@@ -63,8 +63,6 @@ SERVER.bind(ADDRESS)
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-#Launch DDLC Game and wait for it to load
-
 if USE_EMOTION_DETECTION:
     # load model
     emotion_model = keras.models.load_model('mobilenet_7.h5')
@@ -109,7 +107,8 @@ def call(client):
     loop.run_until_complete(listenToClient(client))
     loop.close()
 
-subprocess.Popen(GAME_PATH+'\DDLC.exe')
+#Launch the game
+#subprocess.Popen(GAME_PATH+'\DDLC.exe')
 
 async def listenToClient(client):
     """ Get client username """

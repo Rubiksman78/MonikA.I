@@ -47,3 +47,5 @@ You have to create a json file `auth.json` with keys `USERNAME` and `PASSWORD` w
 
 You can change the voice used by replacing the extract `talk_13.wav` in the `audio` folder by another audio extract. The longer the extract, the longer the TTS will take to generate the audio at each turn.
 
+The features are available in a specific `AI` Talk menu in the game.
+![Talk menu](images/image_2.png)
