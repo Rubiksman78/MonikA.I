@@ -32,7 +32,7 @@ parser.add_argument('--use_character_ai', type=bool, default=True,
                     help='use character ai')
 parser.add_argument('--use_chatbot', type=bool, default=False,
                     help='use chatbot')
-parser.add_argument('--use_emotion_detection', type=bool, default=False, 
+parser.add_argument('--use_emotion_detection', type=bool, default=True, 
                     help='use emotion detection')
 parser.add_argument('--use_audio', type=bool, default=False,
                     help='use audio')

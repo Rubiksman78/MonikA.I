@@ -16,7 +16,7 @@ define negative_emotions = ["anger", "disgust", "fear", "sadness"]
 define positive_emotions = ["joy", "surprise"]
 define neutral_emotions = ["neutral"]
 
-define sentences_emotions {
+define sentences_emotions = {
     "angry": "I'm sorry [player], I didn't mean to upset you.",
     "disgusted": "What is going on ? If you feel like there is something wrong, please tell me.",
     "fearful": "Don't be afraid sweetie, I'm here for you.",
@@ -60,7 +60,7 @@ init 5 python:
     addEvent(Event(persistent.event_database,eventlabel="monika_torch",category=['ai'],prompt="Tell me about Pytorch",pool=True,unlocked=True))
 
 label monika_torch:
-    m "Okay sure [player]]."
+    m "Okay sure [player]."
     m "Pytorch is a deep learning framework."
     m "It's a bit more complicated than Tensorflow."
     m "But it's also more powerful."
@@ -94,7 +94,6 @@ label monika_chat:
         $ msg,emotion = msg.split("/g")
         $ gamedir = renpy.config.gamedir
         $ audio_exists = audio_file_exists(gamedir + "/Submods/AI_submod/audio/out.ogg")
-        m 1esa "The audio file exists: [audio_exists] at [gamedir]"
         if audio_exists:
             play sound "Submods/AI_submod/audio/out.ogg"
         #If there is too much text, divide it into several lines
@@ -134,21 +133,21 @@ label monika_cam:
         $ received_emotio = receiveMessage()
         
         if received_emotio == "angry":
-            m 1esa "[sentences_emotions["angry"]]"
+            m 1esa "[sentences_emotions['angry']]"
         elif received_emotio == "disgusted":
-            m 1esa "[sentences_emotions["disgusted"]]"
+            m 1esa "[sentences_emotions['disgusted']]"
         elif received_emotio == "fearful":
-            m 1esa "[sentences_emotions["fearful"]]"
+            m 1esa "[sentences_emotions['fearful']]"
         elif received_emotio == "happy":
-            m 1esa "[sentences_emotions["happy"]]"
+            m 1esa "[sentences_emotions['happy']]"
         elif received_emotio == "neutral":
-            m 1esa "[sentences_emotions["neutral"]]"
+            m 1esa "[sentences_emotions['neutral']]"
         elif received_emotio == "sad":
-            m 1esa "[sentences_emotions["sad"]]"
+            m 1esa "[sentences_emotions['sad']]"
         elif received_emotio == "surprised":
-            m 1esa "[sentences_emotions["surprised"]]"
+            m 1esa "[sentences_emotions['surprised']]"
         elif received_emotio == "no":
-            m 1esa "[sentences_emotions["no"]]"
+            m 1esa "[sentences_emotions['no']]"
         
         m 1esa "Do you want me to continue looking for you? !"
         $ my_msg = renpy.input("")
@@ -172,34 +171,34 @@ label emotion_minute:
     $ received_emotion = receiveMessage()
 
     if received_emotion == "angry":
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions["angry"]],'Window Reactions')
+        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['angry']],'Window Reactions')
         if not wrs_succes:
-            m 2lktpc "[sentences_emotions["angry"]]"
+            m 2lktpc "[sentences_emotions['angry']]"
     elif received_emotion == "disgusted":
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions["disgusted"]],'Window Reactions')
+        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['disgusted']],'Window Reactions')
         if not wrs_succes:
-            m 5eta "[sentences_emotions["disgusted"]]"
+            m 5eta "[sentences_emotions['disgusted']]"
     elif received_emotion == "fearful":
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions["fearful"]],'Window Reactions')
+        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['fearful']],'Window Reactions')
         if not wrs_succes:
-            m 1fkd "[sentences_emotions["fearful"]]"
+            m 1fkd "[sentences_emotions['fearful']]"
     elif received_emotion == "happy":
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions["happy"]],'Window Reactions')
+        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['happy']],'Window Reactions')
         if not wrs_succes:
-            m 1esa "[sentences_emotions["happy"]]"
+            m 1esa "[sentences_emotions['happy']]"
     elif received_emotion == "neutral":
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions["neutral"]],'Window Reactions')
+        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['neutral']],'Window Reactions')
         if not wrs_succes:
-            m 1esa "[sentences_emotions["neutral"]]"
+            m 1esa "[sentences_emotions['neutral']]"
     elif received_emotion == "sad":
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions["sad"]],'Window Reactions')
+        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['sad']],'Window Reactions')
         if not wrs_succes:
-            m 1esa "[sentences_emotions["sad"]]"
+            m 1esa "[sentences_emotions['sad']]"
     elif received_emotion == "surprised":
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions["surprised"]],'Window Reactions')
+        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['surprised']],'Window Reactions')
         if not wrs_succes:
-            m 1esa "[sentences_emotions["surprised"]]"
+            m 1esa "[sentences_emotions['surprised']]"
     elif received_emotion == "no": 
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions["no"]],'Window Reactions')
+        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['no']],'Window Reactions')
         if not wrs_succes:
-            m 1esa "[sentences_emotions["no"]]"
+            m 1esa "[sentences_emotions['no']]"
