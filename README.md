@@ -37,7 +37,7 @@ Don't launch the game independently, it will cause conflicts with the process th
 
 There are several arguments you can use in command line:
 - `--game_path` : the absolute path to your game directory like `some_path\DDLC-1.1.1-pc`
-- `--chatbot_path` : the relative path to the chatbot model like `chatbot_model`
+- `--chatbot_path` : the relative path to the chatbot model like `chatbot_model` (There is actually no model in the repository because of the better performances of the Character AI website)
 - `--use_character_ai` : if you want to use the character AI website, `True` or `False`
 - `--use_chatbot` : if you want to use the chatbot, `True` or `False`
 - `--use_emotion_detection` : if you want to use the emotion detection with the webcam, `True` or `False`

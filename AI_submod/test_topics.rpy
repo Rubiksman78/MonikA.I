@@ -89,7 +89,7 @@ label monika_chat:
             m 1esa "[sentence]"
         m 1esa "I was feeling [emotion]."
         if emotion in positive_emotions:
-            $ mas_gainAffection(1,bypass=True)
+            $ mas_gainAffection(1)
         elif emotion in negative_emotions:
             $ mas_loseAffection(1)
         $ step += 1
