@@ -25,7 +25,7 @@ PASSWORD = auth_dict["PASSWORD"]
 nest_asyncio.apply()
 
 #Argparse for game path, chatbot path, use character ai or not, use chatbot or not, use emotion detection or not
-parser = argparse.ArgumentParser(description='Process some integers.')
+parser = argparse.ArgumentParser(description='Add some arguments.')
 parser.add_argument('--game_path', type=str, default='C:\SAMUEL\ddlc-win\DDLC-1.1.1-pc',
                     help='path to game')
 parser.add_argument('--chatbot_path', type=str, default="output-large-3",
@@ -190,8 +190,9 @@ async def listenToClient(client):
                             msg = msg.encode("utf-8")   
                             sendMessage(msg + b"/g" + emotion)
                         break
+
+                    #TODO: Fix this: trying to send line by line for faster displaying in the game
                     """"
-                    
                     msg = await query[-1].inner_text()
                     #wait until line is finished
                     #split words    
