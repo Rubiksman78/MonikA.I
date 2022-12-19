@@ -10,7 +10,7 @@
 </p>
 
 This project aims to add new AI based features to [Monika After Story mod](https://github.com/Monika-After-Story/MonikaModDev) with the submod API.
-It's using HuggingFace DialoGPT models, [TTS Coqui-AI](https://github.com/coqui-ai/TTS) for Text to Speech and [Character AI](https://character.ai/) for more realistic responses.
+It's using HuggingFace DialoGPT models, [TTS Coqui-AI](https://github.com/coqui-ai/TTS) for Text to Speech and [Character AI](https://character.ai/) for more realistic responses. An [emotion detection from text model](https://huggingface.co/michellejieli/emotion_text_classifier) is also used linked with the chatbot.
 There is also emotion detection with the webcam with a model from [HSEmotion](https://github.com/HSE-asavchenko/face-emotion-recognition).
 
 
@@ -19,6 +19,7 @@ There is also emotion detection with the webcam with a model from [HSEmotion](ht
 - Allow Monika to finally see you through the webcam and react to your emotions
 - Speak without scripted text with Monika using the latest chatbots from Character AI or HuggingFace DialoGPT
 - Hear Monika speak with a Text to Speech module using extracts of voiced dialogues (still in development)
+- Gain affection points by talking with Monika, the more you make her feel positive emotions, the more she will love you (with respect to the daily cap). Be careful, she can also feel negative emotions and lose affection points.
 
 ![Character AI](images/image_1.png)
 ## ❓Installation
