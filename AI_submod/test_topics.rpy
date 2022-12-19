@@ -115,13 +115,21 @@ label monika_cam:
         $ received_emotio = receiveMessage()
         
         if received_emotio == "angry":
+<<<<<<< HEAD
             m 1esa "I'm sorry sweetie, I didn't mean to upset you."
+=======
+            m 1esa "I'm sorry honey, I didn't mean to upset you."
+>>>>>>> f1da7b1911d0909e63b17bca2023e3f7e4cce67c
         elif received_emotio == "disgusted":
             m 1esa "What is going on ? If you feel like there is something wrong, please tell me."
         elif received_emotio == "fearful":
             m 1esa "Don't be afraid honey, I'm here for you."
         elif received_emotio == "happy":
+<<<<<<< HEAD
             m 1esa "I'm glad you're happy, I love you."
+=======
+            m 1esa "I'm glad you're happy honey."
+>>>>>>> f1da7b1911d0909e63b17bca2023e3f7e4cce67c
         elif received_emotio == "neutral":
             m 1esa "Let's do something fun together!"
         elif received_emotio == "sad":
