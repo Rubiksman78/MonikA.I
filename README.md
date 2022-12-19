@@ -19,7 +19,7 @@ There is also emotion detection with the webcam with a model from [HSEmotion](ht
 - Allow Monika to finally see you through the webcam and react to your emotions
 - Speak without scripted text with Monika using the latest chatbots from Character AI or HuggingFace DialoGPT
 - Hear Monika speak with a Text to Speech module using extracts of voiced dialogues (still in development)
-- Gain affection points by talking with Monika, the more you make her feel positive emotions, the more she will love you (with respect to the daily cap). Be careful, she can also feel negative emotions and lose affection points.
+- Gain affection points by talking with Monika, the more you make her feel positive emotions, the more she will love you.
 
 ![Character AI](images/image_1.png)
 ## ❓Installation
@@ -50,8 +50,14 @@ You can change the voice used by replacing the extract `talk_13.wav` in the `aud
 
 When the browser page launches, you now have to solve the captcha yourself and then go back to the game.
 
+## :video_game: In Game
+
 The features are available in a specific `AI` Talk menu in the game.
 ![Talk menu](images/image_2.png)
+
+- Click on `Let's chat together` to use the Character AI Chatbot
+- Click on `Look for me` to use the facial emotions detection in an interactive session
+- Click on `Tell me about Pytorch' if you think it is superior to Tensorflow
 
 ## :alarm_clock: To develop
 - Convert `playwright` browser simulator to python `requests` for faster run and no parasite window
