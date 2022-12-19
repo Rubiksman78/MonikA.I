@@ -57,7 +57,7 @@ The features are available in a specific `AI` Talk menu in the game.
 
 - Click on `Let's chat together` to use the Character AI Chatbot
 - Click on `Look for me` to use the facial emotions detection in an interactive session
-- Click on 'Tell me about Pytorch' if you think it is superior to Tensorflow
+- Click on `Tell me about Pytorch' if you think it is superior to Tensorflow
 
 ## :alarm_clock: To develop
 - Convert `playwright` browser simulator to python `requests` for faster run and no parasite window
