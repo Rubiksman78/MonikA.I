@@ -41,7 +41,9 @@ There are several arguments you can use in command line:
 - `--use_character_ai` : if you want to use the character AI website, `True` or `False`
 - `--use_chatbot` : if you want to use the chatbot, `True` or `False`
 - `--use_emotion_detection` : if you want to use the emotion detection with the webcam, `True` or `False`
-- `--use_audio` : if you want to use the TTS module, `True` or `False`
+- `--use_audio` : if you want to use the TTS module, `True` or `False`. Warning, the audio model is quite long to load, so it can take a while before the sound plays.
 
-You have to create a json file `auth.json` with keys `USERNAME` and `PASSWORD` with your credentials for the character AI website.
+You have to create a json file `auth.json` with keys `USERNAME` and `PASSWORD` with your credentials for the character AI website
+
+You can change the voice used by replacing the extract `talk_13.wav` in the `audio` folder by another audio extract. The longer the extract, the longer the TTS will take to generate the audio at each turn.
 

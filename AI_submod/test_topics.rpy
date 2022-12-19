@@ -32,6 +32,9 @@ init 7 python:
     def send_simple(prefix):
         client_socket.send(bytes(prefix).encode("utf8"))
 
+    def audio_file_exists(filename):
+        return os.path.isfile(filename)
+
     HOST = "127.0.0.1"
     PORT = 12346
 
@@ -70,13 +73,19 @@ label monika_chat:
     $ step = 0
     
     while True:
+        #$ empty_socket(client_socket)
+        #$ client_socket.setblocking(1)
         $ send_simple("chatbot")
         $ my_msg = sendMessage("Speak with Monika:",str(step)) 
         if my_msg == "QUIT":
             return
         $ msg = receiveMessage()
         $ msg,emotion = msg.split("/g")
-        play sound "Submods/AI_submod/audio/out.ogg"
+        $ gamedir = renpy.config.gamedir
+        $ audio_exists = audio_file_exists(gamedir + "/Submods/AI_submod/audio/out.ogg")
+        m 1esa "The audio file exists: [audio_exists] at [gamedir]"
+        if audio_exists:
+            play sound "Submods/AI_submod/audio/out.ogg"
         #If there is too much text, divide it into several lines
         #Split the text into a list of words
         $ sentences_list = []
@@ -93,7 +102,6 @@ label monika_chat:
         elif emotion in negative_emotions:
             $ mas_loseAffection(1)
         $ step += 1
-
 
 #Camera Event
 init 5 python:
@@ -115,21 +123,13 @@ label monika_cam:
         $ received_emotio = receiveMessage()
         
         if received_emotio == "angry":
-<<<<<<< HEAD
-            m 1esa "I'm sorry sweetie, I didn't mean to upset you."
-=======
             m 1esa "I'm sorry honey, I didn't mean to upset you."
->>>>>>> f1da7b1911d0909e63b17bca2023e3f7e4cce67c
         elif received_emotio == "disgusted":
             m 1esa "What is going on ? If you feel like there is something wrong, please tell me."
         elif received_emotio == "fearful":
             m 1esa "Don't be afraid honey, I'm here for you."
         elif received_emotio == "happy":
-<<<<<<< HEAD
-            m 1esa "I'm glad you're happy, I love you."
-=======
             m 1esa "I'm glad you're happy honey."
->>>>>>> f1da7b1911d0909e63b17bca2023e3f7e4cce67c
         elif received_emotio == "neutral":
             m 1esa "Let's do something fun together!"
         elif received_emotio == "sad":
@@ -150,7 +150,8 @@ label monika_cam:
 #Emotion Event
 init 5 python:
     def example_fun():
-        MASEventList.push("emotion_minute") 
+        #MASEventList.push("emotion_minute")
+        return 
 
     store.mas_submod_utils.registerFunction(
         "ch30_minute",
