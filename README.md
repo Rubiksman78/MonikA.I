@@ -20,6 +20,7 @@ There is also an emotion detection with the webcam with a model from [HSEmotion]
 - Speak without scripted text with Monika using the latest chatbots from Character AI or HuggingFace DialoGPT
 - Hear Monika speak with a Text to Speech module using extracts of voiced dialogues (still in development)
 
+![Character AI](images/image_1.png)
 ## ❓Installation
 
 Run the setup with ```bash setup.sh``` that will install the requirements for the project and the requirements for the TTS module.

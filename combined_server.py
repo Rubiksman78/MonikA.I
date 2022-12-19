@@ -28,7 +28,7 @@ parser.add_argument('--game_path', type=str, default='C:\SAMUEL\ddlc-win\DDLC-1.
                     help='path to game')
 parser.add_argument('--chatbot_path', type=str, default="output-large-3",
                     help='path to chatbot')
-parser.add_argument('--use_character_ai', type=bool, default=False,
+parser.add_argument('--use_character_ai', type=bool, default=True,
                     help='use character ai')
 parser.add_argument('--use_chatbot', type=bool, default=False,
                     help='use chatbot')
