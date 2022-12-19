@@ -28,11 +28,11 @@ parser.add_argument('--game_path', type=str, default='C:\SAMUEL\ddlc-win\DDLC-1.
                     help='path to game')
 parser.add_argument('--chatbot_path', type=str, default="output-large-3",
                     help='path to chatbot')
-parser.add_argument('--use_character_ai', type=bool, default=False,
+parser.add_argument('--use_character_ai', type=bool, default=True,
                     help='use character ai')
 parser.add_argument('--use_chatbot', type=bool, default=False,
                     help='use chatbot')
-parser.add_argument('--use_emotion_detection', type=bool, default=False, 
+parser.add_argument('--use_emotion_detection', type=bool, default=True, 
                     help='use emotion detection')
 parser.add_argument('--use_audio', type=bool, default=False,
                     help='use audio')
@@ -91,8 +91,8 @@ async def launch():
     await page.click('[class=" btn border"]')
     await page.fill("input#username",USERNAME)
     await page.fill("input#password",PASSWORD)
-    await page.click("button[type=submit]")
-    await page.click('[href="/chats"]')
+    #await page.click("button[type=submit]") #Now we have to click the button manually
+    await page.click('[href="/chats"]',delay=10000)
     await page.click('[href="/chat?char=e9UVQuLURpLyCdhi8OjSKSLwKIiE0U-nEqXDeAjk538"]')
     await page.click('[class="col-auto px-2 dropdown"]')
     await page.click('text=Save and Start New Chat')
