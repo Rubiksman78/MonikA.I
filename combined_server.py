@@ -2,8 +2,6 @@ from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
-from socket import AF_INET, socket, SOCK_STREAM
-from threading import Thread
 import numpy as np
 import cv2
 import os
@@ -34,7 +32,7 @@ parser.add_argument('--use_chatbot', type=bool, default=False,
                     help='use chatbot')
 parser.add_argument('--use_emotion_detection', type=bool, default=True, 
                     help='use emotion detection')
-parser.add_argument('--use_audio', type=bool, default=False,
+parser.add_argument('--use_audio', type=bool, default=True,
                     help='use audio')
 
 args = parser.parse_args()
@@ -92,7 +90,9 @@ async def launch():
     await page.fill("input#username",USERNAME)
     await page.fill("input#password",PASSWORD)
     #await page.click("button[type=submit]") #Now we have to click the button manually
-    await page.click('[href="/chats"]',delay=5000)
+    while not await page.is_visible('[href="/chats"]'):
+        await asyncio.sleep(1)
+    await page.click('[href="/chats"]')
     await page.click('[href="/chat?char=e9UVQuLURpLyCdhi8OjSKSLwKIiE0U-nEqXDeAjk538"]')
     await page.click('[class="col-auto px-2 dropdown"]')
     await page.click('text=Save and Start New Chat')
@@ -112,14 +112,15 @@ async def listenToClient(client):
     """ Get client username """
     name = "User"
     clients[client] = name
+    if USE_CHARACTER_AI:
+        page = asyncio.run(launch())
     while True:
         received_msg = client.recv(BUFSIZE).decode("utf-8")
         if received_msg == "chatbot":
-            if USE_CHARACTER_AI:
-                page = asyncio.run(launch())
             received_msg = client.recv(BUFSIZE).decode("utf-8")
             received_msg , step = received_msg.split("/g")
             step = int(step)
+            
             if USE_CHATBOT:
                 new_user_input_ids = tokenizer.encode(received_msg + tokenizer.eos_token, return_tensors='pt')
                 bot_input_ids = torch.cat([chat_history_ids[:, bot_input_ids.shape[-1]:][-2:], new_user_input_ids], dim=-1) if step > 2 else new_user_input_ids
