@@ -62,6 +62,7 @@ label monika_torch:
 init 5 python:
     addEvent(Event(persistent.event_database,eventlabel="monika_chat",category=['ai'],prompt="Let's chat together",pool=True,unlocked=True))
 
+define step = 0
 label monika_chat:
     init python:
         #Define all poses liek "1esa"
@@ -69,12 +70,15 @@ label monika_chat:
      
     m "Sure [player], talk to me as much as you want. I won't go anywhere ehehe~"
 
-    $ step = 0
     while True:
         $ send_simple("chatbot")
         $ my_msg = sendMessage("Speak with Monika:",str(step)) 
         if my_msg == "QUIT":
             return
+        if step == 0:
+            $ server_status = receiveMessage() #Check if the browser managed to open
+            if server_status == "server_error":
+                jump server_crashed
         $ msg = receiveMessage()
         $ msg,emotion = msg.split("/g")
         $ gamedir = renpy.config.gamedir
@@ -98,6 +102,11 @@ label monika_chat:
         #     $ mas_loseAffection(1)
         $ step += 1
 
+label server_crashed:
+    m "Oh sorry [player], it seems that there is a bug somewhere."
+    m "I will try to fix it as soon as possible."
+    m "Let's talk again later, I'm sorry sweetheart."
+
 #Camera Event
 init 5 python:
     addEvent(Event(persistent.event_database,
@@ -115,7 +124,7 @@ label monika_cam:
     m 5nublb "I see your cute face now ehehe~"
 
     while True:
-        $ send_simple("camera")
+        $ send_simple("camera_int")
         $ received_emotio = receiveMessage()
         
         if received_emotio == "angry":
@@ -159,13 +168,12 @@ init 5 python:
     
 label emotion_minute:
     $ counter += 1
-    $ send_simple("camera")
-    $ send_simple(counter) #The counter indicates to the server the number of minutes that have passed since the last emotion was sent
+    $ send_simple("camera" + str(counter))
     $ received_emotion = receiveMessage()
 
     if received_emotion == "no_data": #If the server says it is not time to send an emotion,do nothing
         return
-        
+
     if received_emotion == "angry":
         $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['angry']],'Window Reactions')
         if not wrs_succes:

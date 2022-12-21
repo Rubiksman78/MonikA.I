@@ -124,6 +124,7 @@ async def listenToClient(client):
     
     while True:
         received_msg = client.recv(BUFSIZE).decode("utf-8")
+        print(received_msg)
         if received_msg == "chatbot":
             received_msg = client.recv(BUFSIZE).decode("utf-8")
             received_msg , step = received_msg.split("/g")
@@ -148,7 +149,12 @@ async def listenToClient(client):
 
             if USE_CHARACTER_AI:
                 if step == 0:
-                    page = asyncio.run(launch())
+                    try:
+                        page = asyncio.run(launch())
+                        sendMessage("server_ok".encode("utf-8"))
+                    except:
+                        sendMessage("server_error".encode("utf-8"))
+                        continue
                 if os.path.exists(GAME_PATH+'/game/Submods/AI_submod/audio/out.ogg'):
                     os.remove(GAME_PATH+'/game/Submods/AI_submod/audio/out.ogg')
                 if received_msg == "QUIT":
@@ -226,8 +232,40 @@ async def listenToClient(client):
                         previous_msg = msg
                     """
                     
-        elif received_msg == "camera":
-            counter = client.recv(BUFSIZE).decode("utf-8")
+        elif received_msg == "camera_int":
+            # start the webcam feed
+            cap = cv2.VideoCapture(0)
+            # Find haar cascade to draw bounding box around face
+            ret, frame = cap.read()
+            if not ret:
+                break
+            facecasc = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+            gray = np.array(frame, dtype='uint8')
+            faces = facecasc.detectMultiScale(gray,scaleFactor=1.3, minNeighbors=5)
+
+            emotion = None
+            for (x, y, w, h) in faces:
+                cv2.rectangle(frame, (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
+                roi_gray = gray[y:y + h, x:x + w]
+                cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (224, 224)), -1), 0)
+                prediction = emotion_model.predict(cropped_img) #for keras model
+                maxindex = int(np.argmax(prediction))
+                emotion  = emotion_dict[maxindex]
+
+            if emotion == None:
+                emotion = "No"
+
+            msg = emotion.lower()
+            
+            cap.release()
+            cv2.destroyAllWindows()
+
+            msg = msg.encode()
+            sendMessage(msg)
+
+        else:
+            counter = received_msg[6:]
+            #counter = client.recv(BUFSIZE).decode("utf-8")
             counter = int(counter)
             if counter % EMOTION_TIME == 0:
                 # start the webcam feed
@@ -269,6 +307,7 @@ async def listenToClient(client):
                 msg = "no_data"
                 msg = msg.encode()
                 sendMessage(msg)
+
 
 def sendMessage(msg, name=""):
     """ send message to all users present in 
