@@ -46,10 +46,9 @@ There are several arguments you can use in command line:
 - `--use_audio` : if you want to use the TTS module, `True` or `False`. Warning, the audio model is quite long to load, so it can take a while before the sound plays.
 
 You have to create a json file `auth.json` with keys `USERNAME` and `PASSWORD` with your credentials for the character AI website
+When the browser page launches, you may have to solve the captcha yourself and then go back to the game, your ids will be filled automatically.
 
 You can change the voice used by replacing the extract `talk_13.wav` in the `audio` folder by another audio extract. The longer the extract, the longer the TTS will take to generate the audio at each turn.
-
-When the browser page launches, you now have to solve the captcha yourself and then go back to the game.
 
 ## :video_game: In Game
 
