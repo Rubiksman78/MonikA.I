@@ -17,10 +17,10 @@ define positive_emotions = ["joy", "surprise"]
 define neutral_emotions = ["neutral"]
 
 define sentences_emotions = {
-    "angry": "I'm sorry [player], I didn't mean to upset you.",
+    "angry": "I'm sorry my love, I didn't mean to upset you.",
     "disgusted": "What is going on ? If you feel like there is something wrong, please tell me.",
     "fearful": "Don't be afraid sweetie, I'm here for you.",
-    "happy": "I'm glad you're happy [player].",
+    "happy": "I'm glad you're happy darling.",
     "neutral": "Let's do something fun together!",
     "sad": "If you feel down, always remember that I'm here for you. I love you.",
     "surprised": "What is it ? Is there something wrong ?",
@@ -60,7 +60,7 @@ init 5 python:
     addEvent(Event(persistent.event_database,eventlabel="monika_torch",category=['ai'],prompt="Tell me about Pytorch",pool=True,unlocked=True))
 
 label monika_torch:
-    m "Okay sure [player]."
+    m "Okay sure love."
     m "Pytorch is a deep learning framework."
     m "It's a bit more complicated than Tensorflow."
     m "But it's also more powerful."
@@ -147,7 +147,7 @@ label monika_cam:
         elif received_emotio == "no":
             m 6ektuc "[sentences_emotions[no]]"
         
-        m 1esa "Do you want me to continue looking for you?"
+        m 5nublb "Do you want me to continue looking for you?"
         $ my_msg = renpy.input("")
         if my_msg == "No" or my_msg == "no" or my_msg == "NO":
             return
@@ -156,7 +156,8 @@ label monika_cam:
 #Emotion Event
 init 5 python:
     def example_fun():
-        MASEventList.push("emotion_minute")
+        if not mas_inEVL("emotion_minute"):
+            MASEventList.push("emotion_minute")
 
     store.mas_submod_utils.registerFunction(
         "ch30_minute",

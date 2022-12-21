@@ -89,9 +89,11 @@ async def launch():
     await page.click('[class=" btn border"]')
     await page.fill("input#username",USERNAME)
     await page.fill("input#password",PASSWORD)
-    #await page.click("button[type=submit]") #Now we have to click the button manually
-    while not await page.is_visible('[href="/chats"]'):
-        await asyncio.sleep(1)
+    if await page.is_visible('[id="recaptcha-anchor-label"]'): #If there is a captcha,solve it manually, submit, and then continue
+        while not await page.is_visible('[href="/chats"]'):
+            await asyncio.sleep(1)
+    else:
+        await page.click("button[type=submit]") #If there is no captcha
     await page.click('[href="/chats"]')
     await page.click('[href="/chat?char=e9UVQuLURpLyCdhi8OjSKSLwKIiE0U-nEqXDeAjk538"]')
     await page.click('[class="col-auto px-2 dropdown"]')
@@ -158,10 +160,8 @@ async def listenToClient(client):
                         query = await page.query_selector_all(('[class="markdown-wrapper markdown-wrapper-last-msg swiper-no-swiping"]'))
                         msg = await query[0].inner_html()
                         
-                        #replace <em> with {i} and </em> with {/i}
                         msg = msg.replace("<em>","{i}")
                         msg = msg.replace("</em>","{/i}")
-                        #remove <div> and </div>, <p> and </p>
                         msg = msg.replace("<div>","")
                         msg = msg.replace("</div>","")
                         msg = msg.replace("<p>","\n")
@@ -175,6 +175,7 @@ async def listenToClient(client):
                             #Text to speech, save wav to wav_audios folder
                             if USE_AUDIO:
                                 msg_audio = msg.replace("\n"," ")
+                                msg_audio = msg_audio.replace("{i}","")
                                 subprocess.check_call(['tts', '--text', msg_audio, '--model_name', 'tts_models/multilingual/multi-dataset/your_tts', '--speaker_wav', 'audios/talk_13.wav', '--language_idx', 'en', '--out_path', GAME_PATH + '/game/Submods/AI_submod/audio/out.wav'])
                                 f = open(GAME_PATH+'/game/Submods/AI_submod/audio/out.wav', 'rb')
                                 AudioSegment.from_wav(f).export(GAME_PATH+'/game/Submods/AI_submod/audio/out.ogg', format='ogg')
