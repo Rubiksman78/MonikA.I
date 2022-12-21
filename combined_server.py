@@ -19,6 +19,7 @@ auth_dict = json.load(open("auth.json"))
 USERNAME = auth_dict["USERNAME"]
 PASSWORD = auth_dict["PASSWORD"]
 nest_asyncio.apply()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 #Argparse for game path, chatbot path, use character ai or not, use chatbot or not, use emotion detection or not
 parser = argparse.ArgumentParser(description='Add some arguments.')
@@ -32,8 +33,10 @@ parser.add_argument('--use_chatbot', type=bool, default=False,
                     help='use chatbot')
 parser.add_argument('--use_emotion_detection', type=bool, default=True, 
                     help='use emotion detection')
-parser.add_argument('--use_audio', type=bool, default=True,
+parser.add_argument('--use_audio', type=bool, default=False,
                     help='use audio')
+parser.add_argument('--emotion_time', type=int, default=5,
+                    help='time between camera captures')
 
 args = parser.parse_args()
 
@@ -43,6 +46,7 @@ USE_CHARACTER_AI = args.use_character_ai
 USE_CHATBOT = args.use_chatbot
 USE_EMOTION_DETECTION = args.use_emotion_detection
 USE_AUDIO = args.use_audio
+EMOTION_TIME = args.emotion_time
 
 # Global variables 
 clients = {}
@@ -62,6 +66,7 @@ SERVER.bind(ADDRESS)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 emotion_model = keras.models.load_model('mobilenet_7.h5')
+#emotion_model = torch.load('enet_b2_7.pt').to(device)
 
 # prevents openCL usage and unnecessary logging messages
 cv2.ocl.setUseOpenCL(False)
@@ -91,7 +96,7 @@ async def launch():
     await page.fill("input#password",PASSWORD)
     try:
         await page.click("button[type=submit]") #If there is no captcha
-        await page.click('[href="/chats"]',timeout=3000)
+        await page.click('[href="/chats"]',timeout=10000)
     except:
         await page.fill("input#password",PASSWORD)
         while not await page.is_visible('[href="/chats"]'):
@@ -116,8 +121,7 @@ async def listenToClient(client):
     """ Get client username """
     name = "User"
     clients[client] = name
-    if USE_CHARACTER_AI:
-        page = asyncio.run(launch())
+    
     while True:
         received_msg = client.recv(BUFSIZE).decode("utf-8")
         if received_msg == "chatbot":
@@ -143,6 +147,8 @@ async def listenToClient(client):
                 sendMessage(msg)
 
             if USE_CHARACTER_AI:
+                if step == 0:
+                    page = asyncio.run(launch())
                 if os.path.exists(GAME_PATH+'/game/Submods/AI_submod/audio/out.ogg'):
                     os.remove(GAME_PATH+'/game/Submods/AI_submod/audio/out.ogg')
                 if received_msg == "QUIT":
@@ -157,8 +163,6 @@ async def listenToClient(client):
                         pass
                 while True:
                     if not await page.is_disabled('[class="btn py-0"]'):
-                        #done_msg = "DONE"
-                        #sendMessage(done_msg.encode("utf-8"))
                         query = await page.query_selector_all(('[class="markdown-wrapper markdown-wrapper-last-msg swiper-no-swiping"]'))
                         msg = await query[0].inner_html()
                         
@@ -222,44 +226,49 @@ async def listenToClient(client):
                         previous_msg = msg
                     """
                     
-                
-            """
-            if msg.count('!') > 3:
-                msg = msg.replace('!', ' ')
-            if msg.count('?') > 3:
-                msg = msg.replace('?', ' ')
-            """
-
         elif received_msg == "camera":
-            # start the webcam feed
-            cap = cv2.VideoCapture(0)
-            # Find haar cascade to draw bounding box around face
-            ret, frame = cap.read()
-            if not ret:
-                break
-            facecasc = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-            gray = np.array(frame, dtype='uint8')
-            faces = facecasc.detectMultiScale(gray,scaleFactor=1.3, minNeighbors=5)
+            counter = client.recv(BUFSIZE).decode("utf-8")
+            counter = int(counter)
+            if counter % EMOTION_TIME == 0:
+                # start the webcam feed
+                cap = cv2.VideoCapture(0)
+                # Find haar cascade to draw bounding box around face
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                facecasc = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+                gray = np.array(frame, dtype='uint8')
+                faces = facecasc.detectMultiScale(gray,scaleFactor=1.3, minNeighbors=5)
 
-            emotion = None
-            for (x, y, w, h) in faces:
-                cv2.rectangle(frame, (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
-                roi_gray = gray[y:y + h, x:x + w]
-                cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (224, 224)), -1), 0)
-                prediction = emotion_model.predict(cropped_img)
-                maxindex = int(np.argmax(prediction))
-                emotion  = emotion_dict[maxindex]
+                emotion = None
+                for (x, y, w, h) in faces:
+                    cv2.rectangle(frame, (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
+                    roi_gray = gray[y:y + h, x:x + w]
+                    cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (224, 224)), -1), 0)
+                    prediction = emotion_model.predict(cropped_img) #for keras model
 
-            if emotion == None:
-                emotion = "No"
+                    # cropped_img = torch.from_numpy(cropped_img).float().to(device)
+                    # cropped_img = cropped_img.view(1, 3, 224, 224)
+                    # prediction = emotion_model(cropped_img)
+                    # prediction = prediction.detach().cpu().numpy()
 
-            msg = emotion.lower()
-            
-            cap.release()
-            cv2.destroyAllWindows()
+                    maxindex = int(np.argmax(prediction))
+                    emotion  = emotion_dict[maxindex]
 
-            msg = msg.encode()
-            sendMessage(msg)
+                if emotion == None:
+                    emotion = "No"
+
+                msg = emotion.lower()
+                
+                cap.release()
+                cv2.destroyAllWindows()
+
+                msg = msg.encode()
+                sendMessage(msg)
+            else:
+                msg = "no_data"
+                msg = msg.encode()
+                sendMessage(msg)
 
 def sendMessage(msg, name=""):
     """ send message to all users present in 

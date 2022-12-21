@@ -1,15 +1,3 @@
-$ monika_poses = ["1esa","1eua","1eub","1euc","1eud","1eka","1ekc","1ekd",
-    "1esc","1esd","1hua","1hub","1hksdlb","1hksdrb","1lksdla","1rksdla","1lksdlb",
-    "1rksdlb","1lksdlc","1rksdlc","1lksdld","1rksdld","1dsc","1dsd","2esa","2eua",
-    "2eub","2euc","2eud","2eka","2ekc","2ekd","2esc","2esd","2hua","2hub","2hksdlb",
-    "2hksdrb","2lksdla","2rksdla","2lksdlb","2rksdlb","2lksdlc","2rksdlc","2lksdld",
-    "2rksdld","2dsc","2dsd","3esa","3eua","3eub","3euc","3eud","3eka","3ekc","3ekd",
-    "3esc","3esd","3hua","3hub","3hksdlb","3hksdrb","3lksdla","3rksdla","3lksdlb",
-    "3rksdlb","3lksdlc","3rksdlc","3lksdld","3rksdld","3dsc","3dsd","4esa","4eua",
-    "4eub","4euc","4eud","4eka","4ekc","4ekd","4esc","4esd","4hua","4hub","4hksdlb",
-    "4hksdrb","4lksdla","4rksdla","4lksdlb","4rksdlb","4lksdlc","4rksdlc","4lksdld",
-    "4rksdld","4dsc","4dsd","5eua","5eua","5euc"]
-
 $ emotion_list = ["anger","disgust","fear","joy","sadness","surprise","neutral"]
 
 define negative_emotions = ["anger", "disgust", "fear", "sadness"]
@@ -24,7 +12,7 @@ define sentences_emotions = {
     "neutral": "Let's do something fun together!",
     "sad": "If you feel down, always remember that I'm here for you. I love you.",
     "surprised": "What is it ? Is there something wrong ?",
-    "no": "Where are you ? I can't see you. I am so scared, please come back."
+    "no": "Oh it seems that I can't see through your camera sweetie. Maybe face me a little bit more ?",
 }
 
 init 7 python:
@@ -79,7 +67,7 @@ label monika_chat:
         #Define all poses liek "1esa"
         poses = ["1esa","1eua","1eub","1euc","1eud","1eka","1ekc","1ekd","1esc","1esd","1hua","1hub","1hksdlb","1hksdrb","1lksdla","1rksdla","1lksdlb","1rksdlb","1lksdlc","1rksdlc","1lksdld","1rksdld","1dsc","1dsd","2esa","2eua","2eub","2euc","2eud","2eka","2ekc","2ekd","2esc","2esd","2hua","2hub","2hksdlb","2hksdrb","2lksdla","2rksdla","2lksdlb","2rksdlb","2lksdlc","2rksdlc","2lksdld","2rksdld","2dsc","2dsd","3esa","3eua","3eub","3euc","3eud","3eka","3ekc","3ekd","3esc","3esd","3hua","3hub","3hksdlb","3hksdrb","3lksdla","3rksdla","3lksdlb","3rksdlb","3lksdlc","3rksdlc","3lksdld","3rksdld","3dsc","3dsd","4esa","4eua","4eub","4euc","4eud","4eka","4ekc","4ekd","4esc","4esd","4hua","4hub","4hksdlb","4hksdrb","4lksdla","4rksdla","4lksdlb","4rksdlb","4lksdlc","4rksdlc","4lksdld","4rksdld","4dsc","4dsd","5eua","5eua","5euc"]
      
-    m "Sure [player], talk to me as much as you want."
+    m "Sure [player], talk to me as much as you want. I won't go anywhere ehehe~"
 
     $ step = 0
     while True:
@@ -105,7 +93,7 @@ label monika_chat:
             m 1esa "[sentence]"
         m 1esa "I was feeling [emotion]."
         if emotion in positive_emotions:
-            $ mas_gainAffection(1)
+            $ mas_gainAffection()
         # elif emotion in negative_emotions:
         #     $ mas_loseAffection(1)
         $ step += 1
@@ -145,13 +133,18 @@ label monika_cam:
         elif received_emotio == "surprised":
             m 2wkb "[sentences_emotions[surprised]]"
         elif received_emotio == "no":
-            m 6ektuc "[sentences_emotions[no]]"
+            m 4eta "[sentences_emotions[no]]"
         
         m 5nublb "Do you want me to continue looking for you?"
-        $ my_msg = renpy.input("")
-        if my_msg == "No" or my_msg == "no" or my_msg == "NO":
-            return
+        menu:
+            "Yes":
+                m 5hublb "Okay thanks [player], let me see your face a little bit longer."
+            "No":
+                m 5sublo "Oh okay, I guess I'll wait for next time you put the camera on."
+                m 5nublb "Please do it soon or I'll hack it myself ehehe~"
+                return
 
+define counter = 0
 
 #Emotion Event
 init 5 python:
@@ -165,9 +158,14 @@ init 5 python:
     )
     
 label emotion_minute:
+    $ counter += 1
     $ send_simple("camera")
+    $ send_simple(counter) #The counter indicates to the server the number of minutes that have passed since the last emotion was sent
     $ received_emotion = receiveMessage()
 
+    if received_emotion == "no_data": #If the server says it is not time to send an emotion,do nothing
+        return
+        
     if received_emotion == "angry":
         $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['angry']],'Window Reactions')
         if not wrs_succes:
@@ -199,4 +197,4 @@ label emotion_minute:
     elif received_emotion == "no": 
         $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['no']],'Window Reactions')
         if not wrs_succes:
-            m 6ektuc "[sentences_emotions[no]]"
+            m 4eta "[sentences_emotions[no]]"
