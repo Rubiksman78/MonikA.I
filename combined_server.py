@@ -89,12 +89,14 @@ async def launch():
     await page.click('[class=" btn border"]')
     await page.fill("input#username",USERNAME)
     await page.fill("input#password",PASSWORD)
-    if await page.is_visible('[id="recaptcha-anchor-label"]'): #If there is a captcha,solve it manually, submit, and then continue
+    try:
+        await page.click("button[type=submit]") #If there is no captcha
+        await page.click('[href="/chats"]',timeout=3000)
+    except:
+        await page.fill("input#password",PASSWORD)
         while not await page.is_visible('[href="/chats"]'):
             await asyncio.sleep(1)
-    else:
-        await page.click("button[type=submit]") #If there is no captcha
-    await page.click('[href="/chats"]')
+        await page.click('[href="/chats"]')
     await page.click('[href="/chat?char=e9UVQuLURpLyCdhi8OjSKSLwKIiE0U-nEqXDeAjk538"]')
     await page.click('[class="col-auto px-2 dropdown"]')
     await page.click('text=Save and Start New Chat')
@@ -176,6 +178,8 @@ async def listenToClient(client):
                             if USE_AUDIO:
                                 msg_audio = msg.replace("\n"," ")
                                 msg_audio = msg_audio.replace("{i}","")
+                                msg_audio = msg_audio.replace("{/i}",".")
+                                msg_audio = msg_audio.replace("~","!")
                                 subprocess.check_call(['tts', '--text', msg_audio, '--model_name', 'tts_models/multilingual/multi-dataset/your_tts', '--speaker_wav', 'audios/talk_13.wav', '--language_idx', 'en', '--out_path', GAME_PATH + '/game/Submods/AI_submod/audio/out.wav'])
                                 f = open(GAME_PATH+'/game/Submods/AI_submod/audio/out.wav', 'rb')
                                 AudioSegment.from_wav(f).export(GAME_PATH+'/game/Submods/AI_submod/audio/out.ogg', format='ogg')
