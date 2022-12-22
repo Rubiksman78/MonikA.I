@@ -85,8 +85,8 @@ SERVER.bind(ADDRESS)
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-#emotion_model = keras.models.load_model('mobilenet_7.h5')
-emotion_model = torch.load('enet_b2_7.pt').to(device)
+#emotion_model = keras.models.load_model('models/mobilenet_7.h5')
+emotion_model = torch.load('models/enet_b2_7.pt').to(device)
 
 # prevents openCL usage and unnecessary logging messages
 cv2.ocl.setUseOpenCL(False)
@@ -257,7 +257,6 @@ async def listenToClient(client):
         elif received_msg == "camera_int":
             # start the webcam feed
             cap = cv2.VideoCapture(0)
-            # Find haar cascade to draw bounding box around face
             ret, frame = cap.read()
             if not ret:
                 break
@@ -293,7 +292,6 @@ async def listenToClient(client):
             if counter % EMOTION_TIME == 0:
                 # start the webcam feed
                 cap = cv2.VideoCapture(0)
-                # Find haar cascade to draw bounding box around face
                 ret, frame = cap.read()
                 if not ret:
                     break
