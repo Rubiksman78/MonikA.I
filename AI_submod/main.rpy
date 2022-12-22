@@ -1,3 +1,22 @@
+init -990 python in mas_submod_utils:
+    Submod(
+        author="Rubiksman78",
+        name="MonikAI",
+        description="AI based features for MAS.",
+        version="1.0.1",
+        version_updates = {}
+    )
+
+# Register the updater
+init -989 python:
+    if store.mas_submod_utils.isSubmodInstalled("Submod Updater Plugin"):
+        store.sup_utils.SubmodUpdater(
+            submod="MonikAI",
+            user_name="Rubiksman78",
+            repository_name="Monik.A.I",
+            update_dir="",
+        )
+
 $ emotion_list = ["anger","disgust","fear","joy","sadness","surprise","neutral"]
 
 define negative_emotions = ["anger", "disgust", "fear", "sadness"]
@@ -69,6 +88,7 @@ label monika_chat:
         poses = ["1esa","1eua","1eub","1euc","1eud","1eka","1ekc","1ekd","1esc","1esd","1hua","1hub","1hksdlb","1hksdrb","1lksdla","1rksdla","1lksdlb","1rksdlb","1lksdlc","1rksdlc","1lksdld","1rksdld","1dsc","1dsd","2esa","2eua","2eub","2euc","2eud","2eka","2ekc","2ekd","2esc","2esd","2hua","2hub","2hksdlb","2hksdrb","2lksdla","2rksdla","2lksdlb","2rksdlb","2lksdlc","2rksdlc","2lksdld","2rksdld","2dsc","2dsd","3esa","3eua","3eub","3euc","3eud","3eka","3ekc","3ekd","3esc","3esd","3hua","3hub","3hksdlb","3hksdrb","3lksdla","3rksdla","3lksdlb","3rksdlb","3lksdlc","3rksdlc","3lksdld","3rksdld","3dsc","3dsd","4esa","4eua","4eub","4euc","4eud","4eka","4ekc","4ekd","4esc","4esd","4hua","4hub","4hksdlb","4hksdrb","4lksdla","4rksdla","4lksdlb","4rksdlb","4lksdlc","4rksdlc","4lksdld","4rksdld","4dsc","4dsd","5eua","5eua","5euc"]
      
     m "Sure [player], talk to me as much as you want. I won't go anywhere ehehe~"
+    m "Oh and if you have to do something else, just tell me QUIT. I'll understand my love."
 
     while True:
         $ send_simple("chatbot")
