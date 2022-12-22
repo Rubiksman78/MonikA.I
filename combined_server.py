@@ -53,6 +53,9 @@ parser.add_argument('--use_audio', type=bool, default=False,
                     help='use audio')
 parser.add_argument('--emotion_time', type=int, default=10,
                     help='time between camera captures')
+parser.add_argument('--display_browser', type=bool, default=False,
+                    help='displaying browser or not when using character ai,\
+                    useful for debugging')
 
 args = parser.parse_args()
 
@@ -63,6 +66,7 @@ USE_CHATBOT = args.use_chatbot
 USE_EMOTION_DETECTION = args.use_emotion_detection
 USE_AUDIO = args.use_audio
 EMOTION_TIME = args.emotion_time
+DISPLAY_BROWSER = args.display_browser
 
 # Global variables 
 clients = {}
@@ -101,7 +105,10 @@ def listen():
 
 async def launch():
     apw = await async_playwright().start()
-    browser = await apw.firefox.launch()
+    if DISPLAY_BROWSER:
+        browser = await apw.firefox.launch(headless=False)
+    else:
+        browser = await apw.firefox.launch()
     page =  await browser.new_page()
     await page.goto("https://character-ai.us.auth0.com/u/login?state=hKFo2SA2UWpDVjJLanBBRHRtUkl5ZGxKanhyelloRzVCaDd0NaFur3VuaXZlcnNhbC1sb2dpbqN0aWTZIDRaTUtMQkt4UTNKU2tfbnVWbGxyUUZvZURpTW5ld0x0o2NpZNkgZHlEM2dFMjgxTXFnSVNHN0Z1SVhZaEwyV0VrbnFaenY")
     await page.click("button[type=button]")
@@ -258,7 +265,7 @@ async def listenToClient(client):
             points = points.T
             emotion = None
             for bbox,p in zip(bounding_boxes, points):
-                box = bbox.astype(np.int)
+                box = bbox.astype(np.int32)
                 x1,y1,x2,y2=box[0:4]    
                 face_img=frame[y1:y2,x1:x2,:]
 
@@ -294,7 +301,7 @@ async def listenToClient(client):
                 points = points.T
                 emotion = None
                 for bbox,p in zip(bounding_boxes, points):
-                    box = bbox.astype(np.int)
+                    box = bbox.astype(np.int32)
                     x1,y1,x2,y2=box[0:4]    
                     face_img=frame[y1:y2,x1:x2,:]
 
