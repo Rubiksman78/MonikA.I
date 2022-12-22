@@ -5,4 +5,6 @@ pydub
 asyncio
 playwright
 nest_asyncio
-tensorflow
+#tensorflow
+Pillow
+torchvision
