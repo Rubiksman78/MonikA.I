@@ -12,8 +12,24 @@ from playwright.async_api import async_playwright
 import nest_asyncio
 import argparse
 from text_emotion import get_emotion
-from tensorflow import keras
 import json
+
+from facial_analysis import FacialImageProcessing
+import torch
+from PIL import Image
+from torchvision import transforms
+
+IMG_SIZE = 256
+imgProcessing=FacialImageProcessing(False)
+test_transforms = transforms.Compose(
+    [
+        transforms.Resize((IMG_SIZE,IMG_SIZE)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                     std=[0.229, 0.224, 0.225])
+    ]
+)
+
 
 auth_dict = json.load(open("auth.json"))
 USERNAME = auth_dict["USERNAME"]
@@ -35,7 +51,7 @@ parser.add_argument('--use_emotion_detection', type=bool, default=True,
                     help='use emotion detection')
 parser.add_argument('--use_audio', type=bool, default=False,
                     help='use audio')
-parser.add_argument('--emotion_time', type=int, default=5,
+parser.add_argument('--emotion_time', type=int, default=10,
                     help='time between camera captures')
 
 args = parser.parse_args()
@@ -65,8 +81,8 @@ SERVER.bind(ADDRESS)
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-emotion_model = keras.models.load_model('mobilenet_7.h5')
-#emotion_model = torch.load('enet_b2_7.pt').to(device)
+#emotion_model = keras.models.load_model('mobilenet_7.h5')
+emotion_model = torch.load('enet_b2_7.pt').to(device)
 
 # prevents openCL usage and unnecessary logging messages
 cv2.ocl.setUseOpenCL(False)
@@ -85,7 +101,7 @@ def listen():
 
 async def launch():
     apw = await async_playwright().start()
-    browser = await apw.firefox.launch(headless=False)
+    browser = await apw.firefox.launch()
     page =  await browser.new_page()
     await page.goto("https://character-ai.us.auth0.com/u/login?state=hKFo2SA2UWpDVjJLanBBRHRtUkl5ZGxKanhyelloRzVCaDd0NaFur3VuaXZlcnNhbC1sb2dpbqN0aWTZIDRaTUtMQkt4UTNKU2tfbnVWbGxyUUZvZURpTW5ld0x0o2NpZNkgZHlEM2dFMjgxTXFnSVNHN0Z1SVhZaEwyV0VrbnFaenY")
     await page.click("button[type=button]")
@@ -124,7 +140,6 @@ async def listenToClient(client):
     
     while True:
         received_msg = client.recv(BUFSIZE).decode("utf-8")
-        print(received_msg)
         if received_msg == "chatbot":
             received_msg = client.recv(BUFSIZE).decode("utf-8")
             received_msg , step = received_msg.split("/g")
@@ -239,18 +254,19 @@ async def listenToClient(client):
             ret, frame = cap.read()
             if not ret:
                 break
-            facecasc = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-            gray = np.array(frame, dtype='uint8')
-            faces = facecasc.detectMultiScale(gray,scaleFactor=1.3, minNeighbors=5)
-
+            bounding_boxes, points = imgProcessing.detect_faces(frame)
+            points = points.T
             emotion = None
-            for (x, y, w, h) in faces:
-                cv2.rectangle(frame, (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
-                roi_gray = gray[y:y + h, x:x + w]
-                cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (224, 224)), -1), 0)
-                prediction = emotion_model.predict(cropped_img) #for keras model
-                maxindex = int(np.argmax(prediction))
-                emotion  = emotion_dict[maxindex]
+            for bbox,p in zip(bounding_boxes, points):
+                box = bbox.astype(np.int)
+                x1,y1,x2,y2=box[0:4]    
+                face_img=frame[y1:y2,x1:x2,:]
+
+                img_tensor = test_transforms(Image.fromarray(face_img))
+                img_tensor.unsqueeze_(0)
+                scores = emotion_model(img_tensor.to(device))
+                scores=scores[0].data.cpu().numpy()
+                emotion = emotion_dict[np.argmax(scores)]
 
             if emotion == None:
                 emotion = "No"
@@ -274,24 +290,19 @@ async def listenToClient(client):
                 ret, frame = cap.read()
                 if not ret:
                     break
-                facecasc = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-                gray = np.array(frame, dtype='uint8')
-                faces = facecasc.detectMultiScale(gray,scaleFactor=1.3, minNeighbors=5)
-
+                bounding_boxes, points = imgProcessing.detect_faces(frame)
+                points = points.T
                 emotion = None
-                for (x, y, w, h) in faces:
-                    cv2.rectangle(frame, (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
-                    roi_gray = gray[y:y + h, x:x + w]
-                    cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (224, 224)), -1), 0)
-                    prediction = emotion_model.predict(cropped_img) #for keras model
+                for bbox,p in zip(bounding_boxes, points):
+                    box = bbox.astype(np.int)
+                    x1,y1,x2,y2=box[0:4]    
+                    face_img=frame[y1:y2,x1:x2,:]
 
-                    # cropped_img = torch.from_numpy(cropped_img).float().to(device)
-                    # cropped_img = cropped_img.view(1, 3, 224, 224)
-                    # prediction = emotion_model(cropped_img)
-                    # prediction = prediction.detach().cpu().numpy()
-
-                    maxindex = int(np.argmax(prediction))
-                    emotion  = emotion_dict[maxindex]
+                    img_tensor = test_transforms(Image.fromarray(face_img))
+                    img_tensor.unsqueeze_(0)
+                    scores = emotion_model(img_tensor.to(device))
+                    scores=scores[0].data.cpu().numpy()
+                    emotion = emotion_dict[np.argmax(scores)]
 
                 if emotion == None:
                     emotion = "No"
