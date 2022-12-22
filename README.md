@@ -64,3 +64,4 @@ The features are available in a specific `AI` Talk menu in the game.
 - Speech to text to convert your own voice in text and directly speak with Monika
 - Better face emotions detection :white_check_mark:
 - Face recognition for Monika only to recognize you
+- *Feel free to suggest improvements or new AI features you would like to see*
