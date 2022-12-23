@@ -27,6 +27,7 @@ There is also emotion detection with the webcam with a model from [HSEmotion](ht
 
 - Clone the repository or download the latest release
 - Go to the project folder with your favorite IDE
+- Be sure to have Python installed (>=3.8)
 
 To setup all the libraries:
 - **If you have `bash`** (you can install [Git Bash](https://git-scm.com/downloads) on Windows if needed): Run the setup with ```bash setup.sh``` that will install the requirements for the project and the requirements for the TTS module
