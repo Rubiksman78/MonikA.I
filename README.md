@@ -78,7 +78,8 @@ https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-
 
 ## :alarm_clock: To develop
 - Convert `playwright` browser simulator to python `requests` for faster run and no parasite window
-- Speech to text to convert your own voice in text and directly speak with Monika :soon:
+- Speech to text to convert your own voice in text and directly speak with Monika :white_check_mark:
 - Better face emotions detection :white_check_mark:
 - Face recognition for Monika only to recognize you
+- Add possibility to see when microphone starts recording in the game for STT
 - *Feel free to suggest improvements or new AI features you would like to see*
