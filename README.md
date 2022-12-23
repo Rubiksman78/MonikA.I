@@ -63,7 +63,7 @@ The features are available in a specific `AI` Talk menu in the game.
 
 ## :alarm_clock: To develop
 - Convert `playwright` browser simulator to python `requests` for faster run and no parasite window
-- Speech to text to convert your own voice in text and directly speak with Monika
+- Speech to text to convert your own voice in text and directly speak with Monika :soon:
 - Better face emotions detection :white_check_mark:
 - Face recognition for Monika only to recognize you
 - *Feel free to suggest improvements or new AI features you would like to see*
