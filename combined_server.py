@@ -53,10 +53,10 @@ parser.add_argument('--use_audio', type=bool, default=False,
                     help='use audio')
 parser.add_argument('--emotion_time', type=int, default=10,
                     help='time between camera captures')
-parser.add_argument('--display_browser', type=bool, default=True,
+parser.add_argument('--display_browser', type=bool, default=False,
                     help='displaying browser or not when using character ai,\
                     useful for debugging')
-parser.add_argument('--choose_character', type=str, default="0",
+parser.add_argument('--choose_character', type=str, default="1",
                     help='character to chat with')
 
 args = parser.parse_args()
