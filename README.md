@@ -47,6 +47,9 @@ There are several arguments you can use in command line:
 - `--use_chatbot` : if you want to use the chatbot, `True` or `False`
 - `--use_emotion_detection` : if you want to use the emotion detection with the webcam, `True` or `False`
 - `--use_audio` : if you want to use the TTS module, `True` or `False`. Warning, the audio model is quite long to load, so it can take a while before the sound plays.
+- `--emotion_time`: the number of minutes between each webcam capture for emotion detection
+- `--display_browser`: whether or not you want to see the simulated browser (useful when having to solve captcha)
+- `--choose_character`: switch between the character you prefer 
 
 You have to create a json file `auth.json` with keys `USERNAME` and `PASSWORD` with your credentials for the character AI website.
 When the browser page launches, you may have to solve the captcha yourself and then go back to the game, your ids will be filled automatically.
