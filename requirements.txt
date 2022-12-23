@@ -4,6 +4,7 @@ opencv-python
 torchvision
 Pillow
 tensorflow
+timm
 #For text emotion recognition
 transformers
 #For TTS
