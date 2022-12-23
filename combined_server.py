@@ -52,14 +52,14 @@ parser.add_argument('--use_chatbot', type=bool, default=False,
                     help='use chatbot')
 parser.add_argument('--use_emotion_detection', type=bool, default=True, 
                     help='use emotion detection')
-parser.add_argument('--use_audio', type=bool, default=False,
+parser.add_argument('--use_audio', type=bool, default=True,
                     help='use audio')
 parser.add_argument('--emotion_time', type=int, default=10,
                     help='time between camera captures')
 parser.add_argument('--display_browser', type=bool, default=False,
                     help='displaying browser or not when using character ai,\
                     useful for debugging')
-parser.add_argument('--choose_character', type=str, default="1",
+parser.add_argument('--choose_character', type=str, default="0",
                     help='character to chat with')
 
 args = parser.parse_args()
@@ -97,7 +97,6 @@ SERVER.bind(ADDRESS)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 #emotion_model = keras.models.load_model('models/mobilenet_7.h5')
-emotion_model = torch.load('models/enet_b2_7.pt').to(device)
 
 # prevents openCL usage and unnecessary logging messages
 cv2.ocl.setUseOpenCL(False)
@@ -260,6 +259,7 @@ async def listenToClient(client):
                         break
                     
         elif received_msg == "camera_int":
+            emotion_model = torch.load('models/enet_b2_7.pt').to(device)
             # start the webcam feed
             cap = cv2.VideoCapture(0)
             ret, frame = cap.read()
@@ -291,6 +291,7 @@ async def listenToClient(client):
             sendMessage(msg)
 
         else:
+            emotion_model = torch.load('models/enet_b2_7.pt').to(device)
             counter = received_msg[6:]
             counter = int(counter)
             if counter % EMOTION_TIME == 0:
