@@ -3,6 +3,7 @@ torch
 opencv-python
 torchvision
 Pillow
+tensorflow
 #For text emotion recognition
 transformers
 #For TTS
