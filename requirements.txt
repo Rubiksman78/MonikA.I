@@ -1,10 +1,17 @@
-transformers
+#For facial recognition
 torch
 opencv-python
+torchvision
+Pillow
+#For text emotion recognition
+transformers
+#For TTS
 pydub
+#For character.ai 
 asyncio
 playwright
 nest_asyncio
-#tensorflow
-Pillow
-torchvision
+#For STT
+pyaudio
+SpeechRecognition
+git+https://github.com/openai/whisper.git

@@ -13,11 +13,14 @@ import nest_asyncio
 import argparse
 from text_emotion import get_emotion
 import json
+import time
 
 from facial_analysis import FacialImageProcessing
 import torch
 from PIL import Image
 from torchvision import transforms
+
+from speech_to_text import stt
 
 IMG_SIZE = 256
 imgProcessing=FacialImageProcessing(False)
@@ -161,12 +164,25 @@ async def listenToClient(client):
     clients[client] = name
     
     while True:
-        received_msg = client.recv(BUFSIZE).decode("utf-8")
+        received_msg = client.recv(BUFSIZE).decode("utf-8") #Message indicating the mode used (chatbot,camera_int or camera)
+        #print("Received: "+ received_msg)
+        received_msg = received_msg.split("/m")
+        rest_msg = received_msg[1]
+        received_msg = received_msg[0]
         if received_msg == "chatbot":
-            received_msg = client.recv(BUFSIZE).decode("utf-8")
-            received_msg , step = received_msg.split("/g")
+            if '/g' in rest_msg:
+                received_msg , step = rest_msg.split("/g")
+            else:
+                received_msg = client.recv(BUFSIZE).decode("utf-8") #Message containing the user input
+                received_msg , step = received_msg.split("/g")
             step = int(step)
-            
+
+            #Speech to text
+            if received_msg == "begin_record":
+                received_msg = stt()
+
+            print("User: "+received_msg)
+
             if USE_CHATBOT:
                 new_user_input_ids = tokenizer.encode(received_msg + tokenizer.eos_token, return_tensors='pt')
                 bot_input_ids = torch.cat([chat_history_ids[:, bot_input_ids.shape[-1]:][-2:], new_user_input_ids], dim=-1) if step > 2 else new_user_input_ids
@@ -220,6 +236,8 @@ async def listenToClient(client):
                         msg = msg.replace("<br>","")
                         msg = msg.replace("<br/>","")
                         msg = msg.replace('<div style="overflow-wrap: break-word;">',"")
+                        msg = msg.replace("&lt;","<")
+                        msg = msg.replace("&gt;",">")
 
                         if received_msg != "QUIT":
                             #Text to speech, save wav to wav_audios folder
@@ -236,39 +254,10 @@ async def listenToClient(client):
                             emotion = get_emotion(msg)
                             emotion = emotion.encode("utf-8")
                             msg = msg.encode("utf-8")   
-                            sendMessage(msg + b"/g" + emotion)
+                            msg_to_send = msg + b"/g" + emotion
+                            print("Sent: "+ msg_to_send.decode("utf-8"))
+                            sendMessage(msg_to_send)
                         break
-
-                    #TODO: Fix this: trying to send line by line for faster displaying in the game
-                    """"
-                    msg = await query[-1].inner_text()
-                    #wait until line is finished
-                    #split words    
-                    words = msg.split(" ")
-                    #get last word
-                    last_word = words[-1]
-                    with open("log.txt","a") as f:
-                        f.write(repr(msg) + "\n")
-                    #Check if there is '\n' in last word and if the previous last word didn't have '\n'
-                    lines = msg.split("\n")
-                    #remove empty lines
-                    lines = [line for line in lines if line != ""]
-                    if last_word.count("\n") > 0 and not previous_last:
-                        msg = lines[-2]
-                        if msg != previous_msg:
-                            previous_last = True
-                            print([repr(line) for line in lines])
-                            print("Current msg: " + msg)
-                            print("Previous msg: " + previous_msg)
-                            print("Last word: " + last_word)
-                            print("\n")
-                            previous_msg = msg
-                            msg = msg.encode("utf-8")
-                            sendMessage(msg)
-                    else:
-                        previous_last = False
-                        previous_msg = msg
-                    """
                     
         elif received_msg == "camera_int":
             # start the webcam feed
@@ -303,7 +292,6 @@ async def listenToClient(client):
 
         else:
             counter = received_msg[6:]
-            #counter = client.recv(BUFSIZE).decode("utf-8")
             counter = int(counter)
             if counter % EMOTION_TIME == 0:
                 # start the webcam feed
