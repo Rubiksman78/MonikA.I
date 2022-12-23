@@ -34,7 +34,7 @@ define sentences_emotions = {
     "no": "Oh it seems that I can't see through your camera sweetie. Maybe face me a little bit more ?",
 }
 
-init 7 python:
+init 5 python:
     from socket import AF_INET, socket, SOCK_STREAM
     from threading import Thread
     import select
@@ -60,6 +60,7 @@ init 7 python:
     ADDR = (HOST, PORT)
     client_socket = socket(AF_INET, SOCK_STREAM)
     client_socket.connect(ADDR)
+    monika_nickname = store.persistent._mas_monika_nickname
 
 
 #Tuto Pytorch Event
@@ -82,17 +83,18 @@ init 5 python:
     addEvent(Event(persistent.event_database,eventlabel="monika_chat",category=['ai'],prompt="Let's chat together",pool=True,unlocked=True))
 
 define step = 0
+
 label monika_chat:
     init python:
         #Define all poses liek "1esa"
         poses = ["1esa","1eua","1eub","1euc","1eud","1eka","1ekc","1ekd","1esc","1esd","1hua","1hub","1hksdlb","1hksdrb","1lksdla","1rksdla","1lksdlb","1rksdlb","1lksdlc","1rksdlc","1lksdld","1rksdld","1dsc","1dsd","2esa","2eua","2eub","2euc","2eud","2eka","2ekc","2ekd","2esc","2esd","2hua","2hub","2hksdlb","2hksdrb","2lksdla","2rksdla","2lksdlb","2rksdlb","2lksdlc","2rksdlc","2lksdld","2rksdld","2dsc","2dsd","3esa","3eua","3eub","3euc","3eud","3eka","3ekc","3ekd","3esc","3esd","3hua","3hub","3hksdlb","3hksdrb","3lksdla","3rksdla","3lksdlb","3rksdlb","3lksdlc","3rksdlc","3lksdld","3rksdld","3dsc","3dsd","4esa","4eua","4eub","4euc","4eud","4eka","4ekc","4ekd","4esc","4esd","4hua","4hub","4hksdlb","4hksdrb","4lksdla","4rksdla","4lksdlb","4rksdlb","4lksdlc","4rksdlc","4lksdld","4rksdld","4dsc","4dsd","5eua","5eua","5euc"]
      
     m "Sure [player], talk to me as much as you want. I won't go anywhere ehehe~"
-    m "Oh and if you have to do something else, just tell me QUIT. I'll understand my love."
+    m "Oh and if you have to do something else, just tell me 'QUIT'. I'll understand my love."
 
     while True:
         $ send_simple("chatbot")
-        $ my_msg = sendMessage("Speak with Monika:",str(step)) 
+        $ my_msg = sendMessage("Speak with [monika_nickname]:",str(step)) 
         if my_msg == "QUIT":
             return
         if step == 0:
@@ -126,6 +128,7 @@ label server_crashed:
     m "Oh sorry [player], it seems that there is a bug somewhere."
     m "I will try to fix it as soon as possible."
     m "Let's talk again later, I'm sorry sweetheart."
+    return
 
 #Camera Event
 init 5 python:
