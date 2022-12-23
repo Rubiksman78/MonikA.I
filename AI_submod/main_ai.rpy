@@ -38,6 +38,7 @@ init 5 python:
     from socket import AF_INET, socket, SOCK_STREAM
     from threading import Thread
     import select
+    from time import sleep
     def receiveMessage():
         msg = client_socket.recv(BUFSIZ).decode("utf8")
         return msg
@@ -46,6 +47,9 @@ init 5 python:
         my_msg = renpy.input(prefix)
         client_socket.send(bytes(my_msg + "/g" + step).encode("utf8"))
         return my_msg
+
+    def sendAudio(prefix,step):
+        client_socket.send(bytes(prefix + "/g" + step).encode("utf8"))
 
     def send_simple(prefix):
         client_socket.send(bytes(prefix).encode("utf8"))
@@ -85,24 +89,51 @@ init 5 python:
 define step = 0
 
 label monika_chat:
-    init python:
-        #Define all poses liek "1esa"
-        poses = ["1esa","1eua","1eub","1euc","1eud","1eka","1ekc","1ekd","1esc","1esd","1hua","1hub","1hksdlb","1hksdrb","1lksdla","1rksdla","1lksdlb","1rksdlb","1lksdlc","1rksdlc","1lksdld","1rksdld","1dsc","1dsd","2esa","2eua","2eub","2euc","2eud","2eka","2ekc","2ekd","2esc","2esd","2hua","2hub","2hksdlb","2hksdrb","2lksdla","2rksdla","2lksdlb","2rksdlb","2lksdlc","2rksdlc","2lksdld","2rksdld","2dsc","2dsd","3esa","3eua","3eub","3euc","3eud","3eka","3ekc","3ekd","3esc","3esd","3hua","3hub","3hksdlb","3hksdrb","3lksdla","3rksdla","3lksdlb","3rksdlb","3lksdlc","3rksdlc","3lksdld","3rksdld","3dsc","3dsd","4esa","4eua","4eub","4euc","4eud","4eka","4ekc","4ekd","4esc","4esd","4hua","4hub","4hksdlb","4hksdrb","4lksdla","4rksdla","4lksdlb","4rksdlb","4lksdlc","4rksdlc","4lksdld","4rksdld","4dsc","4dsd","5eua","5eua","5euc"]
-     
-    m "Sure [player], talk to me as much as you want. I won't go anywhere ehehe~"
-    m "Oh and if you have to do something else, just tell me 'QUIT'. I'll understand my love."
+    $ use_voice = False
+    $ local_step = 0
+
+    m 5tubfb "Sure [player], talk to me as much as you want. I won't go anywhere ehehe~"
+    m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. I'll understand my love."
+
+    m 4nubfa "Maybe you could allow me to hear your beautiful voice?"
+    menu:
+        "Sure, I'll allow you to hear my voice.":
+            m 1subfb "Thank you [player]!"
+            m 1subfb "I'll be waiting for you to say something."
+            $ use_voice = True
+        "Sorry, my microphone is broken.":
+            m 2eua "Oh, that's okay [player]."
+            m 2eua "I'll just have to wait for you to type something then."
+            $ use_voice = False
 
     while True:
-        $ send_simple("chatbot")
-        $ my_msg = sendMessage("Speak with [monika_nickname]:",str(step)) 
-        if my_msg == "QUIT":
-            return
-        if step == 0:
-            $ server_status = receiveMessage() #Check if the browser managed to open
+        $ send_simple("chatbot/m")
+        if use_voice:
+            if local_step > 0:
+                m 6wubla "Can I hear your voice again?"
+                menu:
+                    "Yes, of course.":
+                        $ sendAudio("begin_record",str(step))
+                    "No, sorry I've got something to do.":
+                        $ my_msg = sendAudio("QUIT",str(step))
+                        return
+            else:
+                $ sendAudio("begin_record",str(step))
+        else:
+            $ my_msg = sendMessage("Speak with [monika_nickname]:",str(step)) 
+            if my_msg == "QUIT":
+                return
+
+        $ message_received = receiveMessage().split("/g")
+        if len(message_received) < 2: #Only one word: server status
+            $ server_status = message_received[0]
             if server_status == "server_error":
                 jump server_crashed
-        $ msg = receiveMessage()
-        $ msg,emotion = msg.split("/g")
+            $ new_smg = receiveMessage().split("/g")
+            $ msg,emotion = new_smg
+        else:
+            $ msg,emotion = message_received
+
         $ gamedir = renpy.config.gamedir
         $ audio_exists = audio_file_exists(gamedir + "/Submods/AI_submod/audio/out.ogg")
         if audio_exists:
@@ -123,6 +154,7 @@ label monika_chat:
         # elif emotion in negative_emotions:
         #     $ mas_loseAffection(1)
         $ step += 1
+        $ local_step += 1
 
 label server_crashed:
     m "Oh sorry [player], it seems that there is a bug somewhere."
@@ -147,7 +179,7 @@ label monika_cam:
     m 5nublb "I see your cute face now ehehe~"
 
     while True:
-        $ send_simple("camera_int")
+        $ send_simple("camera_int/m")
         $ received_emotio = receiveMessage()
         
         if received_emotio == "angry":
@@ -191,7 +223,7 @@ init 5 python:
     
 label emotion_minute:
     $ counter += 1
-    $ send_simple("camera" + str(counter))
+    $ send_simple("camera" + str(counter) + "/m")
     $ received_emotion = receiveMessage()
 
     if received_emotion == "no_data": #If the server says it is not time to send an emotion,do nothing
