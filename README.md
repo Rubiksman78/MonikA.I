@@ -51,7 +51,14 @@ There are several arguments you can use in command line:
 - `--display_browser`: whether or not you want to see the simulated browser (useful when having to solve captcha)
 - `--choose_character`: switch between the character you prefer 
 
-You have to create a json file `auth.json` with keys `USERNAME` and `PASSWORD` with your credentials for the character AI website.
+You have to create a json file `auth.json` with keys `USERNAME` and `PASSWORD` with your credentials for the character AI website:
+```
+{
+  "USERNAME":****@****,
+  "PASSWORD":*****
+}
+```
+  
 When the browser page launches, you may have to solve the captcha yourself and then go back to the game, your ids will be filled automatically.
 
 You can change the voice used by replacing the extract `talk_13.wav` in the `audio` folder by another audio extract. The longer the extract, the longer the TTS will take to generate the audio at each turn.
