@@ -124,7 +124,17 @@ label monika_chat:
             if my_msg == "QUIT":
                 return
 
-        $ message_received = receiveMessage().split("/g")
+        python:
+            client_socket.setblocking(0)
+            while True:
+                ready = select.select([client_socket], [], [], 0.1)
+                if ready[0]:
+                    message_received = receiveMessage().split("/g")
+                    break
+                else:
+                    renpy.say(m,"[monika_nickname] is thinking...")
+            client_socket.setblocking(1)
+
         if len(message_received) < 2: #Only one word: server status
             $ server_status = message_received[0]
             if server_status == "server_error":
@@ -155,6 +165,7 @@ label monika_chat:
         #     $ mas_loseAffection(1)
         $ step += 1
         $ local_step += 1
+        stop sound
 
 label server_crashed:
     m "Oh sorry [player], it seems that there is a bug somewhere."
