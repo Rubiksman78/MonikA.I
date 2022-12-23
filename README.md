@@ -62,6 +62,10 @@ The features are available in a specific `AI` Talk menu in the game.
 - Click on `Look for me` to use the facial emotions detection in an interactive session
 - Click on `Tell me about Pytorch` if you think it is superior to Tensorflow
 
+## :cinema: Video Demonstration
+
+https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-a1fb-62d695e76c51.mp4
+
 ## :alarm_clock: To develop
 - Convert `playwright` browser simulator to python `requests` for faster run and no parasite window
 - Speech to text to convert your own voice in text and directly speak with Monika :soon:
