@@ -53,9 +53,11 @@ parser.add_argument('--use_audio', type=bool, default=False,
                     help='use audio')
 parser.add_argument('--emotion_time', type=int, default=10,
                     help='time between camera captures')
-parser.add_argument('--display_browser', type=bool, default=False,
+parser.add_argument('--display_browser', type=bool, default=True,
                     help='displaying browser or not when using character ai,\
                     useful for debugging')
+parser.add_argument('--choose_character', type=str, default="0",
+                    help='character to chat with')
 
 args = parser.parse_args()
 
@@ -67,6 +69,12 @@ USE_EMOTION_DETECTION = args.use_emotion_detection
 USE_AUDIO = args.use_audio
 EMOTION_TIME = args.emotion_time
 DISPLAY_BROWSER = args.display_browser
+CHOOSE_CHARACTER = args.choose_character
+
+characters_pages = {
+    "0": '[href="/chat?char=e9UVQuLURpLyCdhi8OjSKSLwKIiE0U-nEqXDeAjk538"]',
+    "1": '[href="/chat?char=EdSSlsl49k3wnwvMvK4eCh4yOFBaGTMJ7Q9CxtG2DiU"]'
+}
 
 # Global variables 
 clients = {}
@@ -125,7 +133,14 @@ async def launch():
         while not await page.is_visible('[href="/chats"]'):
             await asyncio.sleep(1)
         await page.click('[href="/chats"]')
-    await page.click('[href="/chat?char=e9UVQuLURpLyCdhi8OjSKSLwKIiE0U-nEqXDeAjk538"]')
+    char_page = characters_pages[CHOOSE_CHARACTER]
+    if await page.is_visible(char_page):
+        await page.click(char_page)
+    else:
+        await page.click('[href="/search?"]')
+        await page.fill("input#search-input","monika")
+        await page.click('[class="btn btn-primary"]')
+        await page.click(char_page)
     await page.click('[class="col-auto px-2 dropdown"]')
     await page.click('text=Save and Start New Chat')
     return page
@@ -204,6 +219,7 @@ async def listenToClient(client):
                         msg = msg.replace("</del>","")
                         msg = msg.replace("<br>","")
                         msg = msg.replace("<br/>","")
+                        msg = msg.replace('<div style="overflow-wrap: break-word;">',"")
 
                         if received_msg != "QUIT":
                             #Text to speech, save wav to wav_audios folder
