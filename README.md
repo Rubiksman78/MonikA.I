@@ -25,7 +25,8 @@ There is also emotion detection with the webcam with a model from [HSEmotion](ht
 ![Character AI](images/image_1.png)
 ## ❓Installation
 
-Run the setup with ```bash setup.sh``` that will install the requirements for the project and the requirements for the TTS module. Just do `pip install -r requirements.txt` if you do not wish to use TTS and have supplementary setups to do.
+- If you have `bash` (you can install Git Bash on Windows if needed): Run the setup with ```bash setup.sh``` that will install the requirements for the project and the requirements for the TTS module
+- Else: Just do `pip install -r requirements.txt`. If you still want to use TTS, you can follow the instructions [here](https://tts.readthedocs.io/en/latest/tutorial_for_nervous_beginners.html).
 
 ## :heavy_plus_sign: Add to the game
 
