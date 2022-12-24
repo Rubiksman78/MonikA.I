@@ -38,7 +38,7 @@ The submod is the folder `AI_submod`. To add it to your game, you have to add it
 
 ## Video tutorial
 
-[![](https://markdown-videos.deta/youtube/EORpS-fZ10s)](https://youtu.be/EORpS-fZ10s)
+[![Watch the video](https://img.youtube.com/vi/EORpS-fZ10s/default.jpg)](https://youtu.be/EORpS-fZ10s)
 
 ## :loudspeaker: Usage
 
