@@ -36,9 +36,9 @@ To setup all the libraries:
 
 The submod is the folder `AI_submod`. To add it to your game, you have to add it in your game folder to `game/Submods/`.
 
-## Video tutorial
+## :video_camera: Video tutorial
 
-[![Watch the video](https://img.youtube.com/vi/EORpS-fZ10s/default.jpg)](https://youtu.be/EORpS-fZ10s)
+[![Watch the video](https://img.youtube.com/vi/EORpS-fZ10s/hqdefault.jpg.jpg)](https://youtu.be/EORpS-fZ10s)
 
 ## :loudspeaker: Usage
 
