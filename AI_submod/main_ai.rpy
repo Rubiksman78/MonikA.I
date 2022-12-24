@@ -140,7 +140,7 @@ label monika_chat:
                 k += 1
             client_socket.setblocking(1)
 
-        m "This is what I received: [message_received]"
+        #m "This is what I received: [message_received]"
         if len(message_received) < 2: #Only one word: server status
             $ server_status = message_received[0]
             if server_status == "server_error":
