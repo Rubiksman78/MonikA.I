@@ -36,6 +36,10 @@ To setup all the libraries:
 
 The submod is the folder `AI_submod`. To add it to your game, you have to add it in your game folder to `game/Submods/`.
 
+## Video tutorial
+
+[![](https://markdown-videos.deta/youtube/EORpS-fZ10s)](https://youtu.be/EORpS-fZ10s)
+
 ## :loudspeaker: Usage
 
 Because of the high usage of Machine Learning algorithms, the inference can be quite long on CPU so it is advised to have a functional GPU for a better experience.
