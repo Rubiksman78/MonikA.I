@@ -13,7 +13,6 @@ import nest_asyncio
 import argparse
 from text_emotion import get_emotion
 import json
-import time
 
 from facial_analysis import FacialImageProcessing
 import torch
@@ -52,7 +51,7 @@ parser.add_argument('--use_chatbot', type=bool, default=False,
                     help='use chatbot')
 parser.add_argument('--use_emotion_detection', type=bool, default=True, 
                     help='use emotion detection')
-parser.add_argument('--use_audio', type=bool, default=True,
+parser.add_argument('--use_audio', type=bool, default=False,
                     help='use audio')
 parser.add_argument('--emotion_time', type=int, default=10,
                     help='time between camera captures')

@@ -1,6 +1,6 @@
 init -990 python in mas_submod_utils:
     Submod(
-        author="Rubiksman78",
+        author="Rubiksman1006",
         name="MonikAI",
         description="AI based features for MAS.",
         version="1.0.1",
@@ -12,7 +12,7 @@ init -989 python:
     if store.mas_submod_utils.isSubmodInstalled("Submod Updater Plugin"):
         store.sup_utils.SubmodUpdater(
             submod="MonikAI",
-            user_name="Rubiksman78",
+            user_name="Rubiksman1006",
             repository_name="Monik.A.I",
             update_dir="",
         )
@@ -126,19 +126,26 @@ label monika_chat:
 
         python:
             client_socket.setblocking(0)
+            k = 0
             while True:
                 ready = select.select([client_socket], [], [], 0.1)
                 if ready[0]:
                     message_received = receiveMessage().split("/g")
                     break
                 else:
+                    if k > 20:
+                        renpy.say(m,"Oh, it seems that I can't hear you. Maybe you forgot something in the options ?")
+                        break 
                     renpy.say(m,"[monika_nickname] is thinking...")
+                k += 1
             client_socket.setblocking(1)
 
+        m "This is what I received: [message_received]"
         if len(message_received) < 2: #Only one word: server status
             $ server_status = message_received[0]
             if server_status == "server_error":
                 jump server_crashed
+
             $ new_smg = receiveMessage().split("/g")
             $ msg,emotion = new_smg
         else:
@@ -154,6 +161,8 @@ label monika_chat:
         
         $ sentences_list = msg.split("\n")
         $ sentences_list = [x for x in sentences_list if x != '']
+        if sentences_list[0] == "server_ok":
+            $ sentences_list.pop(0)
         while len(sentences_list) > 0:
             $ sentence = sentences_list[0]
             $ sentences_list.pop(0)
