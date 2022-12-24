@@ -9,6 +9,7 @@ timm
 transformers
 #For TTS
 pydub
+TTS
 #For character.ai 
 asyncio
 playwright
