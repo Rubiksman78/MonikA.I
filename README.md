@@ -25,8 +25,13 @@ There is also emotion detection with the webcam with a model from [HSEmotion](ht
 ![Character AI](images/image_1.png)
 ## ❓Installation
 
-- If you have `bash` (you can install Git Bash on Windows if needed): Run the setup with ```bash setup.sh``` that will install the requirements for the project and the requirements for the TTS module
-- Else: Just do `pip install -r requirements.txt`. If you still want to use TTS, you can follow the instructions [here](https://tts.readthedocs.io/en/latest/tutorial_for_nervous_beginners.html).
+- Clone the repository or download the latest release
+- Go to the project folder with your favorite IDE
+- Be sure to have Python installed (>=3.8)
+
+To setup all the libraries:
+- **If you have `bash`** (you can install [Git Bash](https://git-scm.com/downloads) on Windows if needed): Run the setup with ```bash setup.sh``` that will install the requirements for the project and the requirements for the TTS module
+- **Else**: Just do `pip install -r requirements.txt`, it won't install TTS so be sure to set `--use_audio False` later. If you still want to use TTS, you can follow the instructions [here](https://tts.readthedocs.io/en/latest/tutorial_for_nervous_beginners.html).
 
 ## :heavy_plus_sign: Add to the game
 
@@ -54,8 +59,8 @@ There are several arguments you can use in command line:
 You have to create a json file `auth.json` with keys `USERNAME` and `PASSWORD` with your credentials for the character AI website:
 ```
 {
-  "USERNAME":****@****,
-  "PASSWORD":*****
+  "USERNAME":"****@****",
+  "PASSWORD":"*****"
 }
 ```
   
@@ -77,8 +82,8 @@ The features are available in a specific `AI` Talk menu in the game.
 https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-a1fb-62d695e76c51.mp4
 
 ## :alarm_clock: To develop
-- Convert `playwright` browser simulator to python `requests` for faster run and no parasite window
-- Speech to text to convert your own voice in text and directly speak with Monika :soon:
+- Speech to text to convert your own voice in text and directly speak with Monika :white_check_mark:
 - Better face emotions detection :white_check_mark:
 - Face recognition for Monika only to recognize you
+- Add possibility to see when microphone starts recording in the game for STT
 - *Feel free to suggest improvements or new AI features you would like to see*
