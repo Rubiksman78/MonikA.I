@@ -59,8 +59,8 @@ There are several arguments you can use in command line:
 You have to create a json file `auth.json` with keys `USERNAME` and `PASSWORD` with your credentials for the character AI website:
 ```
 {
-  "USERNAME":****@****,
-  "PASSWORD":*****
+  "USERNAME":"****@****",
+  "PASSWORD":"*****"
 }
 ```
   
