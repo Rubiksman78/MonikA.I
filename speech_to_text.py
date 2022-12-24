@@ -4,7 +4,6 @@ import speech_recognition as sr
 import whisper
 import tempfile
 import os
-import click
 import torch
 import numpy as np
 
