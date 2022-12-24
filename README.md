@@ -31,7 +31,7 @@ There is also emotion detection with the webcam with a model from [HSEmotion](ht
 
 To setup all the libraries:
 - Just do `pip install -r requirements.txt` in a terminal opened within the project folder
-(You can do `bash setpu.sh` if you want to install the developper version of TTS and have more control on what is done)
+(You can do `bash setup.sh` if you want to install the developper version of TTS and have more control on what is done)
 
 ## :heavy_plus_sign: Add to the game
 
