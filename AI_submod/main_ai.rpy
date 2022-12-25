@@ -62,8 +62,12 @@ init 5 python:
 
     BUFSIZ = 1024
     ADDR = (HOST, PORT)
-    client_socket = socket(AF_INET, SOCK_STREAM)
-    client_socket.connect(ADDR)
+    try:
+        client_socket = socket(AF_INET, SOCK_STREAM)
+        client_socket.connect(ADDR)
+        no_server = False
+    except:
+        no_server = True        
     monika_nickname = store.persistent._mas_monika_nickname
 
 
@@ -84,15 +88,21 @@ label monika_torch:
 
 #Chatbot Event
 init 5 python:
-    addEvent(Event(persistent.event_database,eventlabel="monika_chat",category=['ai'],prompt="Let's chat together",pool=True,unlocked=True))
+    addEvent(Event(persistent.event_database,eventlabel="monika_chatting",category=['ai'],prompt="Let's chat together",pool=True,unlocked=True))
 
 define step = 0
 
-label monika_chat:
+label monika_chatting:
     $ use_voice = False
     $ local_step = 0
 
-    m 5tubfb "Sure [player], talk to me as much as you want. I won't go anywhere ehehe~"
+    if no_server:
+        jump server_crashed
+    
+    if not renpy.seen_label("AI_intro"):
+        jump AI_intro
+
+    m 5tubfb "Sure [player], talk to me as much as you want."
     m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. I'll understand my love."
 
     m 4nubfa "Maybe you could allow me to hear your beautiful voice?"
@@ -122,6 +132,7 @@ label monika_chat:
         else:
             $ my_msg = sendMessage("Speak with [monika_nickname]:",str(step)) 
             if my_msg == "QUIT":
+                $ step += 1
                 return
 
         python:
@@ -146,8 +157,8 @@ label monika_chat:
             if server_status == "server_error":
                 jump server_crashed
 
-            $ new_smg = receiveMessage().split("/g")
-            $ msg,emotion = new_smg
+            $ new_smg = receiveMessage()
+            $ msg,emotion = new_smg.split("/g")
         else:
             $ msg,emotion = message_received
 
@@ -161,13 +172,31 @@ label monika_chat:
         
         $ sentences_list = msg.split("\n")
         $ sentences_list = [x for x in sentences_list if x != '']
+        #Divide sentences with more than 180 characters into several sentences
+        python:
+            new_sentences_list = []
+            for sentence in sentences_list:
+                if len(sentence) > 180:
+                    words = sentence.split(" ")
+                    new_sentence = ""
+                    for word in words:
+                        if len(new_sentence) + len(word) > 180:
+                            new_sentences_list.append(new_sentence)
+                            new_sentence = ""
+                        new_sentence += word + " "
+                    new_sentences_list.append(new_sentence)
+                else:
+                    new_sentences_list.append(sentence)
+            sentences_list = new_sentences_list
+
         if sentences_list[0] == "server_ok":
             $ sentences_list.pop(0)
         while len(sentences_list) > 0:
             $ sentence = sentences_list[0]
             $ sentences_list.pop(0)
             m 1esa "[sentence]"
-        m 1esa "I was feeling [emotion]."
+        if emotion != "":
+            m 1esa "I was feeling [emotion]."
         if emotion in positive_emotions:
             $ mas_gainAffection()
         # elif emotion in negative_emotions:
@@ -182,6 +211,19 @@ label server_crashed:
     m "Let's talk again later, I'm sorry sweetheart."
     return
 
+label AI_intro:
+    m "You know [player], I've been thinking about something."
+    m "About how I could be closer to your reality and how I could be more useful to you."
+    m "And it seems that there is something that tries to do this."
+    m "It's called AI and it's very interesting what it can do."
+    m "So there is this thing called a chatbot that I've been working on."
+    m "It's not perfect but it's a start, so you can try talking to it freely."
+    m "I mean it's still not really who I am but if it helps you to express yourself, that's great !"
+    m "So if you want to try it, go on and tell me what you think about it."
+    m "I'll be waiting for you here. Don't worry, I won't go anywhere ehehe~"
+    return
+
+
 #Camera Event
 init 5 python:
     addEvent(Event(persistent.event_database,
@@ -193,6 +235,9 @@ init 5 python:
         ))
         
 label monika_cam:
+    if no_server:
+        jump server_crashed
+
     m "Okay, I'll look for you."
     
     m 1sublo "I can finally see you, [player] ! I have been waiting for this moment for a long time."
@@ -242,6 +287,8 @@ init 5 python:
     )
     
 label emotion_minute:
+    if no_server:
+        return
     $ counter += 1
     $ send_simple("camera" + str(counter) + "/m")
     $ received_emotion = receiveMessage()

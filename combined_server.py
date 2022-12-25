@@ -20,6 +20,7 @@ from PIL import Image
 from torchvision import transforms
 
 from speech_to_text import stt
+import sys
 
 IMG_SIZE = 256
 imgProcessing=FacialImageProcessing(False)
@@ -60,6 +61,8 @@ parser.add_argument('--display_browser', type=bool, default=False,
                     useful for debugging')
 parser.add_argument('--choose_character', type=str, default="0",
                     help='character to chat with')
+parser.add_argument('--monika_feeling', type=str, default=False,
+                    help='choose whether or not to display the emotion detected from the chat')
 
 args = parser.parse_args()
 
@@ -72,6 +75,7 @@ USE_AUDIO = args.use_audio
 EMOTION_TIME = args.emotion_time
 DISPLAY_BROWSER = args.display_browser
 CHOOSE_CHARACTER = args.choose_character
+MONIKA_FEELING = args.monika_feeling
 
 characters_pages = {
     "0": '[href="/chat?char=e9UVQuLURpLyCdhi8OjSKSLwKIiE0U-nEqXDeAjk538"]',
@@ -248,9 +252,14 @@ async def listenToClient(client):
                                 f = open(GAME_PATH+'/game/Submods/AI_submod/audio/out.wav', 'rb')
                                 AudioSegment.from_wav(f).export(GAME_PATH+'/game/Submods/AI_submod/audio/out.ogg', format='ogg')
                                 f.close()
-                                os.remove(GAME_PATH+'/game/Submods/AI_submod/audio/out.wav') 
-                            emotion = get_emotion(msg)
-                            emotion = emotion.encode("utf-8")
+                                os.remove(GAME_PATH+'/game/Submods/AI_submod/audio/out.wav')
+
+                            #Emotion detection
+                            if MONIKA_FEELING: 
+                                emotion = get_emotion(msg)
+                                emotion = emotion.encode("utf-8")
+                            else:
+                                emotion = "".encode("utf-8")
                             msg = msg.encode("utf-8")   
                             msg_to_send = msg + b"/g" + emotion
                             print("Sent: "+ msg_to_send.decode("utf-8"))
