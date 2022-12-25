@@ -8,7 +8,7 @@ import torch
 import numpy as np
 
 
-def stt(model="base", english=True, verbose=False, energy=300, pause=0.8, dynamic_energy=False, save_file=False):
+def stt(model="base", english=True, verbose=False, energy=300, pause=1, dynamic_energy=False, save_file=False):
     if save_file:
         temp_dir = tempfile.mkdtemp()
         save_path = os.path.join(temp_dir, "temp.wav")

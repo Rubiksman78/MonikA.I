@@ -135,6 +135,11 @@ label monika_chatting:
                 $ step += 1
                 return
 
+        if use_voice:
+            $ begin_speak = receiveMessage()
+            if begin_speak == "yes":
+                m 1subfb "Okay, I'm listening."
+    
         python:
             client_socket.setblocking(0)
             k = 0

@@ -19,20 +19,9 @@ import torch
 from PIL import Image
 from torchvision import transforms
 
-from speech_to_text import stt
-import sys
-
-IMG_SIZE = 256
-imgProcessing=FacialImageProcessing(False)
-test_transforms = transforms.Compose(
-    [
-        transforms.Resize((IMG_SIZE,IMG_SIZE)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
-    ]
-)
-
+#from speech_to_text import stt
+import speech_recognition as sr
+import whisper
 
 auth_dict = json.load(open("auth.json"))
 USERNAME = auth_dict["USERNAME"]
@@ -52,7 +41,7 @@ parser.add_argument('--use_chatbot', type=bool, default=False,
                     help='use chatbot')
 parser.add_argument('--use_emotion_detection', type=bool, default=True, 
                     help='use emotion detection')
-parser.add_argument('--use_audio', type=bool, default=False,
+parser.add_argument('--use_audio', type=bool, default=True,
                     help='use audio')
 parser.add_argument('--emotion_time', type=int, default=10,
                     help='time between camera captures')
@@ -99,10 +88,40 @@ SERVER.bind(ADDRESS)
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-#emotion_model = keras.models.load_model('models/mobilenet_7.h5')
+###Load the emotion model#####
+emotion_model = torch.load('models/enet_b2_7.pt').to(device)
+
+###Load the speech recognizer#####
+english = True
+def init_stt(model="base", english=True,energy=300, pause=0.8, dynamic_energy=False):
+    if model != "large" and english:
+        model = model + ".en"
+    audio_model = whisper.load_model(model)    
+    
+    #load the speech recognizer and set the initial energy threshold and pause threshold
+    r = sr.Recognizer()
+    r.energy_threshold = energy
+    r.pause_threshold = pause
+    r.dynamic_energy_threshold = dynamic_energy
+
+    return r,audio_model
+
+r,audio_model = init_stt()
 
 # prevents openCL usage and unnecessary logging messages
 cv2.ocl.setUseOpenCL(False)
+
+
+IMG_SIZE = 256
+imgProcessing=FacialImageProcessing(False)
+test_transforms = transforms.Compose(
+    [
+        transforms.Resize((IMG_SIZE,IMG_SIZE)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                     std=[0.229, 0.224, 0.225])
+    ]
+)
 
 # dictionary which assigns each label an emotion (alphabetical order)
 emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
@@ -181,7 +200,19 @@ async def listenToClient(client):
 
             #Speech to text
             if received_msg == "begin_record":
-                received_msg = stt()
+                #received_msg = stt()
+
+                with sr.Microphone(sample_rate=16000) as source:
+                    sendMessage("yes".encode("utf-8"))
+                    #get and save audio to wav file
+                    audio = r.listen(source)
+                    torch_audio = torch.from_numpy(np.frombuffer(audio.get_raw_data(), np.int16).flatten().astype(np.float32) / 32768.0)
+                    audio_data = torch_audio
+                    if english:
+                        result = audio_model.transcribe(audio_data,language='english')
+                    else:
+                        result = audio_model.transcribe(audio_data)
+                    received_msg = result['text']
 
             print("User: "+received_msg)
 
@@ -267,7 +298,6 @@ async def listenToClient(client):
                         break
                     
         elif received_msg == "camera_int":
-            emotion_model = torch.load('models/enet_b2_7.pt').to(device)
             # start the webcam feed
             cap = cv2.VideoCapture(0)
             ret, frame = cap.read()
@@ -299,7 +329,6 @@ async def listenToClient(client):
             sendMessage(msg)
 
         else:
-            emotion_model = torch.load('models/enet_b2_7.pt').to(device)
             counter = received_msg[6:]
             counter = int(counter)
             if counter % EMOTION_TIME == 0:
