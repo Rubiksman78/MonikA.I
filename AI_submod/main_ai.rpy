@@ -1,9 +1,9 @@
 init -990 python in mas_submod_utils:
     Submod(
         author="Rubiksman1006",
-        name="MonikAI",
+        name="AI_submod",
         description="AI based features for MAS.",
-        version="1.0.1",
+        version="1.1.1",
         version_updates = {}
     )
 
@@ -11,9 +11,9 @@ init -990 python in mas_submod_utils:
 init -989 python:
     if store.mas_submod_utils.isSubmodInstalled("Submod Updater Plugin"):
         store.sup_utils.SubmodUpdater(
-            submod="MonikAI",
-            user_name="Rubiksman1006",
-            repository_name="Monik.A.I",
+            submod="AI_submod",
+            user_name="Rubiksman78",
+            repository_name="MonikA.I",
             update_dir="",
         )
 
@@ -140,22 +140,24 @@ label monika_chatting:
             if begin_speak == "yes":
                 m 1subfb "Okay, I'm listening."
     
-        python:
-            client_socket.setblocking(0)
-            k = 0
-            while True:
-                ready = select.select([client_socket], [], [], 0.1)
-                if ready[0]:
-                    message_received = receiveMessage().split("/g")
-                    break
-                else:
-                    if k > 20:
-                        renpy.say(m,"Oh, it seems that I can't hear you. Maybe you forgot something in the options ?")
-                        break 
-                    renpy.say(m,"[monika_nickname] is thinking...")
-                k += 1
-            client_socket.setblocking(1)
+        # python:
+        #     client_socket.setblocking(0)
+        #     k = 0
+        #     while True:
+        #         ready = select.select([client_socket], [], [], 0.1)
+        #         if ready[0]:
+        #             message_received = receiveMessage().split("/g")
+        #             break
+        #         else:
+        #             if k > 20:
+        #                 renpy.say(m,"Oh, it seems that I can't hear you. Maybe you forgot something in the options ?")
+        #                 break 
+        #             renpy.say(m,"[monika_nickname] is thinking...")
+        #         k += 1
+        #     client_socket.setblocking(1)
 
+        m "[monika_nickname] is thinking..."
+        $ message_received = receiveMessage().split("/g")
         #m "This is what I received: [message_received]"
         if len(message_received) < 2: #Only one word: server status
             $ server_status = message_received[0]
