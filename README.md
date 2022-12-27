@@ -90,7 +90,7 @@ The installation is quite painful, you can do the setup from this [notebook](htt
 
 Little demonstration of this TTS model (pauses were cut for convenience):
 
-https://user-images.githubusercontent.com/66365083/209716400-8ff128c1-be2e-4534-834c-1614782d86e5.mp4
+https://user-images.githubusercontent.com/66365083/209716914-0ee87421-12df-4cc2-96da-9fd85f27214e.mp4
 
 ## :alarm_clock: To develop
 - Speech to text to convert your own voice in text and directly speak with Monika :white_check_mark:
