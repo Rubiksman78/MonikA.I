@@ -83,9 +83,14 @@ The features are available in a specific `AI` Talk menu in the game.
 
 https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-a1fb-62d695e76c51.mp4
 
+## :microphone: Better Voice (only on Linux,MacOS or WSL)
+
+The voice used by Your TTS is obtained with zero-shot learning so it is not perfect and very closed to the original voice. To improve it, you can use the [FastPitch TTS from Nvidia NeMo](https://github.com/NVIDIA/NeMo).
+The installation is quite painful, you can do the setup from this [notebook](https://github.com/NVIDIA/NeMo/blob/main/tutorials/tts/FastPitch_Finetuning.ipynb) and use the script `combined_server_for_the_bold.py` to launch the server with this TTS model. It will also take more RAM so be sure to have enough (at the very least 16GB).
+
 ## :alarm_clock: To develop
 - Speech to text to convert your own voice in text and directly speak with Monika :white_check_mark:
 - Better face emotions detection :white_check_mark:
 - Face recognition for Monika only to recognize you
-- Add possibility to see when microphone starts recording in the game for STT
+- Add possibility to see when microphone starts recording in the game for STT :white_check_mark:
 - *Feel free to suggest improvements or new AI features you would like to see*
