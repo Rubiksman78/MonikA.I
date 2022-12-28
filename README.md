@@ -22,7 +22,7 @@ There is also emotion detection with the webcam with a model from [HSEmotion](ht
 ![Character AI](images/image_1.png)
 ## ❓Installation
 
-- Clone the repository or download the latest release
+- Clone the repository or download the latest release (`source code.zip`)
 - Go to the project folder with your favorite IDE
 - Be sure to have Python installed (3.8 or 3.9)
 
