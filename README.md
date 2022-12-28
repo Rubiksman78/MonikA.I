@@ -24,7 +24,7 @@ There is also emotion detection with the webcam with a model from [HSEmotion](ht
 
 - Clone the repository or download the latest release (`source code.zip`)
 - Go to the project folder with your favorite IDE
-- Be sure to have Python installed (3.8 or 3.9)
+- Be sure to have Python installed (3.8 or 3.9), TTS doesn't work with 3.10
 
 To setup all the libraries:
 - Just do `pip install -r requirements.txt` in a terminal opened within the project folder
