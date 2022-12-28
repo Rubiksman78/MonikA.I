@@ -25,6 +25,6 @@ git+https://github.com/openai/whisper.git
 # pytorch-lightning
 # sentencepiece
 # youtokentome
-wget
-pynini==2.1.4 #on windows, download https://www.openfst.org/twiki/pub/GRM/PyniniDownload/pynini-2.1.5.tar.gz and install it manually (need Microsoft Visual C++ 14.0 https://aka.ms/vs/17/release/vs_BuildTools.exe)
-nemo_toolkit['all']
+# wget
+#pynini==2.1.4 #on windows, download https://www.openfst.org/twiki/pub/GRM/PyniniDownload/pynini-2.1.5.tar.gz and install it manually (need Microsoft Visual C++ 14.0 https://aka.ms/vs/17/release/vs_BuildTools.exe)
+# nemo_toolkit['all']
