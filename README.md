@@ -30,6 +30,7 @@ To setup all the libraries:
 - Just do `pip install -r requirements.txt` in a terminal opened within the project folder
 (You can do `bash setup.sh` if you want to install the developper version of TTS and have more control on what is done)
 - Don't forget to run also `python -m playwright install` to install the browsers.
+- If you have issues for installing TTS, someone made a video for that (here)[https://www.youtube.com/watch?v=zRaDe08cUIk&t=743s].
 
 ## :heavy_plus_sign: Add to the game
 
