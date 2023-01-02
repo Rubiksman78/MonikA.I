@@ -19,7 +19,6 @@ import torch
 from PIL import Image
 from torchvision import transforms
 
-#from speech_to_text import stt
 import speech_recognition as sr
 import whisper
 
@@ -41,7 +40,7 @@ parser.add_argument('--use_chatbot', type=bool, default=False,
                     help='use chatbot')
 parser.add_argument('--use_emotion_detection', type=bool, default=True, 
                     help='use emotion detection')
-parser.add_argument('--use_audio', type=bool, default=True,
+parser.add_argument('--use_audio', type=bool, default=False,
                     help='use audio')
 parser.add_argument('--emotion_time', type=int, default=10,
                     help='time between camera captures')
@@ -177,7 +176,7 @@ def call(client):
     loop.close()
 
 #Launch the game
-subprocess.Popen(GAME_PATH+'\DDLC.exe')
+#subprocess.Popen(GAME_PATH+'\DDLC.exe')
 
 async def listenToClient(client):
     """ Get client username """
@@ -200,7 +199,6 @@ async def listenToClient(client):
 
             #Speech to text
             if received_msg == "begin_record":
-                #received_msg = stt()
 
                 with sr.Microphone(sample_rate=16000) as source:
                     sendMessage("yes".encode("utf-8"))
