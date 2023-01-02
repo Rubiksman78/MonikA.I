@@ -19,7 +19,6 @@ import torch
 from PIL import Image
 from torchvision import transforms
 
-from speech_to_text import stt
 import speech_recognition as sr
 import whisper
 
@@ -218,7 +217,6 @@ async def listenToClient(client):
 
             #Speech to text
             if received_msg == "begin_record":
-                #received_msg = stt()
 
                 with sr.Microphone(sample_rate=16000) as source:
                     sendMessage("yes".encode("utf-8"))
@@ -297,12 +295,7 @@ async def listenToClient(client):
                                 msg_audio = msg_audio.replace("{i}","")
                                 msg_audio = msg_audio.replace("{/i}",".")
                                 msg_audio = msg_audio.replace("~","!")
-                                # subprocess.check_call(['tts', '--text', msg_audio, '--model_name', 'tts_models/multilingual/multi-dataset/your_tts', '--speaker_wav', 'audios/talk_13.wav', '--language_idx', 'en', '--out_path', GAME_PATH + '/game/Submods/AI_submod/audio/out.wav'])
-                                # f = open(GAME_PATH+'/game/Submods/AI_submod/audio/out.wav', 'rb')
-                                # AudioSegment.from_wav(f).export(GAME_PATH+'/game/Submods/AI_submod/audio/out.ogg', format='ogg')
-                                # f.close()
-                                # os.remove(GAME_PATH+'/game/Submods/AI_submod/audio/out.wav')
-
+                              
                                 spec, audio = infer(spec_model, vocoder,msg_audio)
                                 audio = ipd.Audio(audio, rate=22050)
                                 audio = AudioSegment(audio.data, frame_rate=22050, sample_width=2, channels=1)
