@@ -97,6 +97,9 @@ Little demonstration of this TTS model (pauses were cut for convenience):
 
 https://user-images.githubusercontent.com/66365083/209716914-0ee87421-12df-4cc2-96da-9fd85f27214e.mp4
 
+## :headphones: Voicing everything ! 
+The file `main_voicing.rpy` in the `AI_submod` (to put in the game submod folder) is responsible for sending the text displayed in real time to the `voicing.py` script that will play the voice from this text. It is using the same model as the precedent section, feel free to modify the code if you want to use the first TTS model (performances not as good but easier installation).
+
 ## :alarm_clock: To develop
 - Speech to text to convert your own voice in text and directly speak with Monika :white_check_mark:
 - Better face emotions detection :white_check_mark:
