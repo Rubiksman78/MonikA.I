@@ -105,4 +105,5 @@ The file `main_voicing.rpy` in the `AI_submod` (to put in the game submod folder
 - Better face emotions detection :white_check_mark:
 - Face recognition for Monika only to recognize you
 - Add possibility to see when microphone starts recording in the game for STT :white_check_mark:
+- Training new models for MEL Spectrogram Generation (Mixed TTS...) and Vocoders (UnivNet...)
 - *Feel free to suggest improvements or new AI features you would like to see*
