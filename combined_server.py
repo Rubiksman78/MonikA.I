@@ -176,7 +176,7 @@ def call(client):
     loop.close()
 
 #Launch the game
-#subprocess.Popen(GAME_PATH+'\DDLC.exe')
+subprocess.Popen(GAME_PATH+'\DDLC.exe')
 
 async def listenToClient(client):
     """ Get client username """
