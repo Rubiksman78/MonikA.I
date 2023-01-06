@@ -100,6 +100,11 @@ https://user-images.githubusercontent.com/66365083/209716914-0ee87421-12df-4cc2-
 ## :headphones: Voicing everything ! 
 The file `main_voicing.rpy` in the `AI_submod` (to put in the game submod folder) is responsible for sending the text displayed in real time to the `voicing.py` script that will play the voice from this text. It is using the same model as the precedent section, feel free to modify the code if you want to use the first TTS model (performances not as good but easier installation).
 
+## Troubleshooting
+
+- "failed wheels for building TTS": check if you have python 3.8 or 3.9, and not 3.10 or higher
+- "playwright command not found": run "python -m playwright install" instead
+
 ## :alarm_clock: To develop
 - Speech to text to convert your own voice in text and directly speak with Monika :white_check_mark:
 - Better face emotions detection :white_check_mark:
