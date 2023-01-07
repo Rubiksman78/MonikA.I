@@ -2,7 +2,7 @@ init -990 python in mas_submod_utils:
     Submod(
         author="Rubiksman1006",
         name="AI_submod",
-        description="AI based features for MAS.",
+        description="为MAS添加AI为基础的功能.",
         version="1.1.2",
         version_updates = {}
     )
@@ -12,7 +12,7 @@ init -989 python:
     if store.mas_submod_utils.isSubmodInstalled("Submod Updater Plugin"):
         store.sup_utils.SubmodUpdater(
             submod="AI_submod",
-            user_name="Rubiksman78",
+            user_name="MAS-Submod-MoyuTeam",
             repository_name="MonikA.I",
             update_dir="",
         )
