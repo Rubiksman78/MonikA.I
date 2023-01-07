@@ -44,6 +44,7 @@ The submod is the folder `AI_submod`. To add it to your game, you have to add it
 ## :loudspeaker: Usage
 
 Because of the high usage of Machine Learning algorithms, the inference can be quite long on CPU so it is advised to have a functional GPU for a better experience.
+You would need also more RAM than usually, deactivate the TTS model if it is using too much ressources.
 
 To use it, you can launch the script `combined_server.py` that will automatically launch a server with chatbot and emotion recognitions models, it will also launch the game and initialize the client/server connection. 
 
