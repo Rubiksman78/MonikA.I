@@ -9,7 +9,7 @@ translate chinese python:
     "surprised": "What is it ? Is there something wrong ?",
     "no": "Oh it seems that I can't see through your camera sweetie. Maybe face me a little bit more ?",
     }
-    addEvent(Event(persistent.event_database,eventlabel="monika_torch",category=['ai'],prompt="一起聊天吧(Pytorch)",pool=True,unlocked=True))
+    addEvent(Event(persistent.event_database,eventlabel="monika_torch",category=['ai'],prompt="跟我说说Pytorch",pool=True,unlocked=True))
     addEvent(Event(persistent.event_database,eventlabel="monika_chatting",category=['ai'],prompt="一起聊天吧",pool=True,unlocked=True))
     addEvent(Event(persistent.event_database,
         eventlabel="monika_cam",
