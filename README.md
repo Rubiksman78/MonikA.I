@@ -4,6 +4,9 @@
   <a href="https://github.com/Rubiksman78/MonikA.I./releases/latest">
     <img alt="Latest release" src="https://img.shields.io/github/v/release/Rubiksman78/MonikA.I.">
   </a>
+  <a href="https://discord.gg/2RsPuaDxEn">
+    <img alt="Latest release" src="https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white">
+  </a>
 </p>
 
 This project aims to add new AI based features to [Monika After Story mod](https://github.com/Monika-After-Story/MonikaModDev) with the submod API.
