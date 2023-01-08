@@ -5,9 +5,10 @@
     <img alt="Latest release" src="https://img.shields.io/github/v/release/Rubiksman78/MonikA.I.">
   </a>
   <a href="https://discord.gg/2RsPuaDxEn">
-    <img alt="Latest release" src="https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white">
+    <img alt="Latest release" src="https://img.shields.io/discord/2RsPuaDxEn">
   </a>
 </p>
+https://img.shields.io/discord/2RsPuaDxEn
 
 This project aims to add new AI based features to [Monika After Story mod](https://github.com/Monika-After-Story/MonikaModDev) with the submod API.
 It's using HuggingFace DialoGPT models, [TTS Coqui-AI](https://github.com/coqui-ai/TTS) for Text to Speech, [OpenAI Whisper](https://github.com/openai/whisper) with [microphone option](https://github.com/mallorbc/whisper_mic) for Speech to Text and [Character AI](https://character.ai/) for more realistic responses. An [emotion detection from text model](https://huggingface.co/michellejieli/emotion_text_classifier) is also used linked with the chatbot.
