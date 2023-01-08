@@ -5,7 +5,7 @@
     <img alt="Latest release" src="https://img.shields.io/github/v/release/Rubiksman78/MonikA.I.">
   </a>
   <a href="https://discord.gg/2RsPuaDxEn">
-    <img alt="Latest release" src="https://img.shields.io/discord/2RsPuaDxEn">
+    <img alt="Latest release" src="https://img.shields.io/badge/Discord-Join%20the%20Server%20!-brightgreen">
   </a>
 </p>
 https://img.shields.io/discord/2RsPuaDxEn
