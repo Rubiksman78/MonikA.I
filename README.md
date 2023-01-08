@@ -38,7 +38,7 @@ To setup all the libraries:
 
 ## :heavy_plus_sign: Add to the game
 
-The submod is the folder `AI_submod`. To add it to your game, you have to add it in your game folder to `game/Submods/`.
+The submod is in the folder `game`. To add it to your game, you have to add it in the root of your game folder (at the same location where there is already a `game` folder).
 
 ## :video_camera: Video tutorial
 
