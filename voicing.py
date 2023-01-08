@@ -37,7 +37,6 @@ clients = {}
 addresses = {}
 
 HOST = '127.0.0.1'
-#HOST = socket.gethostbyname(socket.gethostname())
 print(HOST)
 PORT = 12344
 BUFSIZE = 1024
@@ -74,15 +73,13 @@ async def listenToClient(client):
     name = "User"
     clients[client] = name
     step = 0
-    sentence_list = []
+    last_sentence = ""
     while True:
         msg = client.recv(BUFSIZE).decode("utf-8")         
 
-        if msg != "":
+        if msg != "" and len(msg) > 5:
             if step > 0:
                 play_obj.stop()
-                if msg_audio == sentence_list[-1]:
-                    continue
             msg_audio = msg.replace("\n"," ")
             msg_audio = msg_audio.replace("{i}","")
             msg_audio = msg_audio.replace("{/i}",".")
@@ -90,13 +87,18 @@ async def listenToClient(client):
             #remove characters in {} and []
             msg_audio = re.sub(r'\{.*?\}', '', msg_audio)
 
-            print(repr(msg_audio))
-            sentence_list.append(msg)
-            
-            spec, audio = infer(spec_model, vocoder,msg_audio)
+            #Delete last_sentence in the msg_audio and everything at the right of it
+            if last_sentence != "":
+                msg_audio = msg_audio.replace(last_sentence,"\g")
+                msg_audio = msg_audio.split("\g")[0]
+            msg_audio_play = msg_audio
+            print(msg_audio + "|" + last_sentence + "|" + msg_audio_play)
+            print('\n')
+            spec, audio = infer(spec_model, vocoder,msg_audio_play)
             audio = ipd.Audio(audio, rate=22050)
             play_obj = sa.play_buffer(audio.data, 1, 2, 22050)
             step += 1
+            last_sentence = msg_audio
     
 def sendMessage(msg, name=""):
     """ send message to all users present in
