@@ -121,6 +121,8 @@ The file `main_voicing.rpy` in the `AI_submod` (to put in the game submod folder
 
 ## :alarm_clock: To develop
 - Improve dialogs to introduce the Submod the first time (telling what it does, how is it different from actual Monika)
+- Add saving history of conversations to see again your best interactions
+- Making it like a messaging app with questions/answers listed on a same window
 - Define better facial expressions corresponding to predifined emotions (happiness,fear,surprise...)
 - Convert more functionalities to executable files (TTS,Speech Recognition)
 - Make the better TTS available only on MacOS/Linux for now usable also on other OS.
