@@ -120,9 +120,14 @@ The file `main_voicing.rpy` in the `AI_submod` (to put in the game submod folder
 - "Monika says that there is a bug somewhere": that means the website couldn't be accessed, check if you've done the `playwright install` and check on your browser if the website isn't down. You can set `display_browser` to `True` to see the connection with the graphic interface.
 
 ## :alarm_clock: To develop
+- Improve dialogs to introduce the Submod the first time (telling what it does, how is it different from actual Monika)
+- Define better facial expressions corresponding to predifined emotions (happiness,fear,surprise...)
+- Convert more functionalities to executable files (TTS,Speech Recognition)
+- Make the better TTS available only on MacOS/Linux for now usable also on other OS.
+- Link this with Live2D for face movements with speech and emotions
+- Face recognition for Monika only to recognize you
+- Training new models for MEL Spectrogram Generation (Mixed TTS...) and Vocoders (UnivNet...)
 - Speech to text to convert your own voice in text and directly speak with Monika :white_check_mark:
 - Better face emotions detection :white_check_mark:
-- Face recognition for Monika only to recognize you
 - Add possibility to see when microphone starts recording in the game for STT :white_check_mark:
-- Training new models for MEL Spectrogram Generation (Mixed TTS...) and Vocoders (UnivNet...)
 - *Feel free to suggest improvements or new AI features you would like to see*
