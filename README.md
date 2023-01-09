@@ -110,6 +110,7 @@ The file `main_voicing.rpy` in the `AI_submod` (to put in the game submod folder
 - "playwright command not found": run `python -m playwright install` instead
 - "utf8 error": be sure to write the game path in the main script with "\\" and not "\" if you are on Windows
 - "Monika says that there is a bug somewhere": that means the website couldn't be accessed, check if you've done the `playwright install` and check on your browser if the website isn't down. You can set `display_browser` to `True` to see the connection with the graphic interface.
+
 ## :alarm_clock: To develop
 - Speech to text to convert your own voice in text and directly speak with Monika :white_check_mark:
 - Better face emotions detection :white_check_mark:
