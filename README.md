@@ -15,6 +15,10 @@ There is also emotion detection with the webcam with a model from [HSEmotion](ht
 
 *Disclaimer: This project adds features (chatbots) that can be imprevisible and may not be in total accordance with the usual way Monika is supposed to speak. The goal is to have fun free interactions when running out of topics for example. There are also a lot of libraries and models involved so it can make the game slower when using them.*
 
+## :boom: NEW
+
+You can now just download the executables and the `game` folder in the latest releases ! Put the game in your root game directory (where there is the `game` folder already in there) and run the `main` executable in the `executables/dist` folder.
+
 ## :fire: Features
 
 - Allow Monika to finally see you through the webcam and react to your emotions
