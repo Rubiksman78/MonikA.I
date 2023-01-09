@@ -17,7 +17,11 @@ There is also emotion detection with the webcam with a model from [HSEmotion](ht
 
 ## :boom: NEW
 
-You can now just download the executables and the `game` folder in the latest releases ! Put the game in your root game directory (where there is the `game` folder already in there) and run the `main` executable in the `executables/dist` folder.
+You can now just download the `executables.zip` and the `game` folder in the latest releases ! Put the game in your root game directory (where there is the `game` folder already in there) and run the `main` executable in the `executables/dist` folder. You don't need to download the `source_code.zip`
+
+()[images/tkinter.png]
+
+You can input you IDs for character.ai, choose the model (0 or 1) and put the path of your DDLC installation (from the root of your PC like `C:\\User...\\MyDDLC` and don't forget `\\` if you are on Windows)
 
 ## :fire: Features
 
