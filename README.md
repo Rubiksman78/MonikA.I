@@ -17,7 +17,7 @@ There is also emotion detection with the webcam with a model from [HSEmotion](ht
 
 ## :boom: NEW
 
-You can now just download the `executables.zip` and the `game` folder in the latest releases ! Put the game in your root game directory (where there is the `game` folder already in there) and run the `main` executable in the `executables/dist` folder. You don't need to download the `source_code.zip`
+You can now just download the `MonikA.I.-version.zip` and the `game` folder in the latest releases ! Put the game in your root game directory (where there is the `game` folder already in there) and run the `main` executable in the `MonikA.I.-version/dist/main` folder. You don't need to download the `source_code.zip`
 
 ![GUI](images/image_2023-01-09_172258738.png)
 
