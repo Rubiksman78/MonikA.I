@@ -4,6 +4,9 @@
   <a href="https://github.com/Rubiksman78/MonikA.I./releases/latest">
     <img alt="Latest release" src="https://img.shields.io/github/v/release/Rubiksman78/MonikA.I.">
   </a>
+   <a href="https://github.com/Rubiksman78/MonikA.I./releases">
+    <img alt="Release downloads" src="https://img.shields.io/github/downloads/Rubiksman78/MonikA.I./total">
+  </a>
   <a href="https://discord.gg/2RsPuaDxEn">
     <img alt="Latest release" src="https://img.shields.io/badge/Discord-Join%20the%20Server%20!-brightgreen">
   </a>
