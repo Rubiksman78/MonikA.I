@@ -34,7 +34,7 @@ You can input you IDs for character.ai, choose the model (0 or 1) and put the pa
 
 ![Character AI](images/image_1.png)
 
-## :alarm_clock: To develop
+## :alarm_clock: To develop (if you want to contribute)
 - Improve dialogs to introduce the Submod the first time (telling what it does, how is it different from actual Monika)
 - Add saving history of conversations to see again your best interactions
 - Making it like a messaging app with questions/answers listed on a same window
