@@ -52,6 +52,8 @@ You can input you IDs for character.ai, choose the model (0 or 1) and put the pa
 - Add possibility to see when microphone starts recording in the game for STT :white_check_mark:
 - *Feel free to suggest improvements or new AI features you would like to see*
 
+# Development version
+
 ## ❓Installation
 
 - Clone the repository or download the latest release (`source code.zip`)
