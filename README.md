@@ -20,6 +20,8 @@ There is also emotion detection with the webcam with a model from [HSEmotion](ht
 
 Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some questions or if you want to be up to date with new fixes and releases !
 
+# User friendly mode
+
 ## :boom: NEW
 
 You can now just download the `MonikA.I.-version.zip` and the `game` folder in the latest releases ! Put the game in your root game directory (where there is the `game` folder already in there, put it at the same level) and run the `main` executable in the `MonikA.I.-version/dist/main` folder. You don't need to download the `source_code.zip`
