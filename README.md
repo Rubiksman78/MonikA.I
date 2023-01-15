@@ -22,9 +22,11 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 # User friendly mode
 
-## :boom: NEW
+## :boom: Installation
 
 You can now just download the `MonikA.I.-version.zip` and the `game` folder in the latest releases ! Put the game in your root game directory (where there is the `game` folder already in there, put it at the same level) and run the `main` executable in the `MonikA.I.-version/dist/main` folder. You don't need to download the `source_code.zip`
+
+Your antivirus might block the execution of the file but it is a common issue with `pyinstaller` to convert python files to executables. All the code is available here for transparency.
 
 ![GUI](images/image_2023-01-09_172258738.png)
 
