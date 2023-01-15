@@ -22,7 +22,7 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 # User friendly mode
 
-## :boom: Installation
+## :boom: Installation (build for Windows OS only now)
 
 You can now just download the `MonikA.I.-version.zip` and the `game` folder in the latest releases ! Put the game in your root game directory (where there is the `game` folder already in there, put it at the same level) and run the `main` executable in the `MonikA.I.-version/dist/main` folder. You don't need to download the `source_code.zip`
 
