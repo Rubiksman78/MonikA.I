@@ -15,7 +15,7 @@ asyncio
 playwright
 nest_asyncio
 #For STT
-pyaudio
+simpleaudio
 SpeechRecognition
 git+https://github.com/openai/whisper.git
 #New TTS
