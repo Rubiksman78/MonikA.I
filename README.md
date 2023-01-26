@@ -26,6 +26,7 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 - Go to the Github project: https://github.com/Rubiksman78/MonikA.I
 - Go to Releases
+![release](https://cdn.discordapp.com/attachments/1063968734831706217/1063968923382464692/tuto1.png)
 - Download MonikA.I-version.zip and game.zip
 - Unzip game.zip and put it in your DDLC folder, at the same level as the existing game (they have to merge together)
 - Unzip MonikA.I-version.zip wherever you want
