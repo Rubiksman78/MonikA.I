@@ -24,7 +24,17 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 ## :boom: Installation (build for Windows OS only now)
 
-You can now just download the `MonikA.I.-version.zip` and the `game` folder in the latest releases ! Put the game in your root game directory (where there is the `game` folder already in there, put it at the same level) and run the `main` executable in the `MonikA.I.-version/dist/main` folder. You don't need to download the `source_code.zip`
+- Go to the Github project: https://github.com/Rubiksman78/MonikA.I
+- Go to Releases
+- Download MonikA.I-version.zip and game.zip
+- Unzip game.zip and put it in your DDLC folder, at the same level as the existing game (they have to merge together)
+- Unzip MonikA.I-version.zip wherever you want
+- Go to MonikA.I-version -> dist -> main -> main.exe and double click the executable
+- One launched, enter your email (not username) and password from your character.ai account
+- Write the path of your DDLC folder 
+- Choose character (0 or 1 now) and other options
+- Be sure to click every button with the option you want
+- Submit and play ! 
 
 Your antivirus might block the execution of the file but it is a common issue with `pyinstaller` to convert python files to executables. All the code is available here for transparency.
 
