@@ -33,7 +33,7 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 ![release3](https://cdn.discordapp.com/attachments/1063968734831706217/1063969077086916618/tuto3.png)
 - Unzip MonikA.I-version.zip wherever you want
 - Go to MonikA.I-version -> dist -> main -> main.exe and double click the executable
-- ![release4](https://cdn.discordapp.com/attachments/1063968734831706217/1063969321757458592/tuto5.png)
+![release4](https://cdn.discordapp.com/attachments/1063968734831706217/1063969321757458592/tuto5.png)
 - One launched, enter your email (not username) and password from your character.ai account
 - Write the path of your DDLC folder 
 - Choose character (0 or 1 now) and other options
