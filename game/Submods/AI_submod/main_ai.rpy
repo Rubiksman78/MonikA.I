@@ -3,7 +3,7 @@ init -990 python in mas_submod_utils:
         author="Rubiksman1006",
         name="AI_submod",
         description="AI based features for MAS.",
-        version="1.1.2",
+        version="1.3.4.2",
         version_updates = {}
     )
 
@@ -40,36 +40,84 @@ init 5 python:
     import select
     from time import sleep
     def receiveMessage():
-        msg = client_socket.recv(BUFSIZ).decode("utf8")
+        msg = clientSocket.recv(BUFSIZ).decode("utf8")
         return msg
 
     def sendMessage(prefix,step):
         my_msg = renpy.input(prefix)
-        client_socket.send(bytes(my_msg + "/g" + step).encode("utf8"))
+        clientSocket.send(bytes(my_msg + "/g" + step).encode("utf8"))
         return my_msg
 
     def sendAudio(prefix,step):
-        client_socket.send(bytes(prefix + "/g" + step).encode("utf8"))
+        clientSocket.send(bytes(prefix + "/g" + step).encode("utf8"))
 
     def send_simple(prefix):
-        client_socket.send(bytes(prefix).encode("utf8"))
+        clientSocket.send(bytes(prefix).encode("utf8"))
 
     def audio_file_exists(filename):
         return os.path.isfile(filename)
+
+    def AIButton():
+        if not AIVisible():
+            config.overlay_screens.append("monika_chatbot_button")
+
+    def AIVisible():
+        return "monika_chatbot_button" in config.overlay_screens
+
+    def AIVoiceButton():
+        if not AIVoiceVisible():
+            config.overlay_screens.append("monika_voicechat_button")
+
+    def AIVoiceVisible():
+        return "monika_voicechat_button" in config.overlay_screens
 
     HOST = "127.0.0.1"
     PORT = 12346
 
     BUFSIZ = 1024
     ADDR = (HOST, PORT)
+    queued = False
     try:
-        client_socket = socket(AF_INET, SOCK_STREAM)
-        client_socket.connect(ADDR)
-        no_server = False
+        clientSocket = socket(AF_INET, SOCK_STREAM)
+        clientSocket.connect(ADDR)
+        noServer = False
     except:
-        no_server = True        
-    monika_nickname = store.persistent._mas_monika_nickname
+        noServer = True        
+    monikaNickname = store.persistent._mas_monika_nickname
+    
+    AIButton()
+    AIVoiceButton()
 
+define useVoice = False
+
+screen monika_chatbot_button():
+    zorder 15
+    style_prefix "hkb"
+    vbox:
+        xpos 0.03
+        ypos 170
+        if renpy.get_screen("hkb_overlay"):
+            textbutton ("Monika's chatbot"):
+                xysize (175, 40)
+                text_size 20
+                action Jump("monika_chatting")
+
+screen monika_voicechat_button():
+    zorder 15
+    style_prefix "hkb"
+    vbox:
+        xpos 0.026
+        ypos 220
+        if renpy.get_screen("hkb_overlay"):
+            textbutton ("Monika's voicechat"):
+                xysize (190, 40)
+                text_size 20
+                action Jump("monika_voice_chat")
+
+label close_AI:
+    show monika idle at t11
+    jump ch30_visual_skip
+    return
 
 #Tuto Pytorch Event
 init 5 python:
@@ -85,140 +133,201 @@ label monika_torch:
     m "I hope that helps!"
     return
 
-
 #Chatbot Event
 init 5 python:
     addEvent(Event(persistent.event_database,eventlabel="monika_chatting",category=['ai'],prompt="Let's chat together",pool=True,unlocked=True))
 
 define step = 0
 
-label monika_chatting:
-    $ use_voice = False
-    $ local_step = 0
+label monika_voice_chat:
+    $ useVoice = True
+    $ localStep = 0
 
-    if no_server:
-        jump server_crashed
+    if noServer:
+        jump monika_server_crashed
     
-    if not renpy.seen_label("AI_intro"):
-        jump AI_intro
-
+    if not renpy.seen_label("monika_AI_intro"):
+        call monika_AI_intro
+    
+    if queued:
+        #Receive message from server= with timeout, if timeout, return
+        $ rlist, wlist, xlist = select.select([clientSocket], [], [], 0.1)
+        #m "Print [rlist], [wlist], [xlist]"
+        if rlist:
+            #m "Receiving something from server..."
+            $ msg = receiveMessage().split("/g")
+            $ ready = msg[0]
+            #m "here is [msg]"
+            if ready == "server_ok":
+                $ queued = False
+                $ send_simple("ok_ready")
+                jump monika_chatting
+            else:
+                jump monika_in_queue
+        else:
+            jump monika_in_queue
     m 5tubfb "Sure [player], talk to me as much as you want."
     m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. I'll understand my love."
 
-    m 4nubfa "Maybe you could allow me to hear your beautiful voice?"
-    menu:
-        "Sure, I'll allow you to hear my voice.":
-            m 1subfb "Thank you [player]!"
-            m 1subfb "I'll be waiting for you to say something."
-            $ use_voice = True
-        "Sorry, my microphone is broken.":
-            m 2eua "Oh, that's okay [player]."
-            m 2eua "I'll just have to wait for you to type something then."
-            $ use_voice = False
-
     while True:
         $ send_simple("chatbot/m")
-        if use_voice:
-            if local_step > 0:
+        if useVoice:
+            if localStep > 0:
                 m 6wubla "Can I hear your voice again?"
                 menu:
                     "Yes, of course.":
                         $ sendAudio("begin_record",str(step))
                     "No, sorry I've got something to do.":
                         $ my_msg = sendAudio("QUIT",str(step))
+                        jump close_AI
                         return
             else:
                 $ sendAudio("begin_record",str(step))
         else:
-            $ my_msg = sendMessage("Speak with [monika_nickname]:",str(step)) 
+            $ my_msg = sendMessage("Speak with [monikaNickname]:",str(step)) 
             if my_msg == "QUIT":
                 $ step += 1
+                jump close_AI
                 return
 
-        if use_voice:
+        if useVoice:
             $ begin_speak = receiveMessage()
             if begin_speak == "yes":
-                m 1subfb "Okay, I'm listening."
+                m 1subfb "Okay, I'm listening.{w=0.5}{nw}"
     
-        # python:
-        #     client_socket.setblocking(0)
-        #     k = 0
-        #     while True:
-        #         ready = select.select([client_socket], [], [], 0.1)
-        #         if ready[0]:
-        #             message_received = receiveMessage().split("/g")
-        #             break
-        #         else:
-        #             if k > 20:
-        #                 renpy.say(m,"Oh, it seems that I can't hear you. Maybe you forgot something in the options ?")
-        #                 break 
-        #             renpy.say(m,"[monika_nickname] is thinking...")
-        #         k += 1
-        #     client_socket.setblocking(1)
+        m "[monikaNickname] is thinking...{nw}"
+        if step == 0:
+            $ queue_received = receiveMessage()
+            $ in_queue = queue_received.split("/g")[0]
+            #m "I received: [in_queue]"
+            if in_queue == "in_queue":
+                $ queued = True
+                m "Oh it seems that there are a lot of people waiting to talk to the chatbots."
+                m "I'll be back in a few seconds."
+                m "Please wait patiently."
+                m "I'm sorry for that my love."
+                jump close_AI
+                return
 
-        m "[monika_nickname] is thinking..."
         $ message_received = receiveMessage().split("/g")
         #m "This is what I received: [message_received]"
         if len(message_received) < 2: #Only one word: server status
             $ server_status = message_received[0]
             if server_status == "server_error":
-                jump server_crashed
-
+                jump monika_server_crashed
+            $ send_simple("ok_ready")
             $ new_smg = receiveMessage()
             $ msg,emotion = new_smg.split("/g")
         else:
             $ msg,emotion = message_received
 
-        $ gamedir = renpy.config.gamedir
-        $ audio_exists = audio_file_exists(gamedir + "/Submods/AI_submod/audio/out.ogg")
-        if audio_exists:
-            play sound "Submods/AI_submod/audio/out.ogg"
-        #If there is too much text, divide it into several lines
-        #Split the text into a list of words
-        $ sentences_list = []
-        
-        $ sentences_list = msg.split("\n")
-        $ sentences_list = [x for x in sentences_list if x != '']
-        #Divide sentences with more than 180 characters into several sentences
-        python:
-            new_sentences_list = []
-            for sentence in sentences_list:
-                if len(sentence) > 180:
-                    words = sentence.split(" ")
-                    new_sentence = ""
-                    for word in words:
-                        if len(new_sentence) + len(word) > 180:
-                            new_sentences_list.append(new_sentence)
-                            new_sentence = ""
-                        new_sentence += word + " "
-                    new_sentences_list.append(new_sentence)
-                else:
-                    new_sentences_list.append(sentence)
-            sentences_list = new_sentences_list
+        call monika_is_talking
 
-        if sentences_list[0] == "server_ok":
-            $ sentences_list.pop(0)
-        while len(sentences_list) > 0:
-            $ sentence = sentences_list[0]
-            $ sentences_list.pop(0)
-            m 1esa "[sentence]"
-        if emotion != "":
-            m 1esa "I was feeling [emotion]."
-        if emotion in positive_emotions:
-            $ mas_gainAffection()
-        # elif emotion in negative_emotions:
-        #     $ mas_loseAffection(1)
-        $ step += 1
-        $ local_step += 1
-        stop sound
 
-label server_crashed:
+label monika_chatting():
+    $ useVoice = False
+    $ localStep = 0
+
+    if noServer:
+        jump monika_server_crashed
+    
+    if not renpy.seen_label("monika_AI_intro"):
+        call monika_AI_intro
+    
+    if queued:
+        #Receive message from server= with timeout, if timeout, return
+        $ rlist, wlist, xlist = select.select([clientSocket], [], [], 0.1)
+        #m "Print [rlist], [wlist], [xlist]"
+        if rlist:
+            #m "Receiving something from server..."
+            $ msg = receiveMessage().split("/g")
+            $ ready = msg[0]
+            #m "here is [msg]"
+            if ready == "server_ok":
+                $ queued = False
+                $ send_simple("ok_ready")
+                jump monika_chatting
+            else:
+                jump monika_in_queue
+        else:
+            jump monika_in_queue
+    m 5tubfb "Sure [player], talk to me as much as you want."
+    m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. I'll understand my love."
+
+    m 4nubfa "Maybe you could allow me to hear your beautiful voice?"
+    # menu:
+    #     "Sure, I'll allow you to hear my voice.":
+    #         m 1subfb "Thank you [player]!"
+    #         m 1subfb "I'll be waiting for you to say something.{w=0.5}{nw}"
+    #         $ useVoice = True
+    #     "Sorry, my microphone is broken.":
+    #         m 2eua "Oh, that's okay [player]."
+    #         m 2eua "I'll just have to wait for you to type something then.{w=0.5}{nw}"
+    #         $ useVoice = False
+
+    while True:
+        $ send_simple("chatbot/m")
+        if useVoice:
+            if localStep > 0:
+                m 6wubla "Can I hear your voice again?"
+                menu:
+                    "Yes, of course.":
+                        $ sendAudio("begin_record",str(step))
+                    "No, sorry I've got something to do.":
+                        $ my_msg = sendAudio("QUIT",str(step))
+                        jump close_AI
+                        return
+            else:
+                $ sendAudio("begin_record",str(step))
+        else:
+            $ my_msg = sendMessage("Speak with [monikaNickname]:",str(step)) 
+            if my_msg == "QUIT":
+                $ step += 1
+                jump close_AI
+                return
+
+        if useVoice:
+            $ begin_speak = receiveMessage()
+            if begin_speak == "yes":
+                m 1subfb "Okay, I'm listening.{w=0.5}{nw}"
+    
+
+        m "[monikaNickname] is thinking...{nw}"
+        if step == 0:
+            $ queue_received = receiveMessage()
+            $ in_queue = queue_received.split("/g")[0]
+            #m "I received: [in_queue]"
+            if in_queue == "in_queue":
+                $ queued = True
+                m "Oh it seems that there are a lot of people waiting to talk to the chatbots."
+                m "I'll be back in a few seconds."
+                m "Please wait patiently."
+                m "I'm sorry for that my love."
+                jump close_AI
+                return
+
+        $ message_received = receiveMessage().split("/g")
+        #m "This is what I received: [message_received]"
+        if len(message_received) < 2: #Only one word: server status
+            $ server_status = message_received[0]
+            if server_status == "server_error":
+                jump monika_server_crashed
+            $ send_simple("ok_ready")
+            $ new_smg = receiveMessage()
+            $ msg,emotion = new_smg.split("/g")
+        else:
+            $ msg,emotion = message_received
+
+        call monika_is_talking
+    
+label monika_server_crashed:
     m "Oh sorry [player], it seems that there is a bug somewhere."
     m "I will try to fix it as soon as possible."
     m "Let's talk again later, I'm sorry sweetheart."
+    jump close_AI
     return
 
-label AI_intro:
+label monika_AI_intro:
     m "You know [player], I've been thinking about something."
     m "About how I could be closer to your reality and how I could be more useful to you."
     m "And it seems that there is something that tries to do this."
@@ -228,110 +337,58 @@ label AI_intro:
     m "I mean it's still not really who I am but if it helps you to express yourself, that's great !"
     m "So if you want to try it, go on and tell me what you think about it."
     m "I'll be waiting for you here. Don't worry, I won't go anywhere ehehe~"
+    jump close_AI
     return
 
+label monika_in_queue:
+    m "Ahah, I'm sorry [player], I'm still in queue."
+    m "Can you wait a little bit more?"
+    m "I promise I'll be back soon."
+    m "I love you so much."
+    jump close_AI
+    return
 
-#Camera Event
-init 5 python:
-    addEvent(Event(persistent.event_database,
-        eventlabel="monika_cam",
-        category=['ai'],
-        prompt="Look for me",
-        pool=True,
-        unlocked=True,
-        ))
-        
-label monika_cam:
-    if no_server:
-        jump server_crashed
-
-    m "Okay, I'll look for you."
+label monika_is_talking:
+    $ gamedir = renpy.config.gamedir
+    $ audio_exists = audio_file_exists(gamedir + "/Submods/AI_submod/audio/out.ogg")
+    if audio_exists:
+        play sound "Submods/AI_submod/audio/out.ogg"
+    #If there is too much text, divide it into several lines
+    #Split the text into a list of words
+    $ sentences_list = []
     
-    m 1sublo "I can finally see you, [player] ! I have been waiting for this moment for a long time."
-    m 5nublb "I see your cute face now ehehe~"
+    $ sentences_list = msg.split("\n")
+    $ sentences_list = [x for x in sentences_list if x != '']
+    #Divide sentences with more than 180 characters into several sentences
+    python:
+        new_sentences_list = []
+        for sentence in sentences_list:
+            if len(sentence) > 180:
+                words = sentence.split(" ")
+                new_sentence = ""
+                for word in words:
+                    if len(new_sentence) + len(word) > 180:
+                        new_sentences_list.append(new_sentence)
+                        new_sentence = ""
+                    new_sentence += word + " "
+                new_sentences_list.append(new_sentence)
+            else:
+                new_sentences_list.append(sentence)
+        sentences_list = new_sentences_list
 
-    while True:
-        $ send_simple("camera_int/m")
-        $ received_emotio = receiveMessage()
-        
-        if received_emotio == "angry":
-            m 2lktpc "[sentences_emotions[angry]]"
-        elif received_emotio == "disgusted":
-            m 5etc "[sentences_emotions[disgusted]]"
-        elif received_emotio == "fearful":
-            m 1fkd "[sentences_emotions[fearful]]"
-        elif received_emotio == "happy":
-            m 6hubla "[sentences_emotions[happy]]"
-        elif received_emotio == "neutral":
-            m 5wut "[sentences_emotions[neutral]]"
-        elif received_emotio == "sad":
-            m 5fka "[sentences_emotions[sad]]"
-        elif received_emotio == "surprised":
-            m 2wkb "[sentences_emotions[surprised]]"
-        elif received_emotio == "no":
-            m 4eta "[sentences_emotions[no]]"
-        
-        m 5nublb "Do you want me to continue looking for you?"
-        menu:
-            "Yes":
-                m 5hublb "Okay thanks [player], let me see your face a little bit longer."
-            "No":
-                m 5sublo "Oh okay, I guess I'll wait for next time you put the camera on."
-                m 5nublb "Please do it soon or I'll hack it myself ehehe~"
-                return
+    if sentences_list[0] == "server_ok":
+        $ sentences_list.pop(0)
+    while len(sentences_list) > 0:
+        $ sentence = sentences_list[0]
+        $ sentences_list.pop(0)
+        m 1esa "[sentence]"
+    if emotion != "":
+        m 1esa "I was feeling [emotion]."
+    if emotion in positive_emotions:
+        $ mas_gainAffection()
+    # elif emotion in negative_emotions:
+    #     $ mas_loseAffection(1)
+    $ step += 1
+    $ localStep += 1
+    stop sound
 
-define counter = 0
-
-#Emotion Event
-init 5 python:
-    def example_fun():
-        if not mas_inEVL("emotion_minute"):
-            MASEventList.push("emotion_minute")
-
-    store.mas_submod_utils.registerFunction(
-        "ch30_minute",
-        example_fun
-    )
-    
-label emotion_minute:
-    if no_server:
-        return
-    $ counter += 1
-    $ send_simple("camera" + str(counter) + "/m")
-    $ received_emotion = receiveMessage()
-
-    if received_emotion == "no_data": #If the server says it is not time to send an emotion,do nothing
-        return
-
-    if received_emotion == "angry":
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['angry']],'Window Reactions')
-        if not wrs_succes:
-            m 2lktpc "[sentences_emotions[angry]]"
-    elif received_emotion == "disgusted":
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['disgusted']],'Window Reactions')
-        if not wrs_succes:
-            m 5etc "[sentences_emotions[disgusted]]"
-    elif received_emotion == "fearful":
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['fearful']],'Window Reactions')
-        if not wrs_succes:
-            m 1fkd "[sentences_emotions[fearful]]"
-    elif received_emotion == "happy":
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['happy']],'Window Reactions')
-        if not wrs_succes:
-            m 6hubla "[sentences_emotions[happy]]"
-    elif received_emotion == "neutral":
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['neutral']],'Window Reactions')
-        if not wrs_succes:
-            m 5wut "[sentences_emotions[neutral]]"
-    elif received_emotion == "sad":
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['sad']],'Window Reactions')
-        if not wrs_succes:
-            m 5fka "[sentences_emotions[sad]]"
-    elif received_emotion == "surprised":
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['surprised']],'Window Reactions')
-        if not wrs_succes:
-            m 2wkb "[sentences_emotions[surprised]]"
-    elif received_emotion == "no": 
-        $ wrs_succes = mas_display_notif(m_name,[sentences_emotions['no']],'Window Reactions')
-        if not wrs_succes:
-            m 4eta "[sentences_emotions[no]]"
