@@ -32,6 +32,7 @@ def get_input():
     global USE_CHARACTER_AI
     global USE_TTS
     global DEBUG_MODE
+    global CONTINUE_FROM_LAST
     USERNAME = username.get()
     PASSWORD = password.get()
     CHOOSE_CHARACTER = choose_character.get()
@@ -39,6 +40,7 @@ def get_input():
     USE_TTS = use_tts.get()
     GAME_PATH = game_path.get()
     DEBUG_MODE = debug_mode.get()
+    CONTINUE_FROM_LAST = continue_from_last.get()
     root.destroy()
 
 username = tk.StringVar()
@@ -48,6 +50,7 @@ use_character_ai = tk.StringVar()
 use_tts = tk.StringVar()
 game_path = tk.StringVar()
 debug_mode = tk.StringVar()
+continue_from_last = tk.StringVar()
 
 # tk.Label(root, text="Username").grid(row=0, column=0)
 # tk.Label(root, text="Password").grid(row=1, column=0)
@@ -55,6 +58,7 @@ tk.Label(root, text="Choose Character").grid(row=3, column=0)
 tk.Label(root, text="Use Character AI").grid(row=5, column=0)
 tk.Label(root, text="Use TTS").grid(row=6, column=0)
 tk.Label(root, text="Use Debug Mode").grid(row=7, column=0)
+tk.Label(root, text="Continue from last chat").grid(row=8, column=0)
 
 # tk.Entry(root, textvariable=username).grid(row=0, column=1)
 # tk.Entry(root, textvariable=password, show='*').grid(row=1, column=1)
@@ -69,7 +73,10 @@ tk.Radiobutton(root, text="No", variable=use_tts, value=False).grid(row=6, colum
 tk.Radiobutton(root, text="Yes", variable=debug_mode, value=True).grid(row=7, column=1)
 tk.Radiobutton(root, text="No", variable=debug_mode, value=False).grid(row=7, column=2)
 
-tk.Button(root, text="Submit", command=get_input).grid(row=8, column=0)
+tk.Radiobutton(root, text="Yes", variable=continue_from_last, value=True).grid(row=8, column=1)
+tk.Radiobutton(root, text="No", variable=continue_from_last, value=False).grid(row=8, column=2)
+
+tk.Button(root, text="Submit", command=get_input).grid(row=9, column=0)
 
 if save_ids:
     #Make button appear if the previous one was clicked
@@ -154,14 +161,20 @@ if GAME_PATH != "" and USERNAME != "" and PASSWORD != "":
     with open("game_path.txt", "w") as f:
         f.write(GAME_PATH + ";" + USERNAME + ";" + PASSWORD)
 
+# characters_pages = {
+#     "0": '[href="/chat?char=e9UVQuLURpLyCdhi8OjSKSLwKIiE0U-nEqXDeAjk538"]',
+#     "1": '[href="/chat?char=EdSSlsl49k3wnwvMvK4eCh4yOFBaGTMJ7Q9CxtG2DiU"]'
+# }
+
 characters_pages = {
-    "0": '[href="/chat?char=e9UVQuLURpLyCdhi8OjSKSLwKIiE0U-nEqXDeAjk538"]',
-    "1": '[href="/chat?char=EdSSlsl49k3wnwvMvK4eCh4yOFBaGTMJ7Q9CxtG2DiU"]'
+    "0": 'https://beta.character.ai/chat?char=e9UVQuLURpLyCdhi8OjSKSLwKIiE0U-nEqXDeAjk538',
+    "1": 'https://beta.character.ai/chat?char=EdSSlsl49k3wnwvMvK4eCh4yOFBaGTMJ7Q9CxtG2DiU'
 }
 
 USE_TTS = int(USE_TTS)
 USE_CHARACTER_AI = int(USE_CHARACTER_AI)
 DEBUG_MODE = int(DEBUG_MODE)
+CONTINUE_FROM_LAST = int(CONTINUE_FROM_LAST)
 
 #Convert GAME_PATH to Linux format
 GAME_PATH = GAME_PATH.replace("\\", "/")
@@ -174,7 +187,7 @@ BUFSIZE = 1024
 ADDRESS = (HOST, PORT)
 SERVER = socket(AF_INET, SOCK_STREAM)
 SERVER.bind(ADDRESS)
-
+queued = False
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 ####Load the speech recognizer#####
@@ -203,66 +216,51 @@ def listen():
 		addresses[client] = client_address
 		Thread(target = call, args = (client,)).start()
 
-def launch(browser,pw):
-    page = browser.new_page()
-    count = 0
-    while True:
-        page.goto("https://character-ai.us.auth0.com/u/login?state=hKFo2SA2UWpDVjJLanBBRHRtUkl5ZGxKanhyelloRzVCaDd0NaFur3VuaXZlcnNhbC1sb2dpbqN0aWTZIDRaTUtMQkt4UTNKU2tfbnVWbGxyUUZvZURpTW5ld0x0o2NpZNkgZHlEM2dFMjgxTXFnSVNHN0Z1SVhZaEwyV0VrbnFaenY")
-        #page.wait_for_load_state()
-        #wait for button
-        #page.wait_for_selector("button[type=button]")
-        count += 1
-        if count == 5:
-            print("Can't click first button")
-            return
-        try:
-            page.click("button[type=button]",timeout=5000)
-            break
-        except:
-            browser.close()
-            pw.stop()
-            pw = sync_playwright().start()
-            if DEBUG_MODE:
-                browser = pw.firefox.launch(headless=False)
-            else:
-                browser = pw.firefox.launch()
-            page = browser.new_page()
-        # if page.is_visible("[id=rcc-confirm-button]"):
-        #     break
-    page.click("[id=rcc-confirm-button]",timeout=5000)
+def first_start(context):
+    page = context.new_page()
+    page.goto("https://character-ai.us.auth0.com/u/login?state=hKFo2SAxWUlJZGZBR1dSdXo1M2VfQm9qT21KeGJJV2oxcVAwR6Fur3VuaXZlcnNhbC1sb2dpbqN0aWTZIEVwaVNsaGh3YU5MSzJiYXo5ZDg2c09GR05VaGQza3Zvo2NpZNkgZHlEM2dFMjgxTXFnSVNHN0Z1SVhZaEwyV0VrbnFaenY")
+    queue_and_things(page)
+    page.wait_for_selector('[id="#AcceptButton"]',timeout=5000000)
+    page.click('[id="#AcceptButton"]')
     page.click('[class="btn btn-primary btn-sm"]',timeout=5000)
     page.click('[class=" btn border"]',timeout=5000)
     page.fill("input#username",USERNAME,timeout=5000)
     page.fill("input#password",PASSWORD,timeout=5000)
     page.click("button[type=submit]")
-    try:
-        page.click('[href="/chats"]')
-    except:
-        print("Email or password incorrect or captcha not solved")
-        return
-    # except:
-    #     page.fill("input#password",PASSWORD)
-    #     time_first = time.time()
-    #     while not page.is_visible('[href="/chats"]') and time.time()-time_first < 10:
-    #         page.wait_for_timeout(5000)
-    #     page.click('[href="/chats"]')
+    page.wait_for_timeout(1000)
+    context.storage_state(path="storage.json")
+    return page
+
+def queue_and_things(page,queue_already_done=False):
+    global queued
+    if page.is_visible('[class="waitingrooms-text"]') and not queue_already_done:
+        print("In queue")
+        queued = True
+        sendMessage("in_queue/g".encode("utf-8"))
+    elif not queue_already_done:
+        print("Not in queue")
+        sendMessage("not_in_queue".encode("utf-8"))
+        
+def launch(context,pw,browser):
+    global queued
+    queue_already_done = False
     char_page = characters_pages[CHOOSE_CHARACTER]
-    if page.is_visible(char_page):
-         page.click(char_page,timeout=500)
+    if not os.path.exists("storage.json"):
+        page = first_start(context)
+        queue_already_done = True
     else:
-        try:
-            page.click('[href="/search?"]',timeout=5000)
-            page.fill("input#search-input","monika",timeout=5000)
-            page.click('[class="btn btn-primary"]',delay=2000,timeout=5000)
-            time_init = time.time()
-            while not page.is_visible(char_page) and time.time()-time_init < 30:
-                page.mouse.wheel(0,50)
-            page.click(char_page,timeout=5000)
-        except:
-            print("Character not found")
-            return
-    page.click('[class="col-auto px-2 dropdown"]',timeout=5000)
-    page.click('text=Save and Start New Chat')
+        context = browser.new_context(storage_state="storage.json")
+        page = context.new_page()
+    page.goto(char_page)
+    queue_and_things(page,queue_already_done)
+    if page.is_visible('[id="#AcceptButton"]'):
+        page.click('[id="#AcceptButton"]',timeout=5000)
+    page.wait_for_selector('[class="col-auto px-2 dropdown"]',timeout=5000000)
+    context.storage_state(path="storage.json")
+    if not CONTINUE_FROM_LAST:
+        page.wait_for_timeout(500)
+        page.click('[class="col-auto px-2 dropdown"]',timeout=5000)
+        page.click('text=Save and Start New Chat',timeout=5000)
     return page
 
 def call(client):
@@ -270,7 +268,7 @@ def call(client):
     thread.start()
 
 #Launch the game
-subprocess.Popen(GAME_PATH+'\DDLC.exe')
+subprocess.Popen(GAME_PATH+'/DDLC.exe')
 
 def post_message(page, message):
     if message == "QUIT":
@@ -325,15 +323,14 @@ def listenToClient(client):
                         pw = sync_playwright().start()
                         if DEBUG_MODE:
                             browser =  pw.firefox.launch(headless=False)
+                            context = browser.new_context()
                         else:
                             browser =  pw.firefox.launch()
-                        page = launch(browser,pw)
-                        if page == None:
-                            sendMessage("server_error".encode("utf-8"))
-                            pw.stop()
-                            continue
+                            context = browser.new_context()
+                        page = launch(context,pw,browser)
                         launched = True
                         sendMessage("server_ok".encode("utf-8"))
+                        ok_ready = client.recv(BUFSIZE).decode("utf-8")
                     except:
                         sendMessage("server_error".encode("utf-8"))
                         pw.stop()
@@ -342,6 +339,7 @@ def listenToClient(client):
                 if os.path.exists(GAME_PATH+'/game/Submods/AI_submod/audio/out.ogg'):
                     os.remove(GAME_PATH+'/game/Submods/AI_submod/audio/out.ogg')
                 time.sleep(2)
+                
                 post_message(page,received_msg)
 
                 while True:
@@ -381,6 +379,7 @@ def listenToClient(client):
                                     f = open(GAME_PATH+'/game/Submods/AI_submod/audio/out.wav', 'rb')
                                     audio = f.read()
                                     f.close()
+                                    # audio = model.tts(msg_audio,speaker_wav='audios/talk_13.wav',language_idx='en')
                                     play_obj = sa.play_buffer(audio, 1, 2, 16000)
                                     play_obj.wait_done()
                                     
