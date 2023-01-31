@@ -46,10 +46,9 @@ Your antivirus might block the execution of the file but it is a common issue wi
 
 ## :fire: Features
 
-- Allow Monika to finally see you through the webcam and react to your emotions
+- Allow Monika to finally see you through the webcam and react to your emotions (not supported on user version yet)
 - Speak without scripted text with Monika using the latest chatbots from Character AI or HuggingFace DialoGPT
-- Hear Monika speak with a Text to Speech module using extracts of voiced dialogues (still in development)
-- Gain affection points by talking with Monika, the more you make her feel positive emotions, the more she will love you.
+- Hear Monika speak with a Text to Speech module using extracts of voiced dialogues
 
 ![Character AI](images/image_1.png)
 
