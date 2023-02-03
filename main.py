@@ -297,7 +297,8 @@ def first_start(context):
     page.fill("input#username",USERNAME,timeout=5000)
     page.fill("input#password",PASSWORD,timeout=5000)
     page.click("button[type=submit]")
-    page.wait_for_timeout(1000)
+    #page.wait_for_timeout(1000)
+    page.wait_for_load_state("networkidle")
     context.storage_state(path="storage.json")
     return page
 
