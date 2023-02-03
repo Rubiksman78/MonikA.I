@@ -5,14 +5,19 @@ import subprocess
 from playwright.sync_api import sync_playwright
 import sys
 import tkinter as tk
+import tkinter.font as tkfont
 import time
 #TTS add
 import simpleaudio as sa
+
+from tts_api import TTS
 
 import speech_recognition as sr
 import whisper
 import torch
 import numpy as np
+
+import json
 
 # Configuration
 args = sys.argv[1:]
@@ -33,6 +38,7 @@ def get_input():
     global USE_TTS
     global DEBUG_MODE
     global CONTINUE_FROM_LAST
+    global KEEP_CONFIG
     USERNAME = username.get()
     PASSWORD = password.get()
     CHOOSE_CHARACTER = choose_character.get()
@@ -41,6 +47,7 @@ def get_input():
     GAME_PATH = game_path.get()
     DEBUG_MODE = debug_mode.get()
     CONTINUE_FROM_LAST = continue_from_last.get()
+    KEEP_CONFIG = keep_config.get()
     root.destroy()
 
 username = tk.StringVar()
@@ -51,6 +58,7 @@ use_tts = tk.StringVar()
 game_path = tk.StringVar()
 debug_mode = tk.StringVar()
 continue_from_last = tk.StringVar()
+keep_config = tk.StringVar()
 
 # tk.Label(root, text="Username").grid(row=0, column=0)
 # tk.Label(root, text="Password").grid(row=1, column=0)
@@ -59,6 +67,10 @@ tk.Label(root, text="Use Character AI").grid(row=5, column=0)
 tk.Label(root, text="Use TTS").grid(row=6, column=0)
 tk.Label(root, text="Use Debug Mode").grid(row=7, column=0)
 tk.Label(root, text="Continue from last chat").grid(row=8, column=0)
+
+font = tkfont.Font(family="Helvetica", size=12, weight="bold")
+#set font to keep config
+tk.Label(root, text="Use Saved Config", font=font).grid(row=9, column=0)
 
 # tk.Entry(root, textvariable=username).grid(row=0, column=1)
 # tk.Entry(root, textvariable=password, show='*').grid(row=1, column=1)
@@ -76,7 +88,10 @@ tk.Radiobutton(root, text="No", variable=debug_mode, value=False).grid(row=7, co
 tk.Radiobutton(root, text="Yes", variable=continue_from_last, value=True).grid(row=8, column=1)
 tk.Radiobutton(root, text="No", variable=continue_from_last, value=False).grid(row=8, column=2)
 
-tk.Button(root, text="Submit", command=get_input).grid(row=9, column=0)
+tk.Radiobutton(root, text="Yes", variable=keep_config, value=True).grid(row=9, column=1)
+tk.Radiobutton(root, text="No", variable=keep_config, value=False).grid(row=9, column=2)
+
+tk.Button(root, text="Submit", command=get_input).grid(row=10, column=0)
 
 if save_ids:
     #Make button appear if the previous one was clicked
@@ -156,6 +171,21 @@ else:
     
 root.mainloop()
 
+KEEP_CONFIG = int(KEEP_CONFIG)
+if KEEP_CONFIG:
+    if not os.path.exists("config.json"):
+        raise Exception("config.json not found")
+    with open("config.json", "r") as f:
+        config = json.load(f)
+        GAME_PATH = config["GAME_PATH"]
+        USERNAME = config["USERNAME"]
+        PASSWORD = config["PASSWORD"]
+        USE_TTS = config["USE_TTS"]
+        USE_CHARACTER_AI = config["USE_CHARACTER_AI"]
+        DEBUG_MODE = config["DEBUG_MODE"]
+        CONTINUE_FROM_LAST = config["CONTINUE_FROM_LAST"]
+        CHOOSE_CHARACTER = config["CHOOSE_CHARACTER"]
+
 #Write game_path to a file
 if GAME_PATH != "" and USERNAME != "" and PASSWORD != "":
     with open("game_path.txt", "w") as f:
@@ -176,6 +206,21 @@ USE_CHARACTER_AI = int(USE_CHARACTER_AI)
 DEBUG_MODE = int(DEBUG_MODE)
 CONTINUE_FROM_LAST = int(CONTINUE_FROM_LAST)
 
+#Save config to a json file
+config = {
+    "GAME_PATH": GAME_PATH,
+    "USE_TTS": USE_TTS,
+    "USE_CHARACTER_AI": USE_CHARACTER_AI,
+    "DEBUG_MODE": DEBUG_MODE,
+    "CONTINUE_FROM_LAST": CONTINUE_FROM_LAST,
+    "USERNAME": USERNAME,
+    "PASSWORD": PASSWORD,
+    "CHOOSE_CHARACTER": CHOOSE_CHARACTER,
+}
+
+with open("config.json", "w") as f:
+    json.dump(config, f)
+
 #Convert GAME_PATH to Linux format
 GAME_PATH = GAME_PATH.replace("\\", "/")
 # Global variables 
@@ -189,6 +234,31 @@ SERVER = socket(AF_INET, SOCK_STREAM)
 SERVER.bind(ADDRESS)
 queued = False
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+class my_TTS(TTS):
+    def __init__(self, *args, **kwargs):
+        super(my_TTS, self).__init__(*args, **kwargs)
+    
+    def tts(self, text: str, speaker: str = None, language: str = None,speaker_wav: str = None, reference_wav: str = None, style_wav: str = None, style_text: str = None, reference_speaker_name: str = None):
+        """Synthesize text to speech."""
+
+        wav = self.synthesizer.tts(
+            text=text,
+            speaker_name=speaker,
+            language_name=language,
+            speaker_wav=speaker_wav,
+            reference_wav=reference_wav,
+            style_wav=style_wav,
+            style_text=style_text,
+            reference_speaker_name=reference_speaker_name,
+        )
+        return wav
+
+    def tts_to_file(self, text: str, speaker: str = None, language: str = None, file_path: str = "output.wav", speaker_wav: str = None, reference_wav: str = None, style_wav: str = None, style_text: str = None, reference_speaker_name: str = None):
+        wav = self.tts(text=text, speaker=speaker, language=language,speaker_wav=speaker_wav, reference_wav=reference_wav, style_wav=style_wav, style_text=style_text, reference_speaker_name=reference_speaker_name)
+        self.synthesizer.save_wav(wav=wav, path=file_path)
+
+model = my_TTS(model_name="tts_models/multilingual/multi-dataset/your_tts")
 
 ####Load the speech recognizer#####
 english = True
@@ -374,12 +444,12 @@ def listenToClient(client):
                                 msg_audio = msg_audio.replace("{i}","")
                                 msg_audio = msg_audio.replace("{/i}",".")
                                 msg_audio = msg_audio.replace("~","!")
-                                subprocess.check_call(['tts', '--text', msg_audio, '--model_name', 'tts_models/multilingual/multi-dataset/your_tts', '--speaker_wav', 'audios/talk_13.wav', '--language_idx', 'en', '--out_path', GAME_PATH + '/game/Submods/AI_submod/audio/out.wav'])
+                                #subprocess.check_call(['tts', '--text', msg_audio, '--model_name', 'tts_models/multilingual/multi-dataset/your_tts', '--speaker_wav', 'audios/talk_13.wav', '--language_idx', 'en', '--out_path', GAME_PATH + '/game/Submods/AI_submod/audio/out.wav'])
+                                model.tts_to_file(text=msg_audio,speaker_wav='audios/talk_13.wav', language='en',file_path=GAME_PATH + '/game/Submods/AI_submod/audio/out.wav')
                                 def playVoice():
                                     f = open(GAME_PATH+'/game/Submods/AI_submod/audio/out.wav', 'rb')
                                     audio = f.read()
                                     f.close()
-                                    # audio = model.tts(msg_audio,speaker_wav='audios/talk_13.wav',language_idx='en')
                                     play_obj = sa.play_buffer(audio, 1, 2, 16000)
                                     play_obj.wait_done()
                                     

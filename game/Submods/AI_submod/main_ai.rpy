@@ -3,6 +3,7 @@ init -990 python in mas_submod_utils:
         author="Rubiksman1006",
         name="AI_submod",
         description="AI based features for MAS.",
+        settings_pane="monikai_chat_settings",
         version="1.3.4.2",
         version_updates = {}
     )
@@ -85,10 +86,30 @@ init 5 python:
         noServer = True        
     monikaNickname = store.persistent._mas_monika_nickname
     
-    AIButton()
-    AIVoiceButton()
+    if persistent._show_monikai_buttons == None:
+        persistent._show_monikai_buttons = True
+    
+    if persistent._show_monikai_buttons:
+        AIButton()
+        AIVoiceButton()
 
-define useVoice = False
+define persistent._show_monikai_buttons = True
+screen monikai_chat_settings:
+    $ tooltip = renpy.get_screen("submods", "screens").scope["tooltip"]
+
+    vbox:
+        box_wrap False
+        xfill True
+        xmaximum 800
+
+        style_prefix "check"
+
+    
+        textbutton "Show buttons":
+            selected persistent._show_monikai_buttons
+            action ToggleField(persistent, "_show_monikai_buttons")
+            hovered SetField(tooltip, "value", "Enable display of shortcut buttons.")
+            unhovered SetField(tooltip, "value", tooltip.default)
 
 screen monika_chatbot_button():
     zorder 15
@@ -97,10 +118,15 @@ screen monika_chatbot_button():
         xpos 0.03
         ypos 170
         if renpy.get_screen("hkb_overlay"):
-            textbutton ("Monika's chatbot"):
-                xysize (175, 40)
-                text_size 20
-                action Jump("monika_chatting")
+            if store.mas_hotkeys.talk_enabled is False:
+                textbutton ("Monika's chatbot"):
+                    xysize (175, 40)
+                    text_size 20
+            else:
+                textbutton ("Monika's chatbot"):
+                    xysize (175, 40)
+                    text_size 20
+                    action Jump("monika_chatting")
 
 screen monika_voicechat_button():
     zorder 15
@@ -109,10 +135,15 @@ screen monika_voicechat_button():
         xpos 0.026
         ypos 220
         if renpy.get_screen("hkb_overlay"):
-            textbutton ("Monika's voicechat"):
-                xysize (190, 40)
-                text_size 20
-                action Jump("monika_voice_chat")
+            if store.mas_hotkeys.talk_enabled is False:
+                textbutton ("Monika's voicechat"):
+                    xysize (190, 40)
+                    text_size 20
+            else:
+                textbutton ("Monika's voicechat"):
+                    xysize (190, 40)
+                    text_size 20
+                    action Jump("monika_voice_chat")
 
 label close_AI:
     show monika idle at t11
@@ -140,6 +171,7 @@ init 5 python:
 define step = 0
 
 label monika_voice_chat:
+    $ mas_RaiseShield_dlg()
     $ useVoice = True
     $ localStep = 0
 
@@ -167,7 +199,6 @@ label monika_voice_chat:
         else:
             jump monika_in_queue
     m 5tubfb "Sure [player], talk to me as much as you want."
-    m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. I'll understand my love."
 
     while True:
         $ send_simple("chatbot/m")
@@ -225,6 +256,7 @@ label monika_voice_chat:
 
 
 label monika_chatting():
+    $ mas_RaiseShield_dlg()
     $ useVoice = False
     $ localStep = 0
 
@@ -254,7 +286,7 @@ label monika_chatting():
     m 5tubfb "Sure [player], talk to me as much as you want."
     m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. I'll understand my love."
 
-    m 4nubfa "Maybe you could allow me to hear your beautiful voice?"
+    #m 4nubfa "Maybe you could allow me to hear your beautiful voice?"
     # menu:
     #     "Sure, I'll allow you to hear my voice.":
     #         m 1subfb "Thank you [player]!"
