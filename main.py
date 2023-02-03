@@ -297,7 +297,10 @@ def first_start(context):
     page.fill("input#username",USERNAME,timeout=5000)
     page.fill("input#password",PASSWORD,timeout=5000)
     page.click("button[type=submit]")
-    #page.wait_for_timeout(1000)
+    page.wait_for_load_state("networkidle")
+    if not page.is_visible('[class="nav-icon-text-desktop text-wrap"]'):
+        print("Something is wrong, captcha or wrong ids, try again with debug mode")
+    page.wait_for_selector('[class="nav-icon-text-desktop text-wrap"]',timeout=50000)
     page.wait_for_load_state("networkidle")
     context.storage_state(path="storage.json")
     return page
