@@ -128,3 +128,26 @@ class TTS:
         """
         wav = self.tts(text=text, speaker=speaker, language=language)
         self.synthesizer.save_wav(wav=wav, path=file_path)
+
+class my_TTS(TTS):
+    def __init__(self, *args, **kwargs):
+        super(my_TTS, self).__init__(*args, **kwargs)
+    
+    def tts(self, text: str, speaker: str = None, language: str = None,speaker_wav: str = None, reference_wav: str = None, style_wav: str = None, style_text: str = None, reference_speaker_name: str = None):
+        """Synthesize text to speech."""
+
+        wav = self.synthesizer.tts(
+            text=text,
+            speaker_name=speaker,
+            language_name=language,
+            speaker_wav=speaker_wav,
+            reference_wav=reference_wav,
+            style_wav=style_wav,
+            style_text=style_text,
+            reference_speaker_name=reference_speaker_name,
+        )
+        return wav
+
+    def tts_to_file(self, text: str, speaker: str = None, language: str = None, file_path: str = "output.wav", speaker_wav: str = None, reference_wav: str = None, style_wav: str = None, style_text: str = None, reference_speaker_name: str = None):
+        wav = self.tts(text=text, speaker=speaker, language=language,speaker_wav=speaker_wav, reference_wav=reference_wav, style_wav=style_wav, style_text=style_text, reference_speaker_name=reference_speaker_name)
+        self.synthesizer.save_wav(wav=wav, path=file_path)
