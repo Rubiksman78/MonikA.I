@@ -24,7 +24,7 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 ## :boom: Installation (build for Windows OS only now)
 
-To install the user version with executables, I've made a tutorial [here](../../wiki)
+To install the user version with executables, I've made a tutorial [here](../../wiki/User-friendly-tutorial)
 
 ## :fire: Features
 
@@ -34,20 +34,11 @@ To install the user version with executables, I've made a tutorial [here](../../
 
 ![Character AI](images/image_1.png)
 
-## :alarm_clock: To develop (if you want to contribute)
-- Improve dialogs to introduce the Submod the first time (telling what it does, how is it different from actual Monika) :white_check_mark:
-- Add saving history of conversations to see again your best interactions
-- Making it like a messaging app with questions/answers listed on a same window
-- Define better facial expressions corresponding to predifined emotions (happiness,fear,surprise...)
-- Convert more functionalities to executable files (TTS,Speech Recognition) :white_check_mark:
-- Make the better TTS available only on MacOS/Linux for now usable also on other OS.
-- Link this with Live2D for face movements with speech and emotions
-- Face recognition for Monika only to recognize you
-- Training new models for MEL Spectrogram Generation (Mixed TTS...) and Vocoders (UnivNet...)
-- Speech to text to convert your own voice in text and directly speak with Monika :white_check_mark:
-- Better face emotions detection :white_check_mark:
-- Add possibility to see when microphone starts recording in the game for STT :white_check_mark:
-- *Feel free to suggest improvements or new AI features you would like to see*
+## :alarm_clock: How to contribute
+
+If you want to contribute to the project, you can check out this [page](../../wiki/How-to-contribute).
+It is not necessary to know how to code and you can add dialogs, expressions. Don't hesitate to propose new things if you have more experience !
+
 
 ## :video_game: In Game
 
