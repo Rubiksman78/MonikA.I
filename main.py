@@ -1,229 +1,46 @@
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
-import os
+import os,sys
 import subprocess
 from playwright.sync_api import sync_playwright
-import sys
-import tkinter as tk
-import tkinter.font as tkfont
 import time
-#TTS add
 import simpleaudio as sa
 
-from tts_api import TTS
+from tts_api import my_TTS
 
 import speech_recognition as sr
 import whisper
 import torch
 import numpy as np
 
-import json
+import IPython.display as ipd
+from login_screen import CONFIG
 
-# Configuration
-args = sys.argv[1:]
+GAME_PATH = CONFIG["GAME_PATH"]
+USE_TTS = CONFIG["USE_TTS"]
+USE_CHARACTER_AI = CONFIG["USE_CHARACTER_AI"]
+DEBUG_MODE = CONFIG["DEBUG_MODE"]
+CONTINUE_FROM_LAST = CONFIG["CONTINUE_FROM_LAST"]
+USERNAME = CONFIG["USERNAME"]
+PASSWORD = CONFIG["PASSWORD"]
+CHOOSE_CHARACTER = CONFIG["CHOOSE_CHARACTER"]
 
-save_ids = os.path.exists("game_path.txt")
+class HiddenPrints:
+    def __enter__(self):
+        self._original_stdout = sys.stdout
+        sys.stdout = open(os.devnull, 'w')
 
-root = tk.Tk()
-root.title("MonikA.I. Submod")
-root.geometry("400x400")
-root.resizable(False, False)
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout.close()
+        sys.stdout = self._original_stdout
 
-def get_input():
-    global USERNAME
-    global PASSWORD
-    global CHOOSE_CHARACTER
-    global GAME_PATH
-    global USE_CHARACTER_AI
-    global USE_TTS
-    global DEBUG_MODE
-    global CONTINUE_FROM_LAST
-    global KEEP_CONFIG
-    USERNAME = username.get()
-    PASSWORD = password.get()
-    CHOOSE_CHARACTER = choose_character.get()
-    USE_CHARACTER_AI = use_character_ai.get()
-    USE_TTS = use_tts.get()
-    GAME_PATH = game_path.get()
-    DEBUG_MODE = debug_mode.get()
-    CONTINUE_FROM_LAST = continue_from_last.get()
-    KEEP_CONFIG = keep_config.get()
-    root.destroy()
-
-username = tk.StringVar()
-password = tk.StringVar()
-choose_character = tk.StringVar()
-use_character_ai = tk.StringVar()
-use_tts = tk.StringVar()
-game_path = tk.StringVar()
-debug_mode = tk.StringVar()
-continue_from_last = tk.StringVar()
-keep_config = tk.StringVar()
-
-# tk.Label(root, text="Username").grid(row=0, column=0)
-# tk.Label(root, text="Password").grid(row=1, column=0)
-tk.Label(root, text="Choose Character").grid(row=3, column=0)
-tk.Label(root, text="Use Character AI").grid(row=5, column=0)
-tk.Label(root, text="Use TTS").grid(row=6, column=0)
-tk.Label(root, text="Use Debug Mode").grid(row=7, column=0)
-tk.Label(root, text="Continue from last chat").grid(row=8, column=0)
-
-font = tkfont.Font(family="Helvetica", size=12, weight="bold")
-#set font to keep config
-tk.Label(root, text="Use Saved Config", font=font).grid(row=9, column=0)
-
-# tk.Entry(root, textvariable=username).grid(row=0, column=1)
-# tk.Entry(root, textvariable=password, show='*').grid(row=1, column=1)
-tk.Entry(root, textvariable=choose_character).grid(row=3, column=1)
-
-tk.Radiobutton(root, text="Yes", variable=use_character_ai, value=True).grid(row=5, column=1)
-tk.Radiobutton(root, text="No", variable=use_character_ai, value=False).grid(row=5, column=2)
-
-tk.Radiobutton(root, text="Yes", variable=use_tts, value=True).grid(row=6, column=1)
-tk.Radiobutton(root, text="No", variable=use_tts, value=False).grid(row=6, column=2)
-
-tk.Radiobutton(root, text="Yes", variable=debug_mode, value=True).grid(row=7, column=1)
-tk.Radiobutton(root, text="No", variable=debug_mode, value=False).grid(row=7, column=2)
-
-tk.Radiobutton(root, text="Yes", variable=continue_from_last, value=True).grid(row=8, column=1)
-tk.Radiobutton(root, text="No", variable=continue_from_last, value=False).grid(row=8, column=2)
-
-tk.Radiobutton(root, text="Yes", variable=keep_config, value=True).grid(row=9, column=1)
-tk.Radiobutton(root, text="No", variable=keep_config, value=False).grid(row=9, column=2)
-
-tk.Button(root, text="Submit", command=get_input).grid(row=10, column=0)
-
-if save_ids:
-    #Make button appear if the previous one was clicked
-    def on_select(v):
-        global GAME_PATH
-        if v == True:            
-            tk.Label(root, text="Change Game Path").grid(row=4, column=0)
-            tk.Entry(root, textvariable=game_path).grid(row=4, column=3)
-
-            tk.Label(root, text="Change email").grid(row=0, column=0)
-            tk.Entry(root, textvariable=username).grid(row=0, column=3)
-
-            tk.Label(root, text="Change password").grid(row=1, column=0)
-            tk.Entry(root, textvariable=password,show='*').grid(row=1, column=3)
-        else:
-            with open("game_path.txt", "r") as f:
-                string = f.read()
-                GAME_PATH,USERNAME,PASSWORD = string.split(";")
-            #Write GAME_PATH in the box
-            tk.Label(root, text="Change Game Path").grid(row=4, column=0)
-            tk.Entry(root, textvariable=game_path).grid(row=4, column=3)
-            game_path.set(GAME_PATH)
-
-            tk.Label(root, text="Change email").grid(row=0, column=0)
-            tk.Entry(root, textvariable=username).grid(row=0, column=3)
-            username.set(USERNAME)
-
-            tk.Label(root, text="Change password").grid(row=1, column=0)
-            tk.Entry(root, textvariable=password,show='*').grid(row=1, column=3)
-            password.set(PASSWORD)
-
-    tk.Label(root, text="Change Game Path").grid(row=4, column=0)
-    change_game_path = tk.BooleanVar()
-
-    yes_change = tk.Radiobutton(root, text="Yes", variable=change_game_path, value=True)
-    yes_change.grid(row=4, column=1)
-    yes_change.config(command=lambda: on_select(True))
-
-    no_change = tk.Radiobutton(root, text="No", variable=change_game_path, value=False)
-    no_change.grid(row=4, column=2)
-    no_change.config(command=lambda: on_select(False))
-
-    tk.Label(root, text="Change email").grid(row=0, column=0)
-    change_email = tk.BooleanVar()
-
-    yes_change = tk.Radiobutton(root, text="Yes", variable=change_email, value=True)
-    yes_change.grid(row=0, column=1)
-    yes_change.config(command=lambda: on_select(True))
-
-    no_change = tk.Radiobutton(root, text="No", variable=change_email, value=False)
-    no_change.grid(row=0, column=2)
-    no_change.config(command=lambda: on_select(False))
-
-    tk.Label(root, text="Change password").grid(row=1, column=0)
-    change_password = tk.BooleanVar()
-
-    yes_change = tk.Radiobutton(root, text="Yes", variable=change_password, value=True)
-    yes_change.grid(row=1, column=1)
-    yes_change.config(command=lambda: on_select(True))
-
-    no_change = tk.Radiobutton(root, text="No", variable=change_password, value=False)
-    no_change.grid(row=1, column=2)
-    no_change.config(command=lambda: on_select(False))
-
-else:
-    game_path = tk.StringVar()
-    tk.Label(root, text="Game Path").grid(row=4, column=0)
-    tk.Entry(root, textvariable=game_path).grid(row=4, column=1)
-
-    username = tk.StringVar()
-    tk.Label(root, text="Email").grid(row=0, column=0)
-    tk.Entry(root, textvariable=username).grid(row=0, column=1)
-
-    password = tk.StringVar()
-    tk.Label(root, text="Password").grid(row=1, column=0)
-    tk.Entry(root, textvariable=password, show='*').grid(row=1, column=1)
-    
-root.mainloop()
-
-KEEP_CONFIG = int(KEEP_CONFIG)
-if KEEP_CONFIG:
-    if not os.path.exists("config.json"):
-        raise Exception("config.json not found")
-    with open("config.json", "r") as f:
-        config = json.load(f)
-        GAME_PATH = config["GAME_PATH"]
-        USERNAME = config["USERNAME"]
-        PASSWORD = config["PASSWORD"]
-        USE_TTS = config["USE_TTS"]
-        USE_CHARACTER_AI = config["USE_CHARACTER_AI"]
-        DEBUG_MODE = config["DEBUG_MODE"]
-        CONTINUE_FROM_LAST = config["CONTINUE_FROM_LAST"]
-        CHOOSE_CHARACTER = config["CHOOSE_CHARACTER"]
-
-#Write game_path to a file
-if GAME_PATH != "" and USERNAME != "" and PASSWORD != "":
-    with open("game_path.txt", "w") as f:
-        f.write(GAME_PATH + ";" + USERNAME + ";" + PASSWORD)
-
-# characters_pages = {
-#     "0": '[href="/chat?char=e9UVQuLURpLyCdhi8OjSKSLwKIiE0U-nEqXDeAjk538"]',
-#     "1": '[href="/chat?char=EdSSlsl49k3wnwvMvK4eCh4yOFBaGTMJ7Q9CxtG2DiU"]'
-# }
 
 characters_pages = {
     "0": 'https://beta.character.ai/chat?char=e9UVQuLURpLyCdhi8OjSKSLwKIiE0U-nEqXDeAjk538',
     "1": 'https://beta.character.ai/chat?char=EdSSlsl49k3wnwvMvK4eCh4yOFBaGTMJ7Q9CxtG2DiU'
 }
 
-USE_TTS = int(USE_TTS)
-USE_CHARACTER_AI = int(USE_CHARACTER_AI)
-DEBUG_MODE = int(DEBUG_MODE)
-CONTINUE_FROM_LAST = int(CONTINUE_FROM_LAST)
-
-#Save config to a json file
-config = {
-    "GAME_PATH": GAME_PATH,
-    "USE_TTS": USE_TTS,
-    "USE_CHARACTER_AI": USE_CHARACTER_AI,
-    "DEBUG_MODE": DEBUG_MODE,
-    "CONTINUE_FROM_LAST": CONTINUE_FROM_LAST,
-    "USERNAME": USERNAME,
-    "PASSWORD": PASSWORD,
-    "CHOOSE_CHARACTER": CHOOSE_CHARACTER,
-}
-
-with open("config.json", "w") as f:
-    json.dump(config, f)
-
-#Convert GAME_PATH to Linux format
 GAME_PATH = GAME_PATH.replace("\\", "/")
-# Global variables 
 clients = {}
 addresses = {}
 HOST = '127.0.0.1'
@@ -235,30 +52,14 @@ SERVER.bind(ADDRESS)
 queued = False
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-class my_TTS(TTS):
-    def __init__(self, *args, **kwargs):
-        super(my_TTS, self).__init__(*args, **kwargs)
-    
-    def tts(self, text: str, speaker: str = None, language: str = None,speaker_wav: str = None, reference_wav: str = None, style_wav: str = None, style_text: str = None, reference_speaker_name: str = None):
-        """Synthesize text to speech."""
+#Launch the game
+subprocess.Popen(GAME_PATH+'/DDLC.exe')
 
-        wav = self.synthesizer.tts(
-            text=text,
-            speaker_name=speaker,
-            language_name=language,
-            speaker_wav=speaker_wav,
-            reference_wav=reference_wav,
-            style_wav=style_wav,
-            style_text=style_text,
-            reference_speaker_name=reference_speaker_name,
-        )
-        return wav
-
-    def tts_to_file(self, text: str, speaker: str = None, language: str = None, file_path: str = "output.wav", speaker_wav: str = None, reference_wav: str = None, style_wav: str = None, style_text: str = None, reference_speaker_name: str = None):
-        wav = self.tts(text=text, speaker=speaker, language=language,speaker_wav=speaker_wav, reference_wav=reference_wav, style_wav=style_wav, style_text=style_text, reference_speaker_name=reference_speaker_name)
-        self.synthesizer.save_wav(wav=wav, path=file_path)
-
-model = my_TTS(model_name="tts_models/multilingual/multi-dataset/your_tts")
+#########Load the TTS model##########
+with HiddenPrints():
+    if USE_TTS:
+        model = my_TTS(model_name="tts_models/multilingual/multi-dataset/your_tts")
+#####################################
 
 ####Load the speech recognizer#####
 english = True
@@ -266,16 +67,15 @@ def init_stt(model="base", english=True,energy=300, pause=0.8, dynamic_energy=Fa
     if model != "large" and english:
         model = model + ".en"
     audio_model = whisper.load_model(model)    
-    
-    #load the speech recognizer and set the initial energy threshold and pause threshold
     r = sr.Recognizer()
     r.energy_threshold = energy
     r.pause_threshold = pause
     r.dynamic_energy_threshold = dynamic_energy
-
     return r,audio_model
 
 r,audio_model = init_stt()
+#####################################
+
 
 def listen():
 	""" Wait for incoming connections """
@@ -340,9 +140,6 @@ def launch(context,pw,browser):
 def call(client):
     thread = Thread(target=listenToClient, args=(client,), daemon=True)
     thread.start()
-
-#Launch the game
-subprocess.Popen(GAME_PATH+'/DDLC.exe')
 
 def post_message(page, message):
     if message == "QUIT":
@@ -444,23 +241,16 @@ def listenToClient(client):
                             #TTS addition
                             if USE_TTS:
                                 print("Using TTS")
+                                if step > 0:
+                                    play_obj.stop()
                                 msg_audio = msg.replace("\n"," ")
                                 msg_audio = msg_audio.replace("{i}","")
                                 msg_audio = msg_audio.replace("{/i}",".")
                                 msg_audio = msg_audio.replace("~","!")
-                                #subprocess.check_call(['tts', '--text', msg_audio, '--model_name', 'tts_models/multilingual/multi-dataset/your_tts', '--speaker_wav', 'audios/talk_13.wav', '--language_idx', 'en', '--out_path', GAME_PATH + '/game/Submods/AI_submod/audio/out.wav'])
-                                model.tts_to_file(text=msg_audio,speaker_wav='audios/talk_13.wav', language='en',file_path=GAME_PATH + '/game/Submods/AI_submod/audio/out.wav')
-                                def playVoice():
-                                    f = open(GAME_PATH+'/game/Submods/AI_submod/audio/out.wav', 'rb')
-                                    audio = f.read()
-                                    f.close()
-                                    play_obj = sa.play_buffer(audio, 1, 2, 16000)
-                                    play_obj.wait_done()
-                                    
-                                    os.remove(GAME_PATH+'/game/Submods/AI_submod/audio/out.wav')
-                                thread_voice = Thread(target=playVoice, args=(), daemon=True)
-                                thread_voice.start()    
-                       
+                                with HiddenPrints():
+                                    audio = model.tts(text=msg_audio,speaker_wav='audios/talk_13.wav', language='en')
+                                audio = ipd.Audio(audio, rate=16000)
+                                play_obj = sa.play_buffer(audio.data, 1, 2, 16000)                   
                             emotion = "".encode("utf-8")
                             msg = msg.encode("utf-8")   
                             msg_to_send = msg + b"/g" + emotion
