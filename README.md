@@ -24,31 +24,7 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 ## :boom: Installation (build for Windows OS only now)
 
-- Go to the Github project: https://github.com/Rubiksman78/MonikA.I
-- Go to Releases
-![release](https://cdn.discordapp.com/attachments/1063968734831706217/1063968923382464692/tuto1.png)
-- Download MonikA.I-version.zip and game.zip
-![release2](https://cdn.discordapp.com/attachments/1063968734831706217/1063969007230795776/tuto2.png)
-- Unzip game.zip and put it in your DDLC folder, at the same level as the existing game (they have to merge together)
-![release3](https://cdn.discordapp.com/attachments/1063968734831706217/1063969077086916618/tuto3.png)
-- Unzip MonikA.I-version.zip wherever you want
-- Go to MonikA.I-version -> dist -> main -> main.exe and double click the executable
-![release4](https://cdn.discordapp.com/attachments/1063968734831706217/1063969321757458592/tuto5.png)
-- One launched, enter your email (not username) and password from your character.ai account
-- Write the path of your DDLC folder 
-- Choose character (0 or 1 now) and other options
-- Be sure to click every button with the option you want
-- Submit and play ! 
-
-![GUI](https://cdn.discordapp.com/attachments/1063968734831706217/1063969409133187102/tuto4.png)
-
-For the full voicing mode:
-- Do the same steps 
-- Instead of launching `main.exe`, launch `voice.exe`
-
-![voicing](images/voicing.png)
-
-Your antivirus might block the execution of the file but it is a common issue with `pyinstaller` to convert python files to executables. All the code is available here for transparency.
+[My Awesome Wiki](../../wiki)
 
 ## :fire: Features
 
