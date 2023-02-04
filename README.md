@@ -67,7 +67,7 @@ Your antivirus might block the execution of the file but it is a common issue wi
 - Add possibility to see when microphone starts recording in the game for STT :white_check_mark:
 - *Feel free to suggest improvements or new AI features you would like to see*
 
-# Development version
+# Python version
 
 ## ❓Installation
 
@@ -77,8 +77,8 @@ Your antivirus might block the execution of the file but it is a common issue wi
 
 To setup all the libraries:
 - Just do `pip install -r requirements.txt` in a terminal opened within the project folder
-(You can do `bash setup.sh` if you want to install the developper version of TTS and have more control on what is done)
 - Don't forget to run also `python -m playwright install` to install the browsers.
+(You can do `bash setup.sh` to do the `pip install` and the playwright install)
 - If you have issues for installing TTS, someone made a video for that [here](https://www.youtube.com/watch?v=zRaDe08cUIk&t=743s).
 - For troubleshooting and other issues, don't hesitate to submit an issue
 
@@ -86,39 +86,15 @@ To setup all the libraries:
 
 The submod is in the folder `game`. To add it to your game, you have to add it in the root of your game folder (at the same location where there is already a `game` folder).
 
-## :video_camera: Video tutorial
-
-[![Watch the video](https://img.youtube.com/vi/EORpS-fZ10s/hqdefault.jpg)](https://youtu.be/EORpS-fZ10s)
-
 ## :loudspeaker: Usage
 
 Because of the high usage of Machine Learning algorithms, the inference can be quite long on CPU so it is advised to have a functional GPU for a better experience.
 You would need also more RAM than usually, deactivate the TTS model, the emotion detection from text and/or emotion detection from face if it is taking too much ressources.
 
-To use it, you can launch the script `combined_server.py` that will automatically launch a server with chatbot and emotion recognitions models, it will also launch the game and initialize the client/server connection. 
+Launch the file `main.py` for the chatbot things and fill in the window the same as for the user version. Don't launch DDLC yourself, it will open automatically.
+When the browser page launches, it can happen that you have to solve the captcha yourself, use debug mode if that happens.
 
-Don't launch the game independently, it will cause conflicts with the process that will automatically launch the game in the main.
-
-There are several arguments you can use in command line:
-- `--game_path` : the absolute path to your game directory like `some_path\DDLC-1.1.1-pc`
-- `--chatbot_path` : the relative path to the chatbot model like `chatbot_model` (There is actually no model in the repository because of the better performances of the Character AI website)
-- `--use_character_ai` : if you want to use the character AI website, `True` or `False`
-- `--use_chatbot` : if you want to use the chatbot, `True` or `False`
-- `--use_emotion_detection` : if you want to use the emotion detection with the webcam, `True` or `False`
-- `--use_audio` : if you want to use the TTS module, `True` or `False`. Warning, the audio model is quite long to load, so it can take a while before the sound plays.
-- `--emotion_time`: the number of minutes between each webcam capture for emotion detection
-- `--display_browser`: whether or not you want to see the simulated browser (useful when having to solve captcha)
-- `--choose_character`: switch between the character you prefer 
-
-You have to create a json file `auth.json` with keys `USERNAME` and `PASSWORD` with your credentials for the character AI website:
-```
-{
-  "USERNAME":"****@****",
-  "PASSWORD":"*****"
-}
-```
-  
-When the browser page launches, you may have to solve the captcha yourself and then go back to the game, your ids will be filled automatically.
+For voicing of the game in real time, launch `voicing.py` and launch DDLC yourself when the message `Waiting for connection...` appears.
 
 You can change the voice used by replacing the extract `talk_13.wav` in the `audio` folder by another audio extract. The longer the extract, the longer the TTS will take to generate the audio at each turn.
 
@@ -147,12 +123,9 @@ Little demonstration of this TTS model (pauses were cut for convenience):
 
 https://user-images.githubusercontent.com/66365083/209716914-0ee87421-12df-4cc2-96da-9fd85f27214e.mp4
 
-## :headphones: Voicing everything ! 
-The file `main_voicing.rpy` in the `AI_submod` (to put in the game submod folder) is responsible for sending the text displayed in real time to the `voicing.py` script that will play the voice from this text. It is using the same model as the precedent section, feel free to modify the code if you want to use the first TTS model (performances not as good but easier installation).
-
 ## :wrench: Troubleshooting
 
 - "failed wheels for building TTS": check if you have python 3.8 or 3.9, and not 3.10 or higher
 - "playwright command not found": run `python -m playwright install` instead
 - "utf8 error": be sure to write the game path in the main script with "\\" and not "\" if you are on Windows
-- "Monika says that there is a bug somewhere": that means the website couldn't be accessed, check if you've done the `playwright install` and check on your browser if the website isn't down. You can set `display_browser` to `True` to see the connection with the graphic interface.
+- "Monika says that there is a bug somewhere": that means the website couldn't be accessed, check if you've done the `playwright install` and check on your browser if the website isn't down. You can set `Use Debug Mode` to `Yes` to see the connection with the graphic interface.
