@@ -24,6 +24,8 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 ## :boom: Installation (build for Windows OS only now)
 
+This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferale to use them separetely.
+
 To install the user version with executables, I've made a tutorial [here](../../wiki/User-friendly-tutorial)
 
 ## :fire: Features
