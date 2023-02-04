@@ -24,7 +24,7 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 ## :boom: Installation (build for Windows OS only now)
 
-[My Awesome Wiki](../../wiki)
+To install the user version with executables, I've made a tutorial [here](../../wiki)
 
 ## :fire: Features
 
