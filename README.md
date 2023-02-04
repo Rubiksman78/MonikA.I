@@ -49,6 +49,19 @@ To install the user version with executables, I've made a tutorial [here](../../
 - Add possibility to see when microphone starts recording in the game for STT :white_check_mark:
 - *Feel free to suggest improvements or new AI features you would like to see*
 
+## :video_game: In Game
+
+The features are available in a specific `AI` Talk menu in the game.
+![Talk menu](images/image_2.png)
+
+- Click on `Let's chat together` to use the Character AI Chatbot
+- Click on `Look for me` to use the facial emotions detection in an interactive session
+- Click on `Tell me about Pytorch` if you think it is superior to Tensorflow
+
+## :cinema: Video Demonstration
+
+https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-a1fb-62d695e76c51.mp4
+
 # Python version
 
 ## ❓Installation
@@ -79,19 +92,6 @@ When the browser page launches, it can happen that you have to solve the captcha
 For voicing of the game in real time, launch `voicing.py` and launch DDLC yourself when the message `Waiting for connection...` appears.
 
 You can change the voice used by replacing the extract `talk_13.wav` in the `audio` folder by another audio extract. The longer the extract, the longer the TTS will take to generate the audio at each turn.
-
-## :video_game: In Game
-
-The features are available in a specific `AI` Talk menu in the game.
-![Talk menu](images/image_2.png)
-
-- Click on `Let's chat together` to use the Character AI Chatbot
-- Click on `Look for me` to use the facial emotions detection in an interactive session
-- Click on `Tell me about Pytorch` if you think it is superior to Tensorflow
-
-## :cinema: Video Demonstration
-
-https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-a1fb-62d695e76c51.mp4
 
 ## :microphone: Better Voice (only on Linux,MacOS or WSL)
 
