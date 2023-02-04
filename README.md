@@ -26,7 +26,7 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferale to use them separetely.
 
-To install the user version with executables, I've made a tutorial [here](../../wiki/User-friendly-tutorial)
+To install the user version with executables, I've made a tutorial [HERE](../../wiki/User-friendly-tutorial)
 
 ## :fire: Features
 
