@@ -22,7 +22,9 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 # User friendly mode
 
-## :boom: Installation (build for Windows OS only now)
+## :boom: Installation 
+
+(Build is for Windows OS only, see `Python version` section for other OS)
 
 This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferale to use them separetely.
 
