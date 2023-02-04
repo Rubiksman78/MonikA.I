@@ -39,8 +39,12 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 - Choose character (0 or 1 now) and other options
 - Be sure to click every button with the option you want
 - Submit and play ! 
-
 ![GUI](https://cdn.discordapp.com/attachments/1063968734831706217/1063969409133187102/tuto4.png)
+
+For the full voicing mode:
+- Do the same steps 
+- Instead of launching `main.exe`, launch `voice.exe`
+![voicing](images/voicing.png)
 
 Your antivirus might block the execution of the file but it is a common issue with `pyinstaller` to convert python files to executables. All the code is available here for transparency.
 
