@@ -39,7 +39,7 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 - Choose character (0 or 1 now) and other options
 - Be sure to click every button with the option you want
 - Submit and play ! 
-- 
+
 ![GUI](https://cdn.discordapp.com/attachments/1063968734831706217/1063969409133187102/tuto4.png)
 
 For the full voicing mode:
@@ -59,11 +59,11 @@ Your antivirus might block the execution of the file but it is a common issue wi
 ![Character AI](images/image_1.png)
 
 ## :alarm_clock: To develop (if you want to contribute)
-- Improve dialogs to introduce the Submod the first time (telling what it does, how is it different from actual Monika)
+- Improve dialogs to introduce the Submod the first time (telling what it does, how is it different from actual Monika) :white_check_mark:
 - Add saving history of conversations to see again your best interactions
 - Making it like a messaging app with questions/answers listed on a same window
 - Define better facial expressions corresponding to predifined emotions (happiness,fear,surprise...)
-- Convert more functionalities to executable files (TTS,Speech Recognition)
+- Convert more functionalities to executable files (TTS,Speech Recognition) :white_check_mark:
 - Make the better TTS available only on MacOS/Linux for now usable also on other OS.
 - Link this with Live2D for face movements with speech and emotions
 - Face recognition for Monika only to recognize you
