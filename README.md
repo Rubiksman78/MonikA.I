@@ -46,11 +46,13 @@ It is not necessary to know how to code and you can add dialogs, expressions. Do
 ## :video_game: In Game
 
 The features are available in a specific `AI` Talk menu in the game.
-![Talk menu](images/image_2.png)
+![Talk menu](images/event_mas.png)
 
 - Click on `Let's chat together` to use the Character AI Chatbot
-- Click on `Look for me` to use the facial emotions detection in an interactive session
 - Click on `Tell me about Pytorch` if you think it is superior to Tensorflow
+
+There is also the possibility of using buttons on the main screen to directly chat.
+![Talk buttons](images/buttons_mas.png)
 
 ## :cinema: Video Demonstration
 
