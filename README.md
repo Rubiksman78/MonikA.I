@@ -51,7 +51,7 @@ The features are available in a specific `AI` Talk menu in the game.
 - Click on `Let's chat together` to use the Character AI Chatbot
 - Click on `Tell me about Pytorch` if you think it is superior to Tensorflow
 
-There is also the possibility of using buttons on the main screen to directly chat. These can be disabled in the menu if you don't like them.
+There is also the possibility of using buttons on the main screen to directly chat. These can be disabled in the Settings Submods if you don't like them.
 ![Talk buttons](images/buttons_mas.png)
 
 ## :cinema: Video Demonstration
