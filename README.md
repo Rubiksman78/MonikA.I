@@ -34,11 +34,12 @@ To install the user version with executables, I've made a tutorial [here](../../
 
 ![Character AI](images/image_1.png)
 
-## :alarm_clock: How to contribute
+# How to contribute
 
 If you want to contribute to the project, you can check out this [page](../../wiki/How-to-contribute).
 It is not necessary to know how to code and you can add dialogs, expressions. Don't hesitate to propose new things if you have more experience !
 
+# Demonstrations
 
 ## :video_game: In Game
 
