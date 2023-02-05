@@ -14,5 +14,6 @@ init -989 python:
             submod="AI_submod",
             user_name="Rubiksman78",
             repository_name="MonikA.I",
-            extraction_depth=3
+            update_dir="",
+            attachment_id=None,
         )
