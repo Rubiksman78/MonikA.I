@@ -22,33 +22,13 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 # User friendly mode
 
-## :boom: Installation (build for Windows OS only now)
+## :boom: Installation 
 
-- Go to the Github project: https://github.com/Rubiksman78/MonikA.I
-- Go to Releases
-![release](https://cdn.discordapp.com/attachments/1063968734831706217/1063968923382464692/tuto1.png)
-- Download MonikA.I-version.zip and game.zip
-![release2](https://cdn.discordapp.com/attachments/1063968734831706217/1063969007230795776/tuto2.png)
-- Unzip game.zip and put it in your DDLC folder, at the same level as the existing game (they have to merge together)
-![release3](https://cdn.discordapp.com/attachments/1063968734831706217/1063969077086916618/tuto3.png)
-- Unzip MonikA.I-version.zip wherever you want
-- Go to MonikA.I-version -> dist -> main -> main.exe and double click the executable
-![release4](https://cdn.discordapp.com/attachments/1063968734831706217/1063969321757458592/tuto5.png)
-- One launched, enter your email (not username) and password from your character.ai account
-- Write the path of your DDLC folder 
-- Choose character (0 or 1 now) and other options
-- Be sure to click every button with the option you want
-- Submit and play ! 
+(Build is for Windows OS only, see `Python version` section for other OS)
 
-![GUI](https://cdn.discordapp.com/attachments/1063968734831706217/1063969409133187102/tuto4.png)
+This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferale to use them separetely.
 
-For the full voicing mode:
-- Do the same steps 
-- Instead of launching `main.exe`, launch `voice.exe`
-
-![voicing](images/voicing.png)
-
-Your antivirus might block the execution of the file but it is a common issue with `pyinstaller` to convert python files to executables. All the code is available here for transparency.
+To install the user version with executables, I've made a tutorial [HERE](../../wiki/User-friendly-tutorial)
 
 ## :fire: Features
 
@@ -58,20 +38,27 @@ Your antivirus might block the execution of the file but it is a common issue wi
 
 ![Character AI](images/image_1.png)
 
-## :alarm_clock: To develop (if you want to contribute)
-- Improve dialogs to introduce the Submod the first time (telling what it does, how is it different from actual Monika) :white_check_mark:
-- Add saving history of conversations to see again your best interactions
-- Making it like a messaging app with questions/answers listed on a same window
-- Define better facial expressions corresponding to predifined emotions (happiness,fear,surprise...)
-- Convert more functionalities to executable files (TTS,Speech Recognition) :white_check_mark:
-- Make the better TTS available only on MacOS/Linux for now usable also on other OS.
-- Link this with Live2D for face movements with speech and emotions
-- Face recognition for Monika only to recognize you
-- Training new models for MEL Spectrogram Generation (Mixed TTS...) and Vocoders (UnivNet...)
-- Speech to text to convert your own voice in text and directly speak with Monika :white_check_mark:
-- Better face emotions detection :white_check_mark:
-- Add possibility to see when microphone starts recording in the game for STT :white_check_mark:
-- *Feel free to suggest improvements or new AI features you would like to see*
+# How to contribute
+
+If you want to contribute to the project, you can check out this [page](../../wiki/How-to-contribute).
+It is not necessary to know how to code and you can add dialogs, expressions. Don't hesitate to propose new things if you have more experience !
+
+# Demonstrations
+
+## :video_game: In Game
+
+The features are available in a specific `AI` Talk menu in the game.
+![Talk menu](images/event_mas.png)
+
+- Click on `Let's chat together` to use the Character AI Chatbot
+- Click on `Tell me about Pytorch` if you think it is superior to Tensorflow
+
+There is also the possibility of using buttons on the main screen to directly chat. These can be disabled in the Settings Submods if you don't like them.
+![Talk buttons](images/buttons_mas.png)
+
+## :cinema: Video Demonstration
+
+https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-a1fb-62d695e76c51.mp4
 
 # Python version
 
@@ -103,19 +90,6 @@ When the browser page launches, it can happen that you have to solve the captcha
 For voicing of the game in real time, launch `voicing.py` and launch DDLC yourself when the message `Waiting for connection...` appears.
 
 You can change the voice used by replacing the extract `talk_13.wav` in the `audio` folder by another audio extract. The longer the extract, the longer the TTS will take to generate the audio at each turn.
-
-## :video_game: In Game
-
-The features are available in a specific `AI` Talk menu in the game.
-![Talk menu](images/image_2.png)
-
-- Click on `Let's chat together` to use the Character AI Chatbot
-- Click on `Look for me` to use the facial emotions detection in an interactive session
-- Click on `Tell me about Pytorch` if you think it is superior to Tensorflow
-
-## :cinema: Video Demonstration
-
-https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-a1fb-62d695e76c51.mp4
 
 ## :microphone: Better Voice (only on Linux,MacOS or WSL)
 
