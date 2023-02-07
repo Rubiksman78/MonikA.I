@@ -15,6 +15,12 @@ import numpy as np
 
 import IPython.display as ipd
 from login_screen import CONFIG
+import re
+
+import cv2
+from torchvision import transforms
+from facial_analysis import FacialImageProcessing
+from PIL import Image
 
 GAME_PATH = CONFIG["GAME_PATH"]
 USE_TTS = CONFIG["USE_TTS"]
@@ -24,6 +30,8 @@ CONTINUE_FROM_LAST = CONFIG["CONTINUE_FROM_LAST"]
 USERNAME = CONFIG["USERNAME"]
 PASSWORD = CONFIG["PASSWORD"]
 CHOOSE_CHARACTER = CONFIG["CHOOSE_CHARACTER"]
+USE_CAMERA = CONFIG["USE_CAMERA"]
+TIME_INTERVALL = CONFIG["TIME_INTERVALL"]
 
 class HiddenPrints:
     def __enter__(self):
@@ -52,8 +60,50 @@ SERVER.bind(ADDRESS)
 queued = False
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
+emoji_pattern = re.compile("["
+    u"\U0001F600-\U0001F64F"  # emoticons
+    u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+    u"\U0001F680-\U0001F6FF"  # transport & map symbols
+    u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+    u"\U00002500-\U00002BEF"  # chinese char
+    u"\U00002702-\U000027B0"
+    u"\U00002702-\U000027B0"
+    u"\U000024C2-\U0001F251"
+    u"\U0001f926-\U0001f937"
+    u"\U00010000-\U0010ffff"
+    u"\u2640-\u2642"
+    u"\u2600-\u2B55"
+    u"\u200d"
+    u"\u23cf"
+    u"\u23e9"
+    u"\u231a"
+    u"\ufe0f"  # dingbats
+    u"\u3030"
+    "]+", flags=re.UNICODE)
+
+uni_chr_re = re.compile(r'\\u[0-9a-fA-F]{4}')
+
 #Launch the game
 subprocess.Popen(GAME_PATH+'/DDLC.exe')
+
+#########Load the emotion model##########
+if USE_CAMERA:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    emotion_model = torch.load('models/enet_b2_7.pt').to(device)
+    emotion_model.eval()
+    cv2.ocl.setUseOpenCL(False)
+    IMG_SIZE = 256
+    imgProcessing=FacialImageProcessing(False)
+    test_transforms = transforms.Compose(
+        [
+            transforms.Resize((IMG_SIZE,IMG_SIZE)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                        std=[0.229, 0.224, 0.225])
+        ]
+    )
+    emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
+############################################
 
 #########Load the TTS model##########
 with HiddenPrints():
@@ -152,7 +202,7 @@ def post_message(page, message):
             break
         except:
             pass
-    
+
 def listenToClient(client):
     """ Get client username """
     name = "User"
@@ -237,8 +287,6 @@ def listenToClient(client):
                         msg = msg.replace("&gt;",">")
 
                         if received_msg != "QUIT":       
-
-                            #TTS addition
                             if USE_TTS:
                                 print("Using TTS")
                                 if step > 0:
@@ -247,6 +295,9 @@ def listenToClient(client):
                                 msg_audio = msg_audio.replace("{i}","")
                                 msg_audio = msg_audio.replace("{/i}",".")
                                 msg_audio = msg_audio.replace("~","!")
+                                msg_audio = emoji_pattern.sub(r'', msg_audio)
+                                msg_audio = uni_chr_re.sub(r'', msg_audio)
+                                print("Sent: "+ msg_audio)
                                 with HiddenPrints():
                                     audio = model.tts(text=msg_audio,speaker_wav='audios/talk_13.wav', language='en')
                                 audio = ipd.Audio(audio, rate=16000)
@@ -254,16 +305,94 @@ def listenToClient(client):
                             emotion = "".encode("utf-8")
                             msg = msg.encode("utf-8")   
                             msg_to_send = msg + b"/g" + emotion
-                            print("Sent: "+ msg_to_send.decode("utf-8"))
                             sendMessage(msg_to_send)
                         break
                     
+        # else:
+        #     counter = received_msg[6:]
+        #     counter = int(counter)
+        #     msg = "no_data"
+        #     msg = msg.encode()
+        #     sendMessage(msg)
+
+        elif received_msg == "camera_int":
+            if USE_CAMERA:
+                # start the webcam feed
+                cap = cv2.VideoCapture(0)
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                bounding_boxes, points = imgProcessing.detect_faces(frame)
+                points = points.T
+                emotion = None
+                for bbox,p in zip(bounding_boxes, points):
+                    box = bbox.astype(np.int32)
+                    x1,y1,x2,y2=box[0:4]    
+                    face_img=frame[y1:y2,x1:x2,:]
+
+                    img_tensor = test_transforms(Image.fromarray(face_img))
+                    img_tensor.unsqueeze_(0)
+                    scores = emotion_model(img_tensor.to(device))
+                    scores=scores[0].data.cpu().numpy()
+                    emotion = emotion_dict[np.argmax(scores)]
+                    
+                if emotion == None:
+                    emotion = "No"
+
+                msg = emotion.lower()
+                
+                cap.release()
+                cv2.destroyAllWindows()
+
+                msg = msg.encode()
+                sendMessage(msg)
+            else:
+                msg = "no_data"
+                msg = msg.encode()
+                sendMessage(msg)
+
         else:
-            counter = received_msg[6:]
-            counter = int(counter)
-            msg = "no_data"
-            msg = msg.encode()
-            sendMessage(msg)
+            if USE_CAMERA:
+                counter = received_msg[6:]
+                counter = int(counter)
+                if counter % TIME_INTERVALL == 0:
+                    # start the webcam feed
+                    cap = cv2.VideoCapture(0)
+                    ret, frame = cap.read()
+                    if not ret:
+                        break
+                    bounding_boxes, points = imgProcessing.detect_faces(frame)
+                    points = points.T
+                    emotion = None
+                    for bbox,p in zip(bounding_boxes, points):
+                        box = bbox.astype(np.int32)
+                        x1,y1,x2,y2=box[0:4]    
+                        face_img=frame[y1:y2,x1:x2,:]
+
+                        img_tensor = test_transforms(Image.fromarray(face_img))
+                        img_tensor.unsqueeze_(0)
+                        scores = emotion_model(img_tensor.to(device))
+                        scores=scores[0].data.cpu().numpy()
+                        emotion = emotion_dict[np.argmax(scores)]
+
+                    if emotion == None:
+                        emotion = "No"
+
+                    msg = emotion.lower()
+                    
+                    cap.release()
+                    cv2.destroyAllWindows()
+
+                    msg = msg.encode()
+                    sendMessage(msg)
+                else:
+                    msg = "no_data"
+                    msg = msg.encode()
+                    sendMessage(msg)
+            else:
+                msg = "no_data"
+                msg = msg.encode()
+                sendMessage(msg)
 
 
 def sendMessage(msg, name=""):
