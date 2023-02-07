@@ -45,9 +45,9 @@ init 5 python:
     try:
         clientSocket = socket(AF_INET, SOCK_STREAM)
         clientSocket.connect(ADDR)
-        noServer = False
+        monikai_no_server = False
     except:
-        noServer = True        
+        monikai_no_server = True        
     monikaNickname = store.persistent._mas_monika_nickname
     
     if persistent._show_monikai_buttons == None:
@@ -66,7 +66,7 @@ label monika_voice_chat:
     $ localStep = 0
 
     #If the game was launched without the python script
-    if noServer:
+    if monikai_no_server:
         jump monika_server_crashed
     
     #If the player has never talked to the chatbot, show the intro
@@ -146,7 +146,7 @@ label monika_chatting_text():
     $ useVoice = False
     $ localStep = 0
 
-    if noServer:
+    if monikai_no_server:
         jump monika_server_crashed
     
     if not renpy.seen_label("monika_AI_intro"):
@@ -210,7 +210,7 @@ init 5 python:
 label monika_chatting():
     $ localStep = 0
 
-    if noServer:
+    if monikai_no_server:
         jump monika_server_crashed
     
     if not renpy.seen_label("monika_AI_intro"):

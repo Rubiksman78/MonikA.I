@@ -3,9 +3,8 @@ init -990 python in mas_submod_utils:
         author="Rubiksman1006",
         name="AI_submod",
         description="AI based features for MAS.",
+        version="1.4.0",
         settings_pane="monikai_chat_settings",
-        version="1.3.5",
-        version_updates = {}
     )
 
 # Register the updater
@@ -15,5 +14,6 @@ init -989 python:
             submod="AI_submod",
             user_name="Rubiksman78",
             repository_name="MonikA.I",
-            update_dir="",
+            extraction_depth=3,
+            attachment_id = 1
         )
