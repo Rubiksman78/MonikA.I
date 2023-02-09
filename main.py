@@ -319,6 +319,40 @@ def listenToClient(client):
             if USE_CAMERA:
                 # start the webcam feed
                 cap = cv2.VideoCapture(0)
+                # while True:
+                #     # get the frame from the webcam
+                #     ret, frame = cap.read()
+                #     if not ret:
+                #         break
+                #     bounding_boxes, points = imgProcessing.detect_faces(frame)
+                #     points = points.T
+                #     emotion = None
+                #     for bbox,p in zip(bounding_boxes, points):
+                #         box = bbox.astype(np.int32)
+                #         x1,y1,x2,y2=box[0:4]    
+                #         face_img=frame[y1:y2,x1:x2,:]
+
+                #         img_tensor = test_transforms(Image.fromarray(face_img))
+                #         img_tensor.unsqueeze_(0)
+                #         scores = emotion_model(img_tensor.to(device))
+                #         scores=scores[0].data.cpu().numpy()
+                #         emotion = emotion_dict[np.argmax(scores)]
+
+                #         #Display camera feed
+                #         # add gaussian blur to all image 
+                #         frame = cv2.GaussianBlur(frame,(23,23),50)
+                #         #hide face with 70 margin
+                #         frame[y1-70:y2+70,x1-70:x2+70] = 0
+                #         cv2.rectangle(frame,(x1,y1),(x2,y2),(0,255,0),2)
+                #         cv2.putText(frame,emotion,(x1,y1),cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,0),2)
+                #         cv2.imshow('frame',frame)
+
+                       
+                #         #quit if echap is pressed
+                #         if cv2.waitKey(1) & 0xFF == 27:
+                #             cv2.destroyAllWindows()
+                #             break
+    
                 ret, frame = cap.read()
                 if not ret:
                     break
