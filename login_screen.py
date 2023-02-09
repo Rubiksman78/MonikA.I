@@ -94,8 +94,6 @@ tk.Radiobutton(root, text="No", variable=use_camera, value=False,bg='#333333',ac
 tk.Radiobutton(root, text="Yes", variable=keep_config, value=True,bg='#333333',activeforeground='white',fg='white',activebackground="#333333",selectcolor='#333333').grid(row=10, column=1)
 tk.Radiobutton(root, text="No", variable=keep_config, value=False,bg='#333333',activeforeground='white',fg='white',activebackground="#333333",selectcolor='#333333').grid(row=10, column=2)
 
-#tk.Button(root, text="Submit", command=get_input,bg='#FF3399',fg='white').grid(row=11, column=1)
-#center the button
 button = tk.Button(root, text="Submit", command=get_input,bg='#FF3399',fg='white')
 button.place(relx=0.5, rely=0.95, anchor=tk.CENTER)
 
@@ -108,82 +106,15 @@ if save_ids:
     password.set(PASSWORD)
     game_path.set(GAME_PATH)
 
-# if save_ids:
-#     #Make button appear if the previous one was clicked
-#     def on_select(v):
-#         global GAME_PATH
-#         if v == True:            
-#             tk.Label(root, text="Change Game Path").grid(row=4, column=0)
-#             tk.Entry(root, textvariable=game_path).grid(row=4, column=3)
+time_intervall.set("10")
+use_character_ai.set(0)
+use_tts.set(0)
+debug_mode.set(0)
+continue_from_last.set(0)
+choose_character.set("0")
+use_camera.set(0)
+keep_config.set(0)
 
-#             tk.Label(root, text="Change email").grid(row=0, column=0)
-#             tk.Entry(root, textvariable=username).grid(row=0, column=3)
-
-#             tk.Label(root, text="Change password").grid(row=1, column=0)
-#             tk.Entry(root, textvariable=password,show='*').grid(row=1, column=3)
-#         else:
-#             with open("save_text.txt", "r") as f:
-#                 string = f.read()
-#                 GAME_PATH,USERNAME,PASSWORD = string.split(";")
-#             #Write GAME_PATH in the box
-#             tk.Label(root, text="Change Game Path").grid(row=4, column=0)
-#             tk.Entry(root, textvariable=game_path).grid(row=4, column=3)
-#             game_path.set(GAME_PATH)
-
-#             tk.Label(root, text="Change email").grid(row=0, column=0)
-#             tk.Entry(root, textvariable=username).grid(row=0, column=3)
-#             username.set(USERNAME)
-
-#             tk.Label(root, text="Change password").grid(row=1, column=0)
-#             tk.Entry(root, textvariable=password,show='*').grid(row=1, column=3)
-#             password.set(PASSWORD)
-
-#     tk.Label(root, text="Change Game Path").grid(row=4, column=0)
-#     change_game_path = tk.BooleanVar()
-
-#     yes_change = tk.Radiobutton(root, text="Yes", variable=change_game_path, value=True)
-#     yes_change.grid(row=4, column=1)
-#     yes_change.config(command=lambda: on_select(True))
-
-#     no_change = tk.Radiobutton(root, text="No", variable=change_game_path, value=False)
-#     no_change.grid(row=4, column=2)
-#     no_change.config(command=lambda: on_select(False))
-
-#     tk.Label(root, text="Change email").grid(row=0, column=0)
-#     change_email = tk.BooleanVar()
-
-#     yes_change = tk.Radiobutton(root, text="Yes", variable=change_email, value=True)
-#     yes_change.grid(row=0, column=1)
-#     yes_change.config(command=lambda: on_select(True))
-
-#     no_change = tk.Radiobutton(root, text="No", variable=change_email, value=False)
-#     no_change.grid(row=0, column=2)
-#     no_change.config(command=lambda: on_select(False))
-
-#     tk.Label(root, text="Change password").grid(row=1, column=0)
-#     change_password = tk.BooleanVar()
-
-#     yes_change = tk.Radiobutton(root, text="Yes", variable=change_password, value=True)
-#     yes_change.grid(row=1, column=1)
-#     yes_change.config(command=lambda: on_select(True))
-
-#     no_change = tk.Radiobutton(root, text="No", variable=change_password, value=False)
-#     no_change.grid(row=1, column=2)
-#     no_change.config(command=lambda: on_select(False))
-
-# else:
-#     game_path = tk.StringVar()
-#     tk.Label(root, text="Game Path").grid(row=4, column=0)
-#     tk.Entry(root, textvariable=game_path).grid(row=4, column=1)
-
-#     username = tk.StringVar()
-#     tk.Label(root, text="Email").grid(row=0, column=0)
-#     tk.Entry(root, textvariable=username).grid(row=0, column=1)
-
-#     password = tk.StringVar()
-#     tk.Label(root, text="Password").grid(row=1, column=0)
-#     tk.Entry(root, textvariable=password, show='*').grid(row=1, column=1)
-    
 root.mainloop()
 
 KEEP_CONFIG = int(KEEP_CONFIG)
