@@ -49,6 +49,8 @@ To use Pygmalion AI models running locally, be sure to have a GPU. There are sev
 - 6b need at least 8GB VRAM (I run it on a GeForce RTX 3070)
 Normally it would require +16GB of VRAM but with int8 quantization and offloading on CPU, it can fit on such GPUs.
 
+Be sure to have setup the Nvidia Drivers, CUDA 11.7...etc (tutorial [here](https://pub.towardsai.net/installing-pytorch-with-cuda-support-on-windows-10-a38b1134535e))
+
 As the model is open-sourced by Pygmalion AI, you can customize a lot of things for the generation. You can change multiple parameters for inference in `pygmalion/pygmalion_config.yml`. Try it out !
 
 # How to contribute
