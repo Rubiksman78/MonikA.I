@@ -22,6 +22,12 @@ from torchvision import transforms
 from facial_analysis import FacialImageProcessing
 from PIL import Image
 
+import yaml
+import json
+from pygmalion.model import build_model_and_tokenizer_for
+from run_pygmalion import inference_fn
+import gc 
+
 GAME_PATH = CONFIG["GAME_PATH"]
 USE_TTS = CONFIG["USE_TTS"]
 USE_CHARACTER_AI = CONFIG["USE_CHARACTER_AI"]
@@ -32,6 +38,35 @@ PASSWORD = CONFIG["PASSWORD"]
 CHOOSE_CHARACTER = CONFIG["CHOOSE_CHARACTER"]
 USE_CAMERA = CONFIG["USE_CAMERA"]
 TIME_INTERVALL = CONFIG["TIME_INTERVALL"]
+USE_PYG = CONFIG["USE_PYG"]
+
+######LOAD PYGMALION CONFIG######
+if USE_PYG:
+    with open("pygmalion/pygmalion_config.yml", "r") as f:
+        PYG_CONFIG = yaml.safe_load(f)
+
+    with open(f"pygmalion/{PYG_CONFIG['char_json']}", "r") as f:
+        char_settings = json.load(f)
+    f.close()
+
+    model_name = PYG_CONFIG["model_name"]
+    gc.collect()
+    torch.cuda.empty_cache()
+    pyg_model, tokenizer = build_model_and_tokenizer_for(model_name)
+
+    generation_settings = {
+        "max_new_tokens": PYG_CONFIG["max_new_tokens"],
+        "temperature": PYG_CONFIG["temperature"],
+        "repetition_penalty": PYG_CONFIG["repetition_penalty"],
+        "top_p": PYG_CONFIG["top_p"],
+        "top_k": PYG_CONFIG["top_k"],
+        "do_sample": PYG_CONFIG["do_sample"],
+        "typical_p":PYG_CONFIG["typical_p"],
+    }
+
+    context_size = PYG_CONFIG["context_size"]
+#################################
+
 
 class HiddenPrints:
     def __enter__(self):
@@ -108,7 +143,7 @@ if USE_CAMERA:
 #########Load the TTS model##########
 with HiddenPrints():
     if USE_TTS:
-        model = my_TTS(model_name="tts_models/multilingual/multi-dataset/your_tts")
+        tts_model = my_TTS(model_name="tts_models/multilingual/multi-dataset/your_tts")
 #####################################
 
 ####Load the speech recognizer#####
@@ -208,6 +243,8 @@ def listenToClient(client):
     name = "User"
     clients[client] = name
     launched = False
+    pyg_count = 0
+    history = ""
     while True:
         received_msg = client.recv(BUFSIZE).decode("utf-8") #Message indicating the mode used (chatbot,camera_int or camera)
         received_msg = received_msg.split("/m")
@@ -238,7 +275,7 @@ def listenToClient(client):
 
             print("User: "+received_msg)
 
-            if USE_CHARACTER_AI:
+            if USE_CHARACTER_AI and not USE_PYG:
                 if not launched:
                     try:
                         pw = sync_playwright().start()
@@ -299,7 +336,7 @@ def listenToClient(client):
                                 msg_audio = uni_chr_re.sub(r'', msg_audio)
                                 print("Sent: "+ msg_audio)
                                 with HiddenPrints():
-                                    audio = model.tts(text=msg_audio,speaker_wav='audios/talk_13.wav', language='en')
+                                    audio = tts_model.tts(text=msg_audio,speaker_wav='audios/talk_13.wav', language='en')
                                 audio = ipd.Audio(audio, rate=16000)
                                 play_obj = sa.play_buffer(audio.data, 1, 2, 16000)                   
                             emotion = "".encode("utf-8")
@@ -307,13 +344,44 @@ def listenToClient(client):
                             msg_to_send = msg + b"/g" + emotion
                             sendMessage(msg_to_send)
                         break
+
+            if USE_PYG and not USE_CHARACTER_AI:
+                if os.path.exists(GAME_PATH+'/game/Submods/AI_submod/audio/out.ogg'):
+                    os.remove(GAME_PATH+'/game/Submods/AI_submod/audio/out.ogg')
+                time.sleep(2)
+               
+                while True: 
+                    if pyg_count == 0:
+                        sendMessage("not_in_queue".encode("utf-8"))
+                        sendMessage("server_ok".encode("utf-8"))
+                        ok_ready = client.recv(BUFSIZE).decode("utf-8")
+                        bot_message = inference_fn(pyg_model,tokenizer,history, "",generation_settings,char_settings,history_length=context_size,count=pyg_count)
+                    else:
+                        bot_message = inference_fn(pyg_model,tokenizer,history, received_msg,generation_settings,char_settings,history_length=context_size,count=pyg_count)
+                        history = history + "\n" + f"You: {received_msg}" + "\n" + f"{bot_message}"
+                    if received_msg != "QUIT":       
+                        if USE_TTS:
+                            print("Using TTS")
+                            if step > 0:
+                                play_obj.stop()
+                            msg_audio = bot_message.replace("\n"," ")
+                            msg_audio = msg_audio.replace("{i}","")
+                            msg_audio = msg_audio.replace("{/i}",".")
+                            msg_audio = msg_audio.replace("~","!")
+                            msg_audio = emoji_pattern.sub(r'', msg_audio)
+                            msg_audio = uni_chr_re.sub(r'', msg_audio)
+                            with HiddenPrints():
+                                audio = tts_model.tts(text=msg_audio,speaker_wav='audios/talk_13.wav', language='en')
+                            audio = ipd.Audio(audio, rate=16000)
+                            play_obj = sa.play_buffer(audio.data, 1, 2, 16000)     
+                        print("Sent: "+ bot_message)              
+                        emotion = "".encode("utf-8")
+                        msg = bot_message.encode("utf-8")   
+                        msg_to_send = msg + b"/g" + emotion
+                        sendMessage(msg_to_send)
+                        pyg_count += 1
+                    break
                     
-        # else:
-        #     counter = received_msg[6:]
-        #     counter = int(counter)
-        #     msg = "no_data"
-        #     msg = msg.encode()
-        #     sendMessage(msg)
 
         elif received_msg == "camera_int":
             if USE_CAMERA:
@@ -339,17 +407,17 @@ def listenToClient(client):
                 #         emotion = emotion_dict[np.argmax(scores)]
 
                 #         #Display camera feed
-                #         # add gaussian blur to all image 
-                #         frame = cv2.GaussianBlur(frame,(23,23),50)
-                #         #hide face with 70 margin
-                #         frame[y1-70:y2+70,x1-70:x2+70] = 0
+                #         #Filters to hide face (disable this if you want to see your face)
+                #         # frame = cv2.GaussianBlur(frame,(23,23),50)
+                #         # frame[y1-70:y2+70,x1-70:x2+70] = 0
+
                 #         cv2.rectangle(frame,(x1,y1),(x2,y2),(0,255,0),2)
                 #         cv2.putText(frame,emotion,(x1,y1),cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,0),2)
                 #         cv2.imshow('frame',frame)
 
-                       
-                #         #quit if echap is pressed
-                #         if cv2.waitKey(1) & 0xFF == 27:
+                #         #quit if q is pressed
+                #         if cv2.waitKey(1) & 0xFF == ord('q'):
+                #             cap.release()
                 #             cv2.destroyAllWindows()
                 #             break
     
