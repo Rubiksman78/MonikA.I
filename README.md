@@ -53,6 +53,8 @@ Be sure to have setup the Nvidia Drivers, CUDA 11.7...etc (tutorial [here](https
 
 As the model is open-sourced by Pygmalion AI, you can customize a lot of things for the generation. You can change multiple parameters for inference in `pygmalion/pygmalion_config.yml`. Try it out !
 
+You can see the chat history in `chat_history.txt` which is directly load each time you launch the game to make the model remember your previous conversation.
+
 More information on their official rentry [here](https://rentry.org/pygmalion-ai#pygmalion-guide-and-faq).
 
 # How to contribute
