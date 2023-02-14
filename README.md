@@ -53,6 +53,8 @@ Be sure to have setup the Nvidia Drivers, CUDA 11.7...etc (tutorial [here](https
 
 As the model is open-sourced by Pygmalion AI, you can customize a lot of things for the generation. You can change multiple parameters for inference in `pygmalion/pygmalion_config.yml`. Try it out !
 
+More information on their official rentry [here](https://rentry.org/pygmalion-ai#pygmalion-guide-and-faq).
+
 # How to contribute
 
 If you want to contribute to the project, you can check out this [page](../../wiki/How-to-contribute).
