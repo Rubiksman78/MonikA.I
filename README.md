@@ -47,6 +47,7 @@ To use Pygmalion AI models running locally, be sure to have a GPU. There are sev
 - 350m and 1.3b can fit in little GPUs (< 4GB of VRAM)
 - 2.7b can fit with around 6-8GB VRAM
 - 6b need at least 10GB VRAM
+
 Normally it would require +16GB of VRAM but with int8 quantization and offloading on CPU, it can fit on such GPUs.
 
 Be sure to have setup the Nvidia Drivers, **CUDA 11.7** (download the 11.7 version and not another one) and the corresponding cudNN (tutorial [here](https://medium.com/geekculture/install-cuda-and-cudnn-on-windows-linux-52d1501a8805)) and some storage space available (6GB for the 2.7B and 15GB for the 6B model).
