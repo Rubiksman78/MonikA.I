@@ -65,6 +65,9 @@ if USE_PYG:
     }
 
     context_size = PYG_CONFIG["context_size"]
+
+    with open("chat_history.txt", "a") as chat_history:
+        chat_history.write("Conversation started at: " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + "\n")
 #################################
 
 
@@ -119,7 +122,7 @@ emoji_pattern = re.compile("["
 uni_chr_re = re.compile(r'\\u[0-9a-fA-F]{4}')
 
 #Launch the game
-subprocess.Popen(GAME_PATH+'/DDLC.exe')
+#subprocess.Popen(GAME_PATH+'/DDLC.exe', shell=True)
 
 #########Load the emotion model##########
 if USE_CAMERA:
@@ -244,7 +247,12 @@ def listenToClient(client):
     clients[client] = name
     launched = False
     pyg_count = 0
-    history = ""
+    if os.path.exists("char_history.txt"):
+        history = open("char_history.txt","r").read()
+        #Remove lines with the pattern "Conversation started at: 2023-02-14 14:14:17"
+        history = re.sub(r"Conversation started at: \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}","",history)
+    else:
+        history = ""
     while True:
         received_msg = client.recv(BUFSIZE).decode("utf-8") #Message indicating the mode used (chatbot,camera_int or camera)
         received_msg = received_msg.split("/m")
@@ -380,6 +388,9 @@ def listenToClient(client):
                         msg_to_send = msg + b"/g" + emotion
                         sendMessage(msg_to_send)
                         pyg_count += 1
+                        if pyg_count > 0:
+                            with open("chat_history.txt", "a") as f:
+                                f.write(f"You: {received_msg}" + "\n" + f'{char_settings["char_name"]}: {bot_message}' + "\n")
                     break
                     
 
