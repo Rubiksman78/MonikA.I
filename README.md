@@ -41,7 +41,7 @@ To install the user version with executables, I've made a tutorial [HERE](../../
 - Speak without scripted text with Monika using the latest chatbots from Character AI or Pygmalion AI
 - Hear Monika speak with a Text to Speech module using extracts of voiced dialogues
 
-## :star2: NEW MODELS: Pygmalion chatbots are now available ! 
+## :star2: Pygmalion chatbots available ! 
 
 Be sure to follow the instructions [here](../../wiki/Install-Pygmalion-locally) to use it.
 
