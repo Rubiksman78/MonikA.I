@@ -43,20 +43,7 @@ To install the user version with executables, I've made a tutorial [HERE](../../
 
 ## :star2: NEW MODELS: Pygmalion chatbots are now available ! 
 
-To use Pygmalion AI models running locally, be sure to have a GPU. There are several models with different sizes:
-- 350m and 1.3b can fit in little GPUs (< 4GB of VRAM)
-- 2.7b can fit with around 6-8GB VRAM
-- 6b need at least 10GB VRAM
-
-Normally it would require +16GB of VRAM but with int8 quantization and offloading on CPU, it can fit on such GPUs.
-
-Be sure to have setup the Nvidia Drivers, **CUDA 11.7** (download the 11.7 version and not another one) and the corresponding cudNN (tutorial [here](https://medium.com/geekculture/install-cuda-and-cudnn-on-windows-linux-52d1501a8805)) and some storage space available (6GB for the 2.7B and 15GB for the 6B model).
-
-As the model is open-sourced by Pygmalion AI, you can customize a lot of things for the generation. You can change multiple parameters for inference in `pygmalion/pygmalion_config.yml`. Try it out !
-
-You can see the chat history in `chat_history.txt` which is directly load each time you launch the game to make the model remember your previous conversation.
-
-More information on their official rentry [here](https://rentry.org/pygmalion-ai#pygmalion-guide-and-faq).
+Be sure to follow the instructions [here](../../wiki/Install-Pygmalion-locally) to use it.
 
 # How to contribute
 
