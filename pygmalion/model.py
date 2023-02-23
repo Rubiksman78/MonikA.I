@@ -28,7 +28,6 @@ def build_model_and_tokenizer_for(
         load_in_8bit=True,
         offload_folder="offload",
         # offload_state_dict=True,
-        # torch_dtype=torch.bfloat16,
         max_memory={0:"6GiB","cpu":"99GiB"},
     )
     logger.info("Model and tokenizer are ready")
@@ -70,24 +69,11 @@ def run_raw_inference(model: transformers.AutoModelForCausalLM,
 
     logger.debug("Before trimming, model output was: `%s`", output)
 
-    #Trim out the input prompt from the generated output.
-    # if (idx := prompt.rfind(user_message)) != -1:
-    #     trimmed_output = output[idx + len(user_message) - 1:].strip()
-    #     logger.debug("After trimming, it became: `%s`", trimmed_output)
-
-    #     return trimmed_output
-    # else:
-    #     raise Exception(
-    #         "Couldn't find user message in the model's output. What?")
     return output
 
 
 def _build_bad_words_list_for(_model_name: str) -> t.List[str]:
     '''Builds a list of bad words for the given model.'''
-
-    # NOTE(11b): This was implemented as a function because each model size
-    # seems to have it quirks at the moment, but this is a rushed implementation
-    # so I'm not handling that, hence the dumb return here.
     return ["Persona:", "Scenario:", "<START>"]
 
 

@@ -25,11 +25,6 @@ def parse_messages_from_str(string: str, names: t.List[str]) -> t.List[str]:
     for match in speaker_regex.finditer(string):
         message_start_indexes.append(match.start())
 
-    # # FIXME(11b): One of these returns is silently dropping the last message.
-    # if len(message_start_indexes) < 2:
-    #     # Single message in the string.
-    #     return [string.strip()]
-
     prev_start_idx = message_start_indexes[0]
     messages = []
 
