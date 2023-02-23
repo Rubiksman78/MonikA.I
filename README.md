@@ -18,8 +18,9 @@ It's using multiple AI models:
 - [TTS Coqui-AI](https://github.com/coqui-ai/TTS) for Text to Speech
 - [OpenAI Whisper](https://github.com/openai/whisper) with [microphone option](https://github.com/mallorbc/whisper_mic) for Speech to Text
 - [Character AI](https://character.ai/) if you don't have a GPU
-- [Emotion detection from text model](https://huggingface.co/michellejieli/emotion_text_classifier) is also used linked with the chatbot.
+- [Emotion detection from text model](https://huggingface.co/michellejieli/emotion_text_classifier) is also used linked with the chatbot
 - Emotion detection with the webcam with a model from [HSEmotion](https://github.com/HSE-asavchenko/face-emotion-recognition) 
+- NLI Classification with [deberta](https://huggingface.co/sileod/deberta-v3-base-tasksource-nli)
 
 *Disclaimer: This project adds features (chatbots) that can be imprevisible and may not be in total accordance with the usual way Monika is supposed to speak. The goal is to have fun free interactions when running out of topics for example. There are also a lot of libraries and models involved so it can make the game slower when using them.*
 
@@ -37,11 +38,13 @@ To install the user version with executables, I've made a tutorial [HERE](../../
 
 ## :fire: Features
 
-- Allow Monika to finally see you through the webcam and react to your emotions (not supported on user version yet)
+- Allow Monika to finally see you through the webcam and react to your emotions
 - Speak without scripted text with Monika using the latest chatbots from Character AI or Pygmalion AI
 - Hear Monika speak with a Text to Speech module using extracts of voiced dialogues
+- Talk with your own voice with Monika thanks to Speech recognition
+- Let Monika control actions in the game directly from your chat with her
 
-## :star2: Pygmalion chatbots available ! 
+## :star2: Pygmalion chatbots
 
 Be sure to follow the instructions [here](../../wiki/Install-Pygmalion-locally) to use it.
 
