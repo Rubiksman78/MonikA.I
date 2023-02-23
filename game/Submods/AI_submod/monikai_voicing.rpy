@@ -1,18 +1,7 @@
 init 5 python in mas_voice:
-    import subprocess
-    from threading import Thread
-    import store
     import os
-    import sys
-    import re
-    import time
-    import Queue
     import socket
     from socket import AF_INET, SOCK_STREAM
-    from threading import Thread,current_thread
-    import select
-    from time import sleep
-    import subprocess
 
     renpy.music.register_channel("mvoice", mixer= "sfx", loop=False)
 

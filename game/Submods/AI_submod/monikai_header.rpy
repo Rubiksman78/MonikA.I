@@ -3,7 +3,7 @@ init -990 python in mas_submod_utils:
         author="Rubiksman1006",
         name="AI_submod",
         description="AI based features for MAS.",
-        version="1.4.0",
+        version="1.5.0",
         settings_pane="monikai_chat_settings",
     )
 
@@ -15,5 +15,5 @@ init -989 python:
             user_name="Rubiksman78",
             repository_name="MonikA.I",
             extraction_depth=3,
-            attachment_id = 1
+            attachment_id = 0
         )
