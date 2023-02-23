@@ -28,6 +28,8 @@ from pygmalion.model import build_model_and_tokenizer_for
 from run_pygmalion import inference_fn
 import gc 
 
+from transformers import pipeline
+
 GAME_PATH = CONFIG["GAME_PATH"]
 USE_TTS = CONFIG["USE_TTS"]
 USE_CHARACTER_AI = CONFIG["USE_CHARACTER_AI"]
@@ -39,6 +41,25 @@ CHOOSE_CHARACTER = CONFIG["CHOOSE_CHARACTER"]
 USE_CAMERA = CONFIG["USE_CAMERA"]
 TIME_INTERVALL = CONFIG["TIME_INTERVALL"]
 USE_PYG = CONFIG["USE_PYG"]
+LAUNCH_YOURSELF = CONFIG["LAUNCH_YOURSELF"]
+USE_ACTIONS = CONFIG["USE_ACTIONS"]
+
+########GIVE ACTIONS FOR CHATBOT########
+if USE_ACTIONS:
+    with open("actions.yml", "r") as f:
+        ACTIONS = yaml.safe_load(f)
+
+    REVERT_ACTION_DICT = {}
+    for key in ACTIONS:
+        for action in ACTIONS[key]:
+            REVERT_ACTION_DICT[action] = key
+    ALL_ACTIONS = []
+    for key in ACTIONS:
+        ALL_ACTIONS += ACTIONS[key]
+
+    action_classifier = pipeline("zero-shot-classification",
+                        model="sileod/deberta-v3-base-tasksource-nli")
+#######################################
 
 ######LOAD PYGMALION CONFIG######
 if USE_PYG:
@@ -65,6 +86,9 @@ if USE_PYG:
     }
 
     context_size = PYG_CONFIG["context_size"]
+
+    with open("chat_history.txt", "a") as chat_history:
+        chat_history.write("Conversation started at: " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + "\n")
 #################################
 
 
@@ -119,7 +143,8 @@ emoji_pattern = re.compile("["
 uni_chr_re = re.compile(r'\\u[0-9a-fA-F]{4}')
 
 #Launch the game
-subprocess.Popen(GAME_PATH+'/DDLC.exe')
+if not LAUNCH_YOURSELF:
+    subprocess.Popen(GAME_PATH+'/DDLC.exe')
 
 #########Load the emotion model##########
 if USE_CAMERA:
@@ -244,7 +269,12 @@ def listenToClient(client):
     clients[client] = name
     launched = False
     pyg_count = 0
-    history = ""
+    if os.path.exists("char_history.txt"):
+        history = open("char_history.txt","r").read()
+        #Remove lines with the pattern "Conversation started at: 2023-02-14 14:14:17"
+        history = re.sub(r"Conversation started at: \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}","",history)
+    else:
+        history = ""
     while True:
         received_msg = client.recv(BUFSIZE).decode("utf-8") #Message indicating the mode used (chatbot,camera_int or camera)
         received_msg = received_msg.split("/m")
@@ -338,10 +368,19 @@ def listenToClient(client):
                                 with HiddenPrints():
                                     audio = tts_model.tts(text=msg_audio,speaker_wav='audios/talk_13.wav', language='en')
                                 audio = ipd.Audio(audio, rate=16000)
-                                play_obj = sa.play_buffer(audio.data, 1, 2, 16000)                   
+                                play_obj = sa.play_buffer(audio.data, 1, 2, 16000)  
+                            if received_msg != "" and USE_ACTIONS:
+                                sequence_to_classify = f"The player is speaking with Monika, his virtual girlfriend. Now he says: {received_msg}. What is the label of this sentence?"
+                                action_to_take = action_classifier(sequence_to_classify,ALL_ACTIONS)   
+                                action_to_take = action_to_take["labels"][0]   
+                                print("Action: "+action_to_take)
+                                action_to_take = REVERT_ACTION_DICT[action_to_take]
+                            else:
+                                action_to_take = "none"
+                            action_to_take = action_to_take.encode("utf-8")           
                             emotion = "".encode("utf-8")
                             msg = msg.encode("utf-8")   
-                            msg_to_send = msg + b"/g" + emotion
+                            msg_to_send = msg + b"/g" + emotion + b"/g" + action_to_take
                             sendMessage(msg_to_send)
                         break
 
@@ -374,53 +413,31 @@ def listenToClient(client):
                                 audio = tts_model.tts(text=msg_audio,speaker_wav='audios/talk_13.wav', language='en')
                             audio = ipd.Audio(audio, rate=16000)
                             play_obj = sa.play_buffer(audio.data, 1, 2, 16000)     
-                        print("Sent: "+ bot_message)              
+                        print("Sent: "+ bot_message)    
+                        if received_msg != "" and USE_ACTIONS:
+                            sequence_to_classify = f"The player is speaking with Monika, his virtual girlfriend. Now he says: {received_msg}. What is the label of this sentence?"
+                            action_to_take = action_classifier(sequence_to_classify,ALL_ACTIONS)   
+                            action_to_take = action_to_take["labels"][0]   
+                            print("Action: "+action_to_take)
+                            action_to_take = REVERT_ACTION_DICT[action_to_take]
+                        else:
+                            action_to_take = "none"
+                        action_to_take = action_to_take.encode("utf-8")                        
                         emotion = "".encode("utf-8")
                         msg = bot_message.encode("utf-8")   
-                        msg_to_send = msg + b"/g" + emotion
+                        msg_to_send = msg + b"/g" + emotion + b"/g" + action_to_take
                         sendMessage(msg_to_send)
                         pyg_count += 1
+                        if pyg_count > 0:
+                            with open("chat_history.txt", "a") as f:
+                                f.write(f"You: {received_msg}" + "\n" + f'{char_settings["char_name"]}: {bot_message}' + "\n")
                     break
                     
 
         elif received_msg == "camera_int":
             if USE_CAMERA:
                 # start the webcam feed
-                cap = cv2.VideoCapture(0)
-                # while True:
-                #     # get the frame from the webcam
-                #     ret, frame = cap.read()
-                #     if not ret:
-                #         break
-                #     bounding_boxes, points = imgProcessing.detect_faces(frame)
-                #     points = points.T
-                #     emotion = None
-                #     for bbox,p in zip(bounding_boxes, points):
-                #         box = bbox.astype(np.int32)
-                #         x1,y1,x2,y2=box[0:4]    
-                #         face_img=frame[y1:y2,x1:x2,:]
-
-                #         img_tensor = test_transforms(Image.fromarray(face_img))
-                #         img_tensor.unsqueeze_(0)
-                #         scores = emotion_model(img_tensor.to(device))
-                #         scores=scores[0].data.cpu().numpy()
-                #         emotion = emotion_dict[np.argmax(scores)]
-
-                #         #Display camera feed
-                #         #Filters to hide face (disable this if you want to see your face)
-                #         # frame = cv2.GaussianBlur(frame,(23,23),50)
-                #         # frame[y1-70:y2+70,x1-70:x2+70] = 0
-
-                #         cv2.rectangle(frame,(x1,y1),(x2,y2),(0,255,0),2)
-                #         cv2.putText(frame,emotion,(x1,y1),cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,0),2)
-                #         cv2.imshow('frame',frame)
-
-                #         #quit if q is pressed
-                #         if cv2.waitKey(1) & 0xFF == ord('q'):
-                #             cap.release()
-                #             cv2.destroyAllWindows()
-                #             break
-    
+                cap = cv2.VideoCapture(0)   
                 ret, frame = cap.read()
                 if not ret:
                     break

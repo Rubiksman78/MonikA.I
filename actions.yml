@@ -1,0 +1,61 @@
+play_game : 
+    # - "NOU" 
+    # - "chess" 
+    # - "piano" 
+    # - "hangman" 
+    # - "pong" 
+    # - "shell game" 
+    # - "rock paper scissors" 
+    # - "tic tac toe"
+    - "play game"
+
+goodbye: 
+    # - "be away for a long time" 
+    # - "go shopping" 
+    # - "go to class" 
+    # - "do homework" 
+    # - "go eat" 
+    # - "hang out with friends" 
+    # - "play another game" 
+    # - "restart the game" 
+    # - "go to sleep" 
+    # - "take you somewhere" 
+    # - "go work out" 
+    # - "go to work" 
+    # - "modify the code" 
+    # - "going to do something"
+    - "goodbye"
+
+greetings:
+  # - "greeting"
+  # - "salutation"
+  - "hello"
+
+go_somewhere:
+  - "go somewhere with you"
+
+change_clothes:
+  - "change clothes"
+  # - "wear something else"
+
+be_right_back:
+  # - "be right back"
+  - "go do something for a bit"
+  
+ask_kiss:
+  - "ask for a kiss"
+
+normal_chat:
+  - "I am feeling"
+  # - "ask for opinion"
+  - "casual chat"
+  - "my own opinion"
+  # - "my opinion on someone"
+
+change_weather:
+  - "change weather"
+
+compliment:
+  - "love you"
+  - "compliment you"
+  # - "compliment your appearance"
