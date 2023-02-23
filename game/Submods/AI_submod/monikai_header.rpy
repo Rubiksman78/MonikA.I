@@ -3,7 +3,7 @@ init -990 python in mas_submod_utils:
         author="Rubiksman1006",
         name="AI_submod",
         description="AI based features for MAS.",
-        version="1.5.0",
+        version="1.6.0",
         settings_pane="monikai_chat_settings",
     )
 
