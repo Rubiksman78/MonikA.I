@@ -36,11 +36,6 @@ def inference_fn(model,tokenizer,history: str, user_input: str,
     model_output = run_raw_inference(model, tokenizer, prompt,
                                             user_input, **generation_settings)
 
-    #generated_messages = parse_messages_from_str(model_output,
-    #                                                 ["You", char_name])
-    #logger.debug("Parsed model response is: `%s`", generated_messages)
-    #bot_message = generated_messages[0]
-
     #remove last line and keep the last line before
     last_line = model_output.splitlines()[-1]
     list_lines = model_output.splitlines()
