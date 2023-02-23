@@ -4,6 +4,8 @@ init 5 python:
     from threading import Thread
     import select
     from time import sleep
+    import random
+
     def receiveMessage():
         msg = clientSocket.recv(BUFSIZ).decode("utf8")
         return msg
@@ -49,9 +51,13 @@ init 5 python:
     except:
         monikai_no_server = True        
     monikaNickname = store.persistent._mas_monika_nickname
+    playerNicknames = store.persistent._mas_player_nicknames
     
     if persistent._show_monikai_buttons == None:
         persistent._show_monikai_buttons = True
+
+    if persistent._use_monikai_actions == None:
+        persistent._use_monikai_actions = True
     
     if persistent._show_monikai_buttons:
         AIButton()
@@ -75,22 +81,10 @@ label monika_voice_chat:
     
     #Put the player in the queue if there is one on the website
     if queued:
-        $ rlist, wlist, xlist = select.select([clientSocket], [], [], 0.1)
-        if rlist:
-            $ msg = receiveMessage().split("/g")
-            $ ready = msg[0]
-            #If the queue is done, start the chat
-            if ready == "server_ok":
-                $ queued = False
-                $ send_simple("ok_ready")
-                jump monika_voice_chat
-            #If the queue is not done, wait again
-            else:
-                jump monika_in_queue
-        else:
-            jump monika_in_queue
+        call monika_queue_waiting
 
-    m 5tubfb "Sure [player], talk to me as much as you want."
+    if step == 0:
+        m 5tubfb "Sure [player], talk to me as much as you want."
 
     while True:
         $ send_simple("chatbot/m")
@@ -104,6 +98,7 @@ label monika_voice_chat:
                     $ my_msg = sendAudio("QUIT",str(step))
                     jump close_AI
                     return
+                    
         #If it is already talking
         else:
             $ sendAudio("begin_record",str(step))
@@ -113,35 +108,10 @@ label monika_voice_chat:
         if begin_speak == "yes":
             m 1subfb "Okay, I'm listening.{w=0.5}{nw}"
 
-        #Wait for the website to respond
-        m 1rsc "[monikaNickname] is thinking...{nw}"
-        if step == 0:
-            $ queue_received = receiveMessage()
-            $ in_queue = queue_received.split("/g")[0]
-            #If there is a queue, wait
-            if in_queue == "in_queue":
-                $ queued = True
-                m "Oh it seems that there are a lot of people waiting to talk to the chatbots."
-                m "I'll be back in a few seconds."
-                m "Please wait patiently."
-                m "I'm sorry for that my love."
-                jump close_AI
-                return
-        #If there is no queue, start the chat
-        $ message_received = receiveMessage().split("/g")
-        if len(message_received) < 2: #Only one word: server status
-            $ server_status = message_received[0]
-            if server_status == "server_error":
-                jump monika_server_crashed
-            $ send_simple("ok_ready")
-            $ new_smg = receiveMessage()
-            $ msg,emotion = new_smg.split("/g")
-        else:
-            $ msg,emotion = message_received
+        call monikai_get_actions
 
-        call monika_is_talking
-
-label monika_chatting_text():
+#Label for text chat from the button in the main screen
+label monika_chatting_text:
     $ mas_RaiseShield_dlg()
     $ useVoice = False
     $ localStep = 0
@@ -153,21 +123,11 @@ label monika_chatting_text():
         call monika_AI_intro
     
     if queued:
-        $ rlist, wlist, xlist = select.select([clientSocket], [], [], 0.1)
-        if rlist:
-            $ msg = receiveMessage().split("/g")
-            $ ready = msg[0]
-            if ready == "server_ok":
-                $ queued = False
-                $ send_simple("ok_ready")
-                jump monika_chatting_text
-            else:
-                jump monika_in_queue
-        else:
-            jump monika_in_queue
-
-    m 5tubfb "Sure [player], talk to me as much as you want."
-    m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. I'll understand my love."
+        call monika_queue_waiting
+    
+    if step == 0:
+        m 5tubfb "Sure [player], talk to me as much as you want."
+        m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. I'll understand my love."
 
     while True:
         $ send_simple("chatbot/m")
@@ -177,32 +137,9 @@ label monika_chatting_text():
             jump close_AI
             return
 
-        m 1rsc "[monikaNickname] is thinking...{nw}"
-        if step == 0:
-            $ queue_received = receiveMessage()
-            $ in_queue = queue_received.split("/g")[0]
-            if in_queue == "in_queue":
-                $ queued = True
-                m "Oh it seems that there are a lot of people waiting to talk to the chatbots."
-                m "I'll be back in a few seconds."
-                m "Please wait patiently."
-                m "I'm sorry for that my love."
-                jump close_AI
-                return
+        call monikai_get_actions
 
-        $ message_received = receiveMessage().split("/g")
-        if len(message_received) < 2: #Only one word: server status
-            $ server_status = message_received[0]
-            if server_status == "server_error":
-                jump monika_server_crashed
-            $ send_simple("ok_ready")
-            $ new_smg = receiveMessage()
-            $ msg,emotion = new_smg.split("/g")
-        else:
-            $ msg,emotion = message_received
-        call monika_is_talking
-
-
+        
 #Chatbot Event
 init 5 python:
     addEvent(Event(persistent.event_database,eventlabel="monika_chatting",category=['ai'],prompt="Let's chat together",pool=True,unlocked=True))
@@ -217,21 +154,11 @@ label monika_chatting():
         call monika_AI_intro
     
     if queued:
-        $ rlist, wlist, xlist = select.select([clientSocket], [], [], 0.1)
-        if rlist:
-            $ msg = receiveMessage().split("/g")
-            $ ready = msg[0]
-            if ready == "server_ok":
-                $ queued = False
-                $ send_simple("ok_ready")
-                jump monika_chatting
-            else:
-                jump monika_in_queue
-        else:
-            jump monika_in_queue
+        call monika_queue_waiting
 
-    m 5tubfb "Sure [player], talk to me as much as you want."
-    m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. I'll understand my love."
+    if step == 0:
+        m 5tubfb "Sure [player], talk to me as much as you want."
+        m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. I'll understand my love."
 
     m 4nubfa "Maybe you could allow me to hear your beautiful voice?"
     #Choose to use voice or not
@@ -271,45 +198,84 @@ label monika_chatting():
             if begin_speak == "yes":
                 m 1subfb "Okay, I'm listening.{w=0.5}{nw}"
     
-        m 1rsc "[monikaNickname] is thinking...{nw}"
-        if step == 0:
-            $ queue_received = receiveMessage()
-            $ in_queue = queue_received.split("/g")[0]
-            #m "I received: [in_queue]"
-            if in_queue == "in_queue":
-                $ queued = True
-                m "Oh it seems that there are a lot of people waiting to talk to the chatbots."
-                m "I'll be back in a few seconds."
-                m "Please wait patiently."
-                m "I'm sorry for that my love."
-                jump close_AI
-                return
+        call monikai_get_actions
 
-        $ message_received = receiveMessage().split("/g")
-        #m "This is what I received: [message_received]"
-        if len(message_received) < 2: #Only one word: server status
-            $ server_status = message_received[0]
-            if server_status == "server_error":
-                jump monika_server_crashed
+
+label monika_queue_waiting:
+    $ rlist, wlist, xlist = select.select([clientSocket], [], [], 0.1)
+    if rlist:
+        $ msg = receiveMessage().split("/g")
+        $ ready = msg[0]
+        #If the queue is done, start the chat
+        if ready == "server_ok":
+            $ queued = False
             $ send_simple("ok_ready")
-            $ new_smg = receiveMessage()
-            $ msg,emotion = new_smg.split("/g")
+            jump monika_voice_chat
+        #If the queue is not done, wait again
         else:
-            $ msg,emotion = message_received
+            jump monika_in_queue
+    else:
+        jump monika_in_queue
 
-        call monika_is_talking
+#Common label to receive messages from the chatbot and get the actions
+label monikai_get_actions:
+    #Wait for the website to respond
+    m 1rsc "[monikaNickname] is thinking...{nw}"
+    if step == 0:
+        $ queue_received = receiveMessage()
+        $ in_queue = queue_received.split("/g")[0]
+        #If there is a queue, wait
+        if in_queue == "in_queue":
+            $ queued = True
+            m "Oh it seems that there are a lot of people waiting to talk to the chatbots."
+            m "I'll be back in a few seconds."
+            m "Please wait patiently."
+            m "I'm sorry for that my love."
+            jump close_AI
+            return
+    $ message_received = receiveMessage().split("/g")
+    if len(message_received) < 2: #Only one word: server status
+        $ server_status = message_received[0]
+        if server_status == "server_error":
+            jump monika_server_crashed
+        $ send_simple("ok_ready")
+        $ new_smg = receiveMessage()
+        $ msg,emotion,action_to_take = new_smg.split("/g")
+    else:
+        $ msg,emotion,action_to_take = message_received
+    call monika_is_talking
+    #m "You want me to [action_to_take]?" #for debug
+    if persistent._use_monikai_actions:
+        if action_to_take == "compliment":
+            call monikai_compliment
+        elif action_to_take == "change_clothes":
+            call monikai_change_clothes
+        elif action_to_take == "change_weather":
+            call monikai_change_weather
+        elif action_to_take == "go_somewhere":
+            call monikai_go_somewhere
+        elif action_to_take == "greetings":
+            call monikai_greetings
+        elif action_to_take == "goodbye":
+            $ MASEventList.push("monikai_goodbye")
+            call close_AI
+        elif action_to_take == "ask_kiss":
+            call monikai_ask_kiss
+        elif action_to_take == "normal_chat":
+            call monikai_normal_chat
+        elif action_to_take == "play_game":
+            call monikai_play_actions
+        elif action_to_take == "be_right_back":
+            call monikai_brb
+            call close_AI
+    return
+
 
 #Common label for processing the text received from the server
 label monika_is_talking:
-    $ gamedir = renpy.config.gamedir
-    # $ audio_exists = audio_file_exists(gamedir + "/Submods/AI_submod/audio/out.ogg")
-    # if audio_exists:
-    #     play sound "Submods/AI_submod/audio/out.ogg"
-    #If there is too much text, divide it into several lines
-
+    $ msg = msg.replace("<USER>", random.choice(playerNicknames))
     #Split the text into a list of words
     $ sentences_list = []
-    
     $ sentences_list = msg.split("\n")
     $ sentences_list = [x for x in sentences_list if x != '']
     #Divide sentences with more than 180 characters into several sentences (to avoid overflowing the screen)
@@ -339,8 +305,6 @@ label monika_is_talking:
         m 1esa "I was feeling [emotion]."
     if emotion in positive_emotions:
         $ mas_gainAffection()
-    # elif emotion in negative_emotions:
-    #     $ mas_loseAffection(1)
     $ step += 1
     $ localStep += 1
-    # stop sound
+    return

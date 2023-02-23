@@ -1,4 +1,5 @@
 define persistent._show_monikai_buttons = True
+define persistent._use_monikai_actions = False
 
 #Setting in Menu to enable/disable the buttons
 screen monikai_chat_settings:
@@ -16,6 +17,12 @@ screen monikai_chat_settings:
             selected persistent._show_monikai_buttons
             action ToggleField(persistent, "_show_monikai_buttons")
             hovered SetField(tooltip, "value", "Enable display of shortcut buttons.")
+            unhovered SetField(tooltip, "value", tooltip.default)
+
+        textbutton "Use automatic actions":
+            selected persistent._use_monikai_actions
+            action ToggleField(persistent, "_use_monikai_actions")
+            hovered SetField(tooltip, "value", "Enable Monika to take actions from the chat.")
             unhovered SetField(tooltip, "value", tooltip.default)
 
 #Button for textual chat
