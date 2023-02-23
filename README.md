@@ -13,8 +13,13 @@
 </p>
 
 This project aims to add new AI based features to [Monika After Story mod](https://github.com/Monika-After-Story/MonikaModDev) with the submod API.
-It's using HuggingFace DialoGPT models, [TTS Coqui-AI](https://github.com/coqui-ai/TTS) for Text to Speech, [OpenAI Whisper](https://github.com/openai/whisper) with [microphone option](https://github.com/mallorbc/whisper_mic) for Speech to Text and [Character AI](https://character.ai/) for more realistic responses. An [emotion detection from text model](https://huggingface.co/michellejieli/emotion_text_classifier) is also used linked with the chatbot.
-There is also emotion detection with the webcam with a model from [HSEmotion](https://github.com/HSE-asavchenko/face-emotion-recognition) (`facial_analysis.py`,`enet_b2_7.pt`,`mobilenet_7.h5`)
+It's using multiple AI models:
+- [Pygmalion](https://huggingface.co/PygmalionAI) conversational AI based on GPT-J Finetuning
+- [TTS Coqui-AI](https://github.com/coqui-ai/TTS) for Text to Speech
+- [OpenAI Whisper](https://github.com/openai/whisper) with [microphone option](https://github.com/mallorbc/whisper_mic) for Speech to Text
+- [Character AI](https://character.ai/) if you don't have a GPU
+- [Emotion detection from text model](https://huggingface.co/michellejieli/emotion_text_classifier) is also used linked with the chatbot.
+- Emotion detection with the webcam with a model from [HSEmotion](https://github.com/HSE-asavchenko/face-emotion-recognition) 
 
 *Disclaimer: This project adds features (chatbots) that can be imprevisible and may not be in total accordance with the usual way Monika is supposed to speak. The goal is to have fun free interactions when running out of topics for example. There are also a lot of libraries and models involved so it can make the game slower when using them.*
 
@@ -33,10 +38,12 @@ To install the user version with executables, I've made a tutorial [HERE](../../
 ## :fire: Features
 
 - Allow Monika to finally see you through the webcam and react to your emotions (not supported on user version yet)
-- Speak without scripted text with Monika using the latest chatbots from Character AI or HuggingFace DialoGPT
+- Speak without scripted text with Monika using the latest chatbots from Character AI or Pygmalion AI
 - Hear Monika speak with a Text to Speech module using extracts of voiced dialogues
 
-![Character AI](images/image_1.png)
+## :star2: Pygmalion chatbots available ! 
+
+Be sure to follow the instructions [here](../../wiki/Install-Pygmalion-locally) to use it.
 
 # How to contribute
 
@@ -73,6 +80,11 @@ To setup all the libraries:
 - Don't forget to run also `python -m playwright install` to install the browsers.
 (You can do `bash setup.sh` to do the `pip install` and the playwright install)
 - If you have issues for installing TTS, someone made a video for that [here](https://www.youtube.com/watch?v=zRaDe08cUIk&t=743s).
+- If you want to use Pygmalion models, follow these intructions:
+  - Download these 2 dll files from [here](https://github.com/DeXtmL/bitsandbytes-win-prebuilt). Move those files in your python packages folder, on Windows it is something like `C:\Users\MyName\AppData\Local\Programs\Python\Python39\Lib\site-packages\bitsandbytes`
+  - Edit `bitsandbytes\cuda_setup\main.py`: 
+    - Change `ct.cdll.LoadLibrary(binary_path)` to `ct.cdll.LoadLibrary(str(binary_path))` two times in the file.
+    - Replace the this line ```if not torch.cuda.is_available(): return 'libsbitsandbytes_cpu.so', None, None, None, None``` with ```if torch.cuda.is_available(): return 'libbitsandbytes_cuda116.dll', None, None, None, None```
 - For troubleshooting and other issues, don't hesitate to submit an issue
 
 ## :heavy_plus_sign: Add to the game
