@@ -80,14 +80,17 @@ https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-
 
 To setup all the libraries:
 - Just do `pip install -r requirements.txt` in a terminal opened within the project folder
+- Run also this command to install `torch` with CUDA 11.7 wheels: `pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu117`
+- If there was an error returned during the installation of the packages, delete the corresponding line in `requirements.txt` and dowload the package concerned manually
 - Don't forget to run also `python -m playwright install` to install the browsers.
-(You can do `bash setup.sh` to do the `pip install` and the playwright install)
-- If you have issues for installing TTS, someone made a video for that [here](https://www.youtube.com/watch?v=zRaDe08cUIk&t=743s).
+- If you have issues for installing TTS, someone made a video for that [here](https://www.youtube.com/watch?v=zRaDe08cUIk&t=743s), `simpleaudio` or other packages might need to install Visual Studio C++ Tools too (see tutorial [here](https://stackoverflow.com/questions/64261546/how-to-solve-error-microsoft-visual-c-14-0-or-greater-is-required-when-inst))
 - If you want to use Pygmalion models, follow these intructions:
-  - Download these 2 dll files from [here](https://github.com/DeXtmL/bitsandbytes-win-prebuilt). Move those files in your python packages folder, on Windows it is something like `C:\Users\MyName\AppData\Local\Programs\Python\Python39\Lib\site-packages\bitsandbytes`
-  - Edit `bitsandbytes\cuda_setup\main.py`: 
-    - Change `ct.cdll.LoadLibrary(binary_path)` to `ct.cdll.LoadLibrary(str(binary_path))` two times in the file.
-    - Replace the this line ```if not torch.cuda.is_available(): return 'libsbitsandbytes_cpu.so', None, None, None, None``` with ```if torch.cuda.is_available(): return 'libbitsandbytes_cuda116.dll', None, None, None, None```
+  - To use `int8` i.e. models taking less GPU RAM with `bitsandbytes`:
+     - Download these 2 dll files from [here](https://github.com/DeXtmL/bitsandbytes-win-prebuilt). Move those files in your python packages folder, on Windows it is something like `C:\Users\MyName\AppData\Local\Programs\Python\Python39\Lib\site-packages\bitsandbytes`
+     - Edit `bitsandbytes\cuda_setup\main.py`: 
+       - Change `ct.cdll.LoadLibrary(binary_path)` to `ct.cdll.LoadLibrary(str(binary_path))` two times in the file.
+       - Replace the this line ```if not torch.cuda.is_available(): return 'libsbitsandbytes_cpu.so', None, None, None, None``` with ```if torch.cuda.is_available(): return 'libbitsandbytes_cuda116.dll', None, None, None, None```
+   - Follow the instructions in the [wiki](https://github.com/Rubiksman78/MonikA.I/wiki/Install-Pygmalion-locally)
 - For troubleshooting and other issues, don't hesitate to submit an issue
 
 ## :heavy_plus_sign: Add to the game
