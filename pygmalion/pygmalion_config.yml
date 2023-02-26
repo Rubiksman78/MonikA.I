@@ -1,10 +1,11 @@
 char_json: monika.json
 context_size: 8
 do_sample: true
-max_new_tokens: 200
+max_new_tokens: 100
 model_name: PygmalionAI/pygmalion-2.7b
 repetition_penalty: 1.2
 temperature: 0.65
 top_k: 0
 top_p: 0.9
 typical_p: 1.0
+use_int_8: true
