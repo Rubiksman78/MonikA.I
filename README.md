@@ -79,11 +79,21 @@ https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-
 - Be sure to have Python installed (3.8 or 3.9), it is not tested and functional before 3.7 and after 3.10.
 
 To setup all the libraries:
-- Just do `pip install -r requirements.txt` in a terminal opened within the project folder
-- Run also this command to install `torch` with CUDA 11.7 wheels: `pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu117`
+- Run these commands in a terminal opened within the project folder to install the packages:
+    ```
+    pip install -r requirements.txt
+    pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu117
+    python -m playwright install firefox
+    ```
 - If there was an error returned during the installation of the packages, delete the corresponding line in `requirements.txt` and dowload the package concerned manually
-- Don't forget to run also `python -m playwright install` to install the browsers.
-- If you have issues for installing TTS, someone made a video for that [here](https://www.youtube.com/watch?v=zRaDe08cUIk&t=743s), `simpleaudio` or other packages might need to install Visual Studio C++ Tools too (see tutorial [here](https://stackoverflow.com/questions/64261546/how-to-solve-error-microsoft-visual-c-14-0-or-greater-is-required-when-inst)), for `simpleaudio` follow [this](https://stackoverflow.com/questions/67312738/error-command-errored-out-with-exit-status-1-python-when-installing-simple)
+- To download TTS (first model with Coqui AI TTS), run these commands:
+    ```
+    git clone https://github.com/coqui-ai/TTS
+    cd TTS
+    pip install -e .
+    cd ../
+    ```
+- `simpleaudio` or other packages might need to install Visual Studio C++ Tools too (see tutorial [here](https://stackoverflow.com/questions/64261546/how-to-solve-error-microsoft-visual-c-14-0-or-greater-is-required-when-inst)), for `simpleaudio` follow [this](https://stackoverflow.com/questions/67312738/error-command-errored-out-with-exit-status-1-python-when-installing-simple)
 - If you want to use Pygmalion models, follow these intructions:
   - To use `int8` i.e. models taking less GPU RAM with `bitsandbytes`:
      - Download these 2 dll files from [here](https://github.com/DeXtmL/bitsandbytes-win-prebuilt). Move those files in your python packages folder, on Windows it is something like `C:\Users\MyName\AppData\Local\Programs\Python\Python39\Lib\site-packages\bitsandbytes`
