@@ -76,7 +76,7 @@ https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-
 
 - Clone the repository or download the latest release (`source code.zip`)
 - Go to the project folder with your favorite IDE
-- Be sure to have Python installed (3.8 or 3.9), TTS doesn't work with 3.10
+- Be sure to have Python installed (3.8 or 3.9), it is not tested and functional before 3.7 and after 3.10.
 
 To setup all the libraries:
 - Just do `pip install -r requirements.txt` in a terminal opened within the project folder
