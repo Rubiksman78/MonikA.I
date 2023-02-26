@@ -4,8 +4,14 @@ import typing as t
 import torch
 import transformers
 
+import yaml
+
 logger = logging.getLogger(__name__)
 
+with open("pygmalion/pygmalion_config.yml", "r") as f:
+        PYG_CONFIG = yaml.safe_load(f)
+
+USE_INT_8 = PYG_CONFIG["use_int_8"]
 
 def build_model_and_tokenizer_for(
     model_name: str
@@ -19,16 +25,16 @@ def build_model_and_tokenizer_for(
         tokenizer(bad_word, add_special_tokens=False).input_ids
         for bad_word in _build_bad_words_list_for(model_name)
     ]
-
     logger.info(f"Loading the {model_name} model")
     model = transformers.AutoModelForCausalLM.from_pretrained(
         model_name,
         bad_words_ids=bad_words_ids,
         device_map="auto",
-        load_in_8bit=True,
+        load_in_8bit=USE_INT_8,
+        torch_dtype=torch.float16,
         offload_folder="offload",
         # offload_state_dict=True,
-        max_memory={0:"6GiB","cpu":"99GiB"},
+        max_memory={0:"5890MiB","cpu":"99GiB"},
     )
     logger.info("Model and tokenizer are ready")
     return model, tokenizer
@@ -68,12 +74,15 @@ def run_raw_inference(model: transformers.AutoModelForCausalLM,
     output = tokenizer.decode(logits[0], skip_special_tokens=True)
 
     logger.debug("Before trimming, model output was: `%s`", output)
-
     return output
 
 
 def _build_bad_words_list_for(_model_name: str) -> t.List[str]:
     '''Builds a list of bad words for the given model.'''
+
+    # NOTE(11b): This was implemented as a function because each model size
+    # seems to have it quirks at the moment, but this is a rushed implementation
+    # so I'm not handling that, hence the dumb return here.
     return ["Persona:", "Scenario:", "<START>"]
 
 

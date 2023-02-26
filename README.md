@@ -48,6 +48,13 @@ To install the user version with executables, I've made a tutorial [HERE](../../
 
 Be sure to follow the instructions [here](../../wiki/Install-Pygmalion-locally) to use it.
 
+## :microphone: Customize Monika's voice
+
+For Your TTS model (worse but faster, ~3s per turn):
+You can change the voice used by replacing the extract `talk_13.wav` in the `audio` folder by another audio extract. The longer the extract, the longer the TTS will take to generate the audio at each turn.
+
+For Tortoise TTS model (better but slower, ~30s per turn): You can change the voice samples in `tortoise-tts-fast/tortoise/voices` folder. Create your own character by adding a folder with the name of your character and put the audio samples in it. The samples must be around 10 seconds long and at the number of 5 maximum. There are some default samples in `example_samples` made from this [post](https://www.reddit.com/r/MASFandom/comments/10sz2z3/giving_monika_a_voice_using_new_ai_technology_to/) thanks to [u/VBandit47](https://www.reddit.com/user/VBandit47/).
+
 # How to contribute
 
 If you want to contribute to the project, you can check out this [page](../../wiki/How-to-contribute).
@@ -119,24 +126,10 @@ The submod is in the folder `game`. To add it to your game, you have to add it i
 Because of the high usage of Machine Learning algorithms, the inference can be quite long on CPU so it is advised to have a functional GPU for a better experience.
 You would need also more RAM than usually, deactivate the TTS model, the emotion detection from text and/or emotion detection from face if it is taking too much ressources.
 
-Launch the file `main.py` for the chatbot things and fill in the window the same as for the user version. Don't launch DDLC yourself, it will open automatically.
+Launch the file `main.py` for the chatbot things and fill in the window the same as for the user version. Don't launch DDLC yourself, it will open automatically (unless you check the option `Launch yourself`).
 When the browser page launches, it can happen that you have to solve the captcha yourself, use debug mode if that happens.
 
 For voicing of the game in real time, launch `voicing.py` and launch DDLC yourself when the message `Waiting for connection...` appears.
-
-You can change the voice used by replacing the extract `talk_13.wav` in the `audio` folder by another audio extract. The longer the extract, the longer the TTS will take to generate the audio at each turn.
-
-## :microphone: Better Voice (only on Linux,MacOS or WSL)
-
-The voice used by Your TTS is obtained with zero-shot learning so it is not perfect and very closed to the original voice. To improve it, you can use the [FastPitch TTS from Nvidia NeMo](https://github.com/NVIDIA/NeMo).
-The installation is quite painful, you can do the setup from this [notebook](https://github.com/NVIDIA/NeMo/blob/main/tutorials/tts/FastPitch_Finetuning.ipynb) and use the script `combined_server_for_the_bold.py` to launch the server with this TTS model. It will also take more RAM so be sure to have enough (at the very least 16GB).
-You can try using the file `setup_new_tts.sh` to help you installing the requirements for this model.
-
-Click [here](https://drive.google.com/drive/folders/1cgro9BbUJ53GFX1OizvNvmH0Cjnc7oqI?usp=sharing) to get the first part of the finetuned model (FastPitch model) and [here](https://drive.google.com/drive/folders/1NLNDTotB4Qyth_vLBmZMTLIg0dmIm6w0?usp=sharing) for the vocoder model (HifiGAN).
-
-Little demonstration of this TTS model (pauses were cut for convenience):
-
-https://user-images.githubusercontent.com/66365083/209716914-0ee87421-12df-4cc2-96da-9fd85f27214e.mp4
 
 ## :wrench: Troubleshooting
 

@@ -1,15 +1,11 @@
-playwright
-simpleaudio
-TTS
-IPython
-tensorflow
-numpy 
-opencv-python
-transformers
-Pillow
-SpeechRecognition
+playwright~=1.31.0
+simpleaudio~=1.0.4
+IPython~=8.10.0
+tensorflow~=2.11.0
+opencv-python~=4.7.0.72
+transformers~=4.26.1
+Pillow~=9.4.0
+SpeechRecognition~=3.9.0
 git+https://github.com/openai/whisper.git 
-tk
-asyncio
-bitsandbytes
--e git+https://github.com/152334H/tortoise-tts-fast@ec2f1f06e7ccc2614f8386414660f05fc7bbe098#egg=tortoise
+tk~=0.1.0
+bitsandbytes~=0.37.0

@@ -33,6 +33,8 @@ def modify_text(path,dest_path):
 
     #remove characters in {} and [] and ()
     lines = [re.sub(r"\[.*?\]", "Sam-chan", line) for line in lines]
+    #Replace Sam-chan with <USER>
+    lines = [re.sub(r"Sam-chan", "<USER>", line) for line in lines]
     lines = [re.sub(r"\{.*?\}", "", line) for line in lines]
     lines = [re.sub(r"\(.*?\)", "", line) for line in lines]
 
@@ -64,6 +66,7 @@ def modify_text(path,dest_path):
     lines = list(dict.fromkeys(lines))
 
     #group . . .
+    lines = [re.sub(r"\.\s*\.\s*\.", "...", line) for line in lines]
     #remove extra spaces
     #lines = [re.sub(r"\s+", " ", line) for line in lines]
 
