@@ -32,7 +32,7 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 (Build is for Windows OS only, see `Python version` section for other OS)
 
-This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferale to use them separetely.
+This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferable to use them separetely.
 
 To install the user version with executables, I've made a tutorial [HERE](../../wiki/User-friendly-tutorial)
 
