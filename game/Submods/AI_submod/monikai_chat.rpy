@@ -38,6 +38,34 @@ init 5 python:
     def AIVoiceVisible():
         return "monika_voicechat_button" in config.overlay_screens
 
+    def mas_get_player_nickname(capitalize=False, exclude_names=[], _default=None, regex_replace_with_nullstr=None):
+        if _default is None:
+            _default = player
+
+        if mas_isMoniHappy(lower=True) or not persistent._mas_player_nicknames:
+            return _default
+
+        nickname_pool = persistent._mas_player_nicknames + [player]
+
+        if exclude_names:
+            nickname_pool = [
+                nickname
+                for nickname in nickname_pool
+                if nickname not in exclude_names
+            ]
+
+            if not nickname_pool:
+                return _default
+
+        selected_nickname = random.choice(nickname_pool)
+
+        if regex_replace_with_nullstr is not None:
+            selected_nickname = re.sub(regex_replace_with_nullstr, "", selected_nickname)
+
+        if capitalize:
+            selected_nickname = selected_nickname.capitalize()
+        return selected_nickname
+
     HOST = "127.0.0.1"
     PORT = 12346
     BUFSIZ = 1024
@@ -51,7 +79,6 @@ init 5 python:
     except:
         monikai_no_server = True        
     monikaNickname = store.persistent._mas_monika_nickname
-    playerNicknames = store.persistent._mas_player_nicknames
     
     if persistent._show_monikai_buttons == None:
         persistent._show_monikai_buttons = True
@@ -107,7 +134,9 @@ label monika_voice_chat:
         $ begin_speak = receiveMessage()
         if begin_speak == "yes":
             m 1subfb "Okay, I'm listening.{w=0.5}{nw}"
-
+        elif begin_speak == "no":
+            m "Oh, it seems you forgot to activate the speech recognition.{w=0.5}{nw}"
+            jump close_AI 
         call monikai_get_actions
 
 #Label for text chat from the button in the main screen
@@ -197,7 +226,10 @@ label monika_chatting():
             $ begin_speak = receiveMessage()
             if begin_speak == "yes":
                 m 1subfb "Okay, I'm listening.{w=0.5}{nw}"
-    
+            elif begin_speak == "no":
+                m "Oh, it seems you forgot to activate the speech recognition.{w=0.5}{nw}"
+                jump close_AI
+                return
         call monikai_get_actions
 
 
@@ -224,6 +256,7 @@ label monikai_get_actions:
     if step == 0:
         $ queue_received = receiveMessage()
         $ in_queue = queue_received.split("/g")[0]
+        $ send_simple("ok_ready")
         #If there is a queue, wait
         if in_queue == "in_queue":
             $ queued = True
@@ -273,7 +306,8 @@ label monikai_get_actions:
 
 #Common label for processing the text received from the server
 label monika_is_talking:
-    $ msg = msg.replace("<USER>", random.choice(playerNicknames))
+    $ player_nickname_ai = mas_get_player_nickname()
+    $ msg = msg.replace("<USER>",player_nickname_ai)
     #Split the text into a list of words
     $ sentences_list = []
     $ sentences_list = msg.split("\n")
