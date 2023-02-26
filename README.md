@@ -15,7 +15,7 @@
 This project aims to add new AI based features to [Monika After Story mod](https://github.com/Monika-After-Story/MonikaModDev) with the submod API.
 It's using multiple AI models:
 - [Pygmalion](https://huggingface.co/PygmalionAI) conversational AI based on GPT-J Finetuning
-- [TTS Coqui-AI](https://github.com/coqui-ai/TTS) for Text to Speech
+- [TTS Coqui-AI](https://github.com/coqui-ai/TTS) and [Tortoise-TTS](https://github.com/152334H/tortoise-tts-fast) for Text to Speech
 - [OpenAI Whisper](https://github.com/openai/whisper) with [microphone option](https://github.com/mallorbc/whisper_mic) for Speech to Text
 - [Character AI](https://character.ai/) if you don't have a GPU
 - [Emotion detection from text model](https://huggingface.co/michellejieli/emotion_text_classifier) is also used linked with the chatbot
