@@ -31,7 +31,7 @@ screen monika_chatbot_button():
     style_prefix "hkb"
     vbox:
         xpos 0.03
-        ypos 170
+        ypos 230
         if renpy.get_screen("hkb_overlay"):
             if store.mas_hotkeys.talk_enabled is False:
                 textbutton ("Monika's chatbot"):
@@ -49,7 +49,7 @@ screen monika_voicechat_button():
     style_prefix "hkb"
     vbox:
         xpos 0.026
-        ypos 220
+        ypos 280
         if renpy.get_screen("hkb_overlay"):
             if store.mas_hotkeys.talk_enabled is False:
                 textbutton ("Monika's voicechat"):
