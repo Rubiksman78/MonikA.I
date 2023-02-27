@@ -470,6 +470,11 @@ def listenToClient(client):
                             with open("chat_history.txt", "a",encoding="utf-8") as f:
                                 f.write(f"You: {received_msg}" + "\n" + f'{char_settings["char_name"]}: {bot_message}' + "\n")
                     break
+                
+            if not USE_PYG and not USE_CHARACTER_AI:
+                sendMessage("not_in_queue".encode("utf-8"))
+                _ = client.recv(BUFSIZE).decode("utf-8")
+                sendMessage("server_error".encode("utf-8"))
                     
 
         elif received_msg == "camera_int":
