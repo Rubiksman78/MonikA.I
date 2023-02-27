@@ -55,7 +55,7 @@ You can change the voice used by replacing the extract `talk_13.wav` in the `aud
 
 For Tortoise TTS model (better but slower, ~40s per turn): You can change the voice samples in `tortoise-tts-fast/tortoise/voices` folder. Create your own character by adding a folder with the name of your character and put the audio samples in it. The samples must be around 10 seconds long and at the number of 5 maximum. There are some default samples in `example_samples` made from this [post](https://www.reddit.com/r/MASFandom/comments/10sz2z3/giving_monika_a_voice_using_new_ai_technology_to/) thanks to [u/VBandit47](https://www.reddit.com/user/VBandit47/).
 
-On CPU, it can take 10x more time to generate the voice.
+On CPU, it can take 10x more time to generate the voice (Tortoise TTS can have unexpected behaviour on CPU)
 
 # How to contribute
 
