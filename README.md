@@ -15,7 +15,7 @@
 This project aims to add new AI based features to [Monika After Story mod](https://github.com/Monika-After-Story/MonikaModDev) with the submod API.
 It's using multiple AI models:
 - [Pygmalion](https://huggingface.co/PygmalionAI) conversational AI based on GPT-J Finetuning
-- [TTS Coqui-AI](https://github.com/coqui-ai/TTS) for Text to Speech
+- [TTS Coqui-AI](https://github.com/coqui-ai/TTS) and [Tortoise-TTS](https://github.com/152334H/tortoise-tts-fast) for Text to Speech
 - [OpenAI Whisper](https://github.com/openai/whisper) with [microphone option](https://github.com/mallorbc/whisper_mic) for Speech to Text
 - [Character AI](https://character.ai/) if you don't have a GPU
 - [Emotion detection from text model](https://huggingface.co/michellejieli/emotion_text_classifier) is also used linked with the chatbot
@@ -34,7 +34,7 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferable to use them separetely.
 
-To install the user version with executables, I've made a tutorial [HERE](../../wiki/User-friendly-tutorial)
+To install the user version with executables, I've made a tutorial [HERE](../../wiki/Installation-tutorial-(after-1.6.1)) for versions equal or after 1.6.1 and [here](../../wiki/Installation-tutorial-(before-1.6.0)) for versions equal or before 1.6.0.
 
 ## :fire: Features
 
@@ -50,10 +50,12 @@ Be sure to follow the instructions [here](../../wiki/Install-Pygmalion-locally) 
 
 ## :microphone: Customize Monika's voice
 
-For Your TTS model (worse but faster, ~3s per turn):
+For Your TTS model (worse but faster, ~5s per turn):
 You can change the voice used by replacing the extract `talk_13.wav` in the `audio` folder by another audio extract. The longer the extract, the longer the TTS will take to generate the audio at each turn.
 
-For Tortoise TTS model (better but slower, ~30s per turn): You can change the voice samples in `tortoise-tts-fast/tortoise/voices` folder. Create your own character by adding a folder with the name of your character and put the audio samples in it. The samples must be around 10 seconds long and at the number of 5 maximum. There are some default samples in `example_samples` made from this [post](https://www.reddit.com/r/MASFandom/comments/10sz2z3/giving_monika_a_voice_using_new_ai_technology_to/) thanks to [u/VBandit47](https://www.reddit.com/user/VBandit47/).
+For Tortoise TTS model (better but slower, ~40s per turn): You can change the voice samples in `tortoise-tts-fast/tortoise/voices` folder. Create your own character by adding a folder with the name of your character and put the audio samples in it. The samples must be around 10 seconds long and at the number of 5 maximum. There are some default samples in `example_samples` made from this [post](https://www.reddit.com/r/MASFandom/comments/10sz2z3/giving_monika_a_voice_using_new_ai_technology_to/) thanks to [u/VBandit47](https://www.reddit.com/user/VBandit47/).
+
+On CPU, it can take 10x more time to generate the voice (Tortoise TTS can have unexpected behaviour on CPU)
 
 # How to contribute
 
@@ -97,6 +99,13 @@ To setup all the libraries:
     ```
     git clone https://github.com/coqui-ai/TTS
     cd TTS
+    pip install -e .
+    cd ../
+    ```
+- To download TTS (new model with Tortoise-TTS), run these commands:
+    ```
+    git clone https://github.com/152334H/tortoise-tts-fast
+    cd tortoise-tts-fast
     pip install -e .
     cd ../
     ```
