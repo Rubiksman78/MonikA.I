@@ -10,7 +10,7 @@ save_ids = os.path.exists("save_text.txt")
 
 root = tk.Tk()
 root.title("MonikA.I. Submod")
-root.geometry("650x400")
+root.geometry("800x400")
 #root.resizable(False, False)
 root.configure(background='#333333')
 
@@ -117,7 +117,9 @@ char_menu = tk.OptionMenu(char_ai_frame, choose_character, "0", "1")
 char_menu.config( bg='white',fg='black')
 char_menu.grid(row=2, column=4)
 
-pyg_menu = tk.OptionMenu(other_frame, pyg_model, "350m","1.3b","2.7b","6b")
+all_models = os.listdir("chatbot_models")
+#pyg_menu = tk.OptionMenu(other_frame, pyg_model, "350m","1.3b","2.7b","6b")
+pyg_menu = tk.OptionMenu(other_frame, pyg_model, *all_models)
 pyg_menu.config( bg='white',fg='black')
 pyg_menu.grid(row=4, column=4)
 
@@ -281,7 +283,7 @@ USE_SPEECH_RECOGNITION = int(USE_SPEECH_RECOGNITION)
 #Save model chosen in pygmalion config
 with open("pygmalion/pygmalion_config.yml", "r") as f:
     config_pyg = yaml.safe_load(f)
-config_pyg["model_name"] = "PygmalionAI/pygmalion-" + PYG_MODEL
+config_pyg["model_name"] = "chatbot_models/" + PYG_MODEL
 with open("pygmalion/pygmalion_config.yml", "w") as f:
     yaml.dump(config_pyg, f)
 
