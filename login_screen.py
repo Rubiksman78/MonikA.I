@@ -198,7 +198,7 @@ if not os.path.exists("config.json"):
     use_camera.set(0)
     #keep_config.set(0)
     use_pyg.set(0)
-    pyg_model.set("2.7b")
+    pyg_model.set("No model set")
     use_actions.set(0)
     tts_model.set("Your TTS")
     use_speech_recognition.set(0)
