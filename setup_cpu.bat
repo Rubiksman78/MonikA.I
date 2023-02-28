@@ -1,5 +1,5 @@
 @echo off
-py -m venv venv
+py -3.8 -m venv venv
 "venv/Scripts/python.exe" -m pip install -r requirements.txt
 git clone https://github.com/coqui-ai/TTS
 cd TTS
