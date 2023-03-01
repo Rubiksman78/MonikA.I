@@ -10,3 +10,4 @@ git+https://github.com/openai/whisper.git
 tk~=0.1.0
 bitsandbytes~=0.37.0
 numpy==1.23.0
+PyAudio
