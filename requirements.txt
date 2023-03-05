@@ -1,5 +1,5 @@
 playwright~=1.31.0
-simpleaudio
+simpleaudio~=1.0.4
 IPython~=8.10.0
 tensorflow~=2.11.0
 opencv-python~=4.7.0.72
