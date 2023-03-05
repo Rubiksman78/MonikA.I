@@ -88,7 +88,7 @@ https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-
 - Be sure to have Python installed (3.8 or 3.9), it is not tested and functional before 3.7 and after 3.10.
 
 To setup all the libraries:
-- Run these commands in a terminal opened within the project folder to install the packages:
+- Run these commands in a terminal opened within the project folder to install the packages (the 2nd one only if you want and can use GPU):
     ```
     pip install -r requirements.txt
     pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu117
