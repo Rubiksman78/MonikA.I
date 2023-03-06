@@ -26,15 +26,7 @@ It's using multiple AI models:
 
 Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some questions or if you want to be up to date with new fixes and releases !
 
-# User friendly mode
-
-## :boom: Installation 
-
-(Build is for Windows OS only, see `Python version` section down here for other OS)
-
-This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferable to use them separetely.
-
-To install the user version with executables, I've made a tutorial [HERE](../../wiki/Installation-tutorial-(after-1.6.1)) for versions equal or after 1.6.1 and [here](../../wiki/Installation-tutorial-(before-1.6.0)) for versions equal or before 1.6.0.
+# Using the Submod
 
 ## :fire: Features
 
@@ -57,27 +49,13 @@ For Tortoise TTS model (better but slower, ~40s per turn): You can change the vo
 
 On CPU, it can take 10x more time to generate the voice (Tortoise TTS can have unexpected behaviour on CPU)
 
-# How to contribute
+## Installation 
 
-If you want to contribute to the project, you can check out this [page](../../wiki/How-to-contribute).
-It is not necessary to know how to code and you can add dialogs, expressions. Don't hesitate to propose new things if you have more experience !
+## :boom: For Windows 
 
-# Demonstrations
+This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferable to use them separetely.
 
-## :video_game: In Game
-
-The features are available in a specific `AI` Talk menu in the game.
-![Talk menu](images/event_mas.png)
-
-- Click on `Let's chat together` to use the Character AI Chatbot
-- Click on `Tell me about Pytorch` if you think it is superior to Tensorflow
-
-There is also the possibility of using buttons on the main screen to directly chat. These can be disabled in the Settings Submods if you don't like them.
-![Talk buttons](images/buttons_mas.png)
-
-## :cinema: Video Demonstration
-
-https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-a1fb-62d695e76c51.mp4
+To install the user version with executables, I've made a tutorial [HERE](../../wiki/Installation-tutorial-(after-1.6.1)) for versions equal or after 1.6.1 and [here](../../wiki/Installation-tutorial-(before-1.6.0)) for versions equal or before 1.6.0.
 
 # Python version (For Linux or MacOS users)
 
@@ -122,7 +100,7 @@ To setup all the libraries:
 
 ## :heavy_plus_sign: Add to the game
 
-The submod is in the folder `game`. To add it to your game, you have to add it in the root of your game folder (at the same location where there is already a `game` folder).
+The submod is in Releases under the name `Monik.A.I-game-version.zip`. To add it to your game, you have to extract it and add it in the root of your game folder (at the same location where there is already a `game` folder).
 
 ## :loudspeaker: Usage
 
@@ -134,7 +112,29 @@ When the browser page launches, it can happen that you have to solve the captcha
 
 For voicing of the game in real time, run `python voicing.py` and launch DDLC yourself when the message `Waiting for connection...` appears.
 
-## :wrench: Troubleshooting
+# How to contribute
+
+If you want to contribute to the project, you can check out this [page](../../wiki/How-to-contribute).
+It is not necessary to know how to code and you can add dialogs, expressions. Don't hesitate to propose new things if you have more experience !
+
+# Demonstrations
+
+## :video_game: In Game
+
+The features are available in a specific `AI` Talk menu in the game.
+![Talk menu](images/event_mas.png)
+
+- Click on `Let's chat together` to use the Character AI Chatbot
+- Click on `Tell me about Pytorch` if you think it is superior to Tensorflow
+
+There is also the possibility of using buttons on the main screen to directly chat. These can be disabled in the Settings Submods if you don't like them.
+![Talk buttons](images/buttons_mas.png)
+
+## :cinema: Video Demonstration
+
+https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-a1fb-62d695e76c51.mp4
+
+# Common issues (to be updated)
 
 - "failed wheels for building TTS": check if you have python 3.8 or 3.9, and not 3.10 or higher
 - "playwright command not found": run `python -m playwright install` 
