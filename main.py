@@ -28,13 +28,15 @@ PASSWORD = CONFIG["PASSWORD"]
 CHOOSE_CHARACTER = CONFIG["CHOOSE_CHARACTER"]
 USE_CAMERA = CONFIG["USE_CAMERA"]
 TIME_INTERVALL = CONFIG["TIME_INTERVALL"]
-USE_PYG = CONFIG["USE_PYG"]
+USE_LOCAL_CHATBOT = CONFIG["USE_LOCAL_CHATBOT"]
 LAUNCH_YOURSELF = CONFIG["LAUNCH_YOURSELF"]
 USE_ACTIONS = CONFIG["USE_ACTIONS"]
 TTS_MODEL = CONFIG["TTS_MODEL"]
 USE_SPEECH_RECOGNITION = CONFIG["USE_SPEECH_RECOGNITION"]
 VOICE_SAMPLE_TORTOISE = CONFIG["VOICE_SAMPLE_TORTOISE"]
 VOICE_SAMPLE_COQUI = CONFIG["VOICE_SAMPLE_COQUI"]
+CHARACTER_JSON = CONFIG["CHARACTER_JSON"]
+USE_RWKV = True
 
 #Disable print from TTS Coqui AI
 class HiddenPrints:
@@ -66,7 +68,7 @@ if USE_ACTIONS:
 #######################################
 
 ######LOAD PYGMALION CONFIG######
-if USE_PYG:
+if USE_LOCAL_CHATBOT:
 
     from pygmalion.model import build_model_and_tokenizer_for
     from run_pygmalion import inference_fn
@@ -75,29 +77,35 @@ if USE_PYG:
     with open("pygmalion/pygmalion_config.yml", "r") as f:
         PYG_CONFIG = yaml.safe_load(f)
 
-    with open(f"pygmalion/{PYG_CONFIG['char_json']}", "r") as f:
+    with open(f"char_json/{CHARACTER_JSON}", "r") as f:
         char_settings = json.load(f)
     f.close()
 
     model_name = PYG_CONFIG["model_name"]
-    gc.collect()
-    torch.cuda.empty_cache()
-    pyg_model, tokenizer = build_model_and_tokenizer_for(model_name)
 
-    generation_settings = {
-        "max_new_tokens": PYG_CONFIG["max_new_tokens"],
-        "temperature": PYG_CONFIG["temperature"],
-        "repetition_penalty": PYG_CONFIG["repetition_penalty"],
-        "top_p": PYG_CONFIG["top_p"],
-        "top_k": PYG_CONFIG["top_k"],
-        "do_sample": PYG_CONFIG["do_sample"],
-        "typical_p":PYG_CONFIG["typical_p"],
-    }
+    if not model_name.endswith(".pth"):
+        USE_RWKV = False
+        gc.collect()
+        torch.cuda.empty_cache()
+        pyg_model, tokenizer = build_model_and_tokenizer_for(model_name)
 
-    context_size = PYG_CONFIG["context_size"]
+        generation_settings = {
+            "max_new_tokens": PYG_CONFIG["max_new_tokens"],
+            "temperature": PYG_CONFIG["temperature"],
+            "repetition_penalty": PYG_CONFIG["repetition_penalty"],
+            "top_p": PYG_CONFIG["top_p"],
+            "top_k": PYG_CONFIG["top_k"],
+            "do_sample": PYG_CONFIG["do_sample"],
+            "typical_p":PYG_CONFIG["typical_p"],
+        }
+
+        context_size = PYG_CONFIG["context_size"]
 
     with open("chat_history.txt", "a") as chat_history:
         chat_history.write("Conversation started at: " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + "\n")
+
+    if USE_RWKV:
+        from ChatRWKV.v2.chat import on_message
 #################################
 
 #########Load the emotion model##########
@@ -139,7 +147,7 @@ with HiddenPrints():
                     high_vram=False,
                     kv_cache=True,
                 )
-            voice_samples, conditioning_latents = load_voices([VOICE_SAMPLE_TORTOISE], [])
+            voice_samples, conditioning_latents = load_voices([VOICE_SAMPLE_TORTOISE], ["tortoise_audios"])
             vfixer = VoiceFixer()
             sampling_rate = 24000
         else:
@@ -158,7 +166,7 @@ def play_TTS(step,msg,play_obj):
         msg_audio = uni_chr_re.sub(r'', msg_audio)
         with HiddenPrints():
             if TTS_MODEL == "Your TTS":
-                audio = tts_model.tts(text=msg_audio,speaker_wav=f'audios/{VOICE_SAMPLE_COQUI}', language='en')
+                audio = tts_model.tts(text=msg_audio,speaker_wav=f'coquiai_audios/{VOICE_SAMPLE_COQUI}', language='en')
             elif TTS_MODEL == "Tortoise TTS":
                 gen, _ = tts_model.tts(
                         text=msg_audio,
@@ -274,7 +282,6 @@ def post_message(page, message):
             break
         except:
             pass
-
 ##########################################################################################
 
 GAME_PATH = GAME_PATH.replace("\\", "/")
@@ -383,7 +390,6 @@ def listenToClient(client):
                 if USE_SPEECH_RECOGNITION:
                     with sr.Microphone(sample_rate=16000) as source:
                         sendMessage("yes".encode("utf-8"))
-                        #get and save audio to wav file
                         audio = r.listen(source)
                         torch_audio = torch.from_numpy(np.frombuffer(audio.get_raw_data(), np.int16).flatten().astype(np.float32) / 32768.0)
                         audio_data = torch_audio
@@ -398,7 +404,7 @@ def listenToClient(client):
                        
             print("User: "+received_msg)
 
-            if USE_CHARACTER_AI and not USE_PYG:
+            if USE_CHARACTER_AI and not USE_LOCAL_CHATBOT:
                 if not launched:
                     try:
                         pw = sync_playwright().start()
@@ -450,21 +456,26 @@ def listenToClient(client):
                             send_answer(received_msg,msg)
                         break
 
-            if USE_PYG and not USE_CHARACTER_AI:           
+            if USE_LOCAL_CHATBOT and not USE_CHARACTER_AI:           
                 while True: 
                     if pyg_count == 0:
                         sendMessage("not_in_queue".encode("utf-8"))
                         _ = client.recv(BUFSIZE).decode("utf-8")
                         sendMessage("server_ok".encode("utf-8"))
                         ok_ready = client.recv(BUFSIZE).decode("utf-8")
-                        bot_message = inference_fn(pyg_model,tokenizer,history, "",generation_settings,char_settings,history_length=context_size,count=pyg_count)
+                        if USE_RWKV:
+                            bot_message = on_message(received_msg)
+                        else:
+                            bot_message = inference_fn(pyg_model,tokenizer,history, "",generation_settings,char_settings,history_length=context_size,count=pyg_count)
+                        
                     else:
-                        bot_message = inference_fn(pyg_model,tokenizer,history, received_msg,generation_settings,char_settings,history_length=context_size,count=pyg_count)
+                        if USE_RWKV:
+                            bot_message = on_message(received_msg)
+                        else:
+                            bot_message = inference_fn(pyg_model,tokenizer,history, received_msg,generation_settings,char_settings,history_length=context_size,count=pyg_count)
                         history = history + "\n" + f"You: {received_msg}" + "\n" + f"{bot_message}"
+                    bot_message = bot_message.replace("\n"," ")
                     if received_msg != "QUIT":   
-                        if received_msg == "REGEN":
-                            history.replace("\n" + f"You: {received_msg}" + "\n" + f"{bot_message}","")
-                            bot_message = inference_fn(pyg_model,tokenizer,history, received_msg,generation_settings,char_settings,history_length=context_size,count=pyg_count) 
                         bot_message = bot_message.replace("<USER>","Player")
                         play_obj = play_TTS(step,bot_message,play_obj)
                         print("Sent: "+ bot_message)    
@@ -472,15 +483,14 @@ def listenToClient(client):
                         pyg_count += 1
                         if pyg_count > 1:
                             with open("chat_history.txt", "a",encoding="utf-8") as f:
-                                f.write(f"You: {received_msg}" + "\n" + f'{char_settings["char_name"]}: {bot_message}' + "\n")
+                                f.write(f"You: {received_msg}" + "\n" + f'Monika: {bot_message}' + "\n")
                     break
                 
-            if not USE_PYG and not USE_CHARACTER_AI:
+            if not USE_LOCAL_CHATBOT and not USE_CHARACTER_AI:
                 sendMessage("not_in_queue".encode("utf-8"))
                 _ = client.recv(BUFSIZE).decode("utf-8")
                 sendMessage("server_error".encode("utf-8"))
                     
-
         elif received_msg == "camera_int":
             if USE_CAMERA:
                 # start the webcam feed
