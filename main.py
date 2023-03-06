@@ -501,16 +501,19 @@ def listenToClient(client):
                 bounding_boxes, points = imgProcessing.detect_faces(frame)
                 points = points.T
                 emotion = None
-                for bbox,p in zip(bounding_boxes, points):
-                    box = bbox.astype(np.int32)
-                    x1,y1,x2,y2=box[0:4]    
-                    face_img=frame[y1:y2,x1:x2,:]
+                try:
+                    for bbox,p in zip(bounding_boxes, points):
+                        box = bbox.astype(np.int32)
+                        x1,y1,x2,y2=box[0:4]    
+                        face_img=frame[y1:y2,x1:x2,:]
 
-                    img_tensor = test_transforms(Image.fromarray(face_img))
-                    img_tensor.unsqueeze_(0)
-                    scores = emotion_model(img_tensor.to(device))
-                    scores=scores[0].data.cpu().numpy()
-                    emotion = emotion_dict[np.argmax(scores)]
+                        img_tensor = test_transforms(Image.fromarray(face_img))
+                        img_tensor.unsqueeze_(0)
+                        scores = emotion_model(img_tensor.to(device))
+                        scores=scores[0].data.cpu().numpy()
+                        emotion = emotion_dict[np.argmax(scores)]
+                except:
+                    emotion = None
                 if emotion == None:
                     emotion = "No"
                 msg = emotion.lower()
@@ -536,16 +539,19 @@ def listenToClient(client):
                     bounding_boxes, points = imgProcessing.detect_faces(frame)
                     points = points.T
                     emotion = None
-                    for bbox,p in zip(bounding_boxes, points):
-                        box = bbox.astype(np.int32)
-                        x1,y1,x2,y2=box[0:4]    
-                        face_img=frame[y1:y2,x1:x2,:]
+                    try:
+                        for bbox,p in zip(bounding_boxes, points):
+                            box = bbox.astype(np.int32)
+                            x1,y1,x2,y2=box[0:4]    
+                            face_img=frame[y1:y2,x1:x2,:]
 
-                        img_tensor = test_transforms(Image.fromarray(face_img))
-                        img_tensor.unsqueeze_(0)
-                        scores = emotion_model(img_tensor.to(device))
-                        scores=scores[0].data.cpu().numpy()
-                        emotion = emotion_dict[np.argmax(scores)]
+                            img_tensor = test_transforms(Image.fromarray(face_img))
+                            img_tensor.unsqueeze_(0)
+                            scores = emotion_model(img_tensor.to(device))
+                            scores=scores[0].data.cpu().numpy()
+                            emotion = emotion_dict[np.argmax(scores)]
+                    except:
+                        emotion = None
                     if emotion == None:
                         emotion = "No"
                     msg = emotion.lower()
