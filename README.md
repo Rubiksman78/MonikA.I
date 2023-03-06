@@ -30,7 +30,7 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 ## :boom: Installation 
 
-(Build is for Windows OS only, see `Python version` section for other OS)
+(Build is for Windows OS only, see `Python version` section down here for other OS)
 
 This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferable to use them separetely.
 
@@ -79,7 +79,7 @@ There is also the possibility of using buttons on the main screen to directly ch
 
 https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-a1fb-62d695e76c51.mp4
 
-# Python version
+# Python version (For Linux or MacOS users)
 
 ## ❓Installation
 
@@ -91,6 +91,7 @@ To setup all the libraries:
 - Run these commands in a terminal opened within the project folder to install the packages (the 2nd one only if you want and can use GPU):
     ```
     pip install -r requirements.txt
+    pip install simpleaudio
     pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu117
     python -m playwright install firefox
     ```
@@ -111,7 +112,7 @@ To setup all the libraries:
     ```
 - `simpleaudio` or other packages might need to install Visual Studio C++ Tools too (see tutorial [here](https://stackoverflow.com/questions/64261546/how-to-solve-error-microsoft-visual-c-14-0-or-greater-is-required-when-inst)), for `simpleaudio` follow [this](https://stackoverflow.com/questions/67312738/error-command-errored-out-with-exit-status-1-python-when-installing-simple)
 - If you want to use Pygmalion models, follow these intructions:
-  - To use `int8` i.e. models taking less GPU RAM with `bitsandbytes`:
+  - To use `int8` i.e. models taking less GPU RAM with `bitsandbytes` (only compatible with recent GPUs):
      - Download these 2 dll files from [here](https://github.com/DeXtmL/bitsandbytes-win-prebuilt). Move those files in your python packages folder, on Windows it is something like `C:\Users\MyName\AppData\Local\Programs\Python\Python39\Lib\site-packages\bitsandbytes`
      - Edit `bitsandbytes\cuda_setup\main.py`: 
        - Change `ct.cdll.LoadLibrary(binary_path)` to `ct.cdll.LoadLibrary(str(binary_path))` two times in the file.
@@ -128,14 +129,13 @@ The submod is in the folder `game`. To add it to your game, you have to add it i
 Because of the high usage of Machine Learning algorithms, the inference can be quite long on CPU so it is advised to have a functional GPU for a better experience.
 You would need also more RAM than usually, deactivate the TTS model, the emotion detection from text and/or emotion detection from face if it is taking too much ressources.
 
-Launch the file `main.py` for the chatbot things and fill in the window the same as for the user version. Don't launch DDLC yourself, it will open automatically (unless you check the option `Launch yourself`).
+Execute `python main.py` for the chatbot things and fill in the window the same as for the user version. Don't launch DDLC yourself, it will open automatically (unless you check the option `Launch yourself`).
 When the browser page launches, it can happen that you have to solve the captcha yourself, use debug mode if that happens.
 
-For voicing of the game in real time, launch `voicing.py` and launch DDLC yourself when the message `Waiting for connection...` appears.
+For voicing of the game in real time, run `python voicing.py` and launch DDLC yourself when the message `Waiting for connection...` appears.
 
 ## :wrench: Troubleshooting
 
 - "failed wheels for building TTS": check if you have python 3.8 or 3.9, and not 3.10 or higher
-- "playwright command not found": run `python -m playwright install` instead
-- "utf8 error": be sure to write the game path in the main script with "\\" and not "\" if you are on Windows
+- "playwright command not found": run `python -m playwright install` 
 - "Monika says that there is a bug somewhere": that means the website couldn't be accessed, check if you've done the `playwright install` and check on your browser if the website isn't down. You can set `Use Debug Mode` to `Yes` to see the connection with the graphic interface.
