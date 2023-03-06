@@ -59,58 +59,7 @@ To install the user version with executables, I've made a tutorial [HERE](../../
 
 # Python version (For Linux or MacOS users)
 
-## ❓Installation
-
-- Clone the repository or download the latest release (`source code.zip`)
-- Go to the project folder with your favorite IDE
-- Be sure to have Python installed (3.8 or 3.9), it is not tested and functional before 3.7 and after 3.10.
-
-To setup all the libraries:
-- Run these commands in a terminal opened within the project folder to install the packages (the 2nd one only if you want and can use GPU):
-    ```
-    pip install -r requirements.txt
-    pip install simpleaudio
-    pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu117
-    python -m playwright install firefox
-    ```
-- If there was an error returned during the installation of the packages, delete the corresponding line in `requirements.txt` and dowload the package concerned manually
-- To download TTS (first model with Coqui AI TTS), run these commands:
-    ```
-    git clone https://github.com/coqui-ai/TTS
-    cd TTS
-    pip install -e .
-    cd ../
-    ```
-- To download TTS (new model with Tortoise-TTS), run these commands:
-    ```
-    git clone https://github.com/152334H/tortoise-tts-fast
-    cd tortoise-tts-fast
-    pip install -e .
-    cd ../
-    ```
-- `simpleaudio` or other packages might need to install Visual Studio C++ Tools too (see tutorial [here](https://stackoverflow.com/questions/64261546/how-to-solve-error-microsoft-visual-c-14-0-or-greater-is-required-when-inst)), for `simpleaudio` follow [this](https://stackoverflow.com/questions/67312738/error-command-errored-out-with-exit-status-1-python-when-installing-simple)
-- If you want to use Pygmalion models, follow these intructions:
-  - To use `int8` i.e. models taking less GPU RAM with `bitsandbytes` (only compatible with recent GPUs):
-     - Download these 2 dll files from [here](https://github.com/DeXtmL/bitsandbytes-win-prebuilt). Move those files in your python packages folder, on Windows it is something like `C:\Users\MyName\AppData\Local\Programs\Python\Python39\Lib\site-packages\bitsandbytes`
-     - Edit `bitsandbytes\cuda_setup\main.py`: 
-       - Change `ct.cdll.LoadLibrary(binary_path)` to `ct.cdll.LoadLibrary(str(binary_path))` two times in the file.
-       - Replace the this line ```if not torch.cuda.is_available(): return 'libsbitsandbytes_cpu.so', None, None, None, None``` with ```if torch.cuda.is_available(): return 'libbitsandbytes_cuda116.dll', None, None, None, None```
-   - Follow the instructions in the [wiki](https://github.com/Rubiksman78/MonikA.I/wiki/Install-Pygmalion-locally)
-- For troubleshooting and other issues, don't hesitate to submit an issue
-
-## :heavy_plus_sign: Add to the game
-
-The submod is in Releases under the name `Monik.A.I-game-version.zip`. To add it to your game, you have to extract it and add it in the root of your game folder (at the same location where there is already a `game` folder).
-
-## :loudspeaker: Usage
-
-Because of the high usage of Machine Learning algorithms, the inference can be quite long on CPU so it is advised to have a functional GPU for a better experience.
-You would need also more RAM than usually, deactivate the TTS model, the emotion detection from text and/or emotion detection from face if it is taking too much ressources.
-
-Execute `python main.py` for the chatbot things and fill in the window the same as for the user version. Don't launch DDLC yourself, it will open automatically (unless you check the option `Launch yourself`).
-When the browser page launches, it can happen that you have to solve the captcha yourself, use debug mode if that happens.
-
-For voicing of the game in real time, run `python voicing.py` and launch DDLC yourself when the message `Waiting for connection...` appears.
+Wiki page [HERE](https://github.com/Rubiksman78/MonikA.I/wiki/Installation-Tutorial-(Linux,MacOS))
 
 # How to contribute
 
