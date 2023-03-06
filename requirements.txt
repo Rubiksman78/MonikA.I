@@ -1,5 +1,5 @@
 playwright~=1.31.0
-simpleaudio-1.0.4-cp38-cp38-win_amd64.whl
+#simpleaudio~=1.0.4
 IPython~=8.10.0
 tensorflow~=2.11.0
 opencv-python~=4.7.0.72
@@ -11,3 +11,6 @@ tk~=0.1.0
 bitsandbytes~=0.37.0
 numpy==1.23.0
 PyAudio
+TTS
+tortoise-tts-fast
+bfg-1.14.0.jar
