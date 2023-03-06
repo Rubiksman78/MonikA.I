@@ -40,6 +40,10 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 Be sure to follow the instructions [here](../../wiki/Install-Pygmalion-locally) to use it.
 
+## :warning: How to use after installing
+ 
+After doing the installation, read the common information for usage on this [page](https://github.com/Rubiksman78/MonikA.I/wiki/Common-information)
+
 # Installation 
 
 ## :eight_spoked_asterisk: User version installation (Windows)
