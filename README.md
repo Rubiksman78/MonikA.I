@@ -26,6 +26,18 @@ It's using multiple AI models:
 
 Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some questions or if you want to be up to date with new fixes and releases !
 
+# Installation 
+
+## :eight_spoked_asterisk: User version installation (Windows)
+
+This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferable to use them separetely.
+
+To install the user version with executables, I've made a tutorial [HERE](../../wiki/Installation-tutorial-(after-1.6.1)) for versions equal or after 1.6.1 and [here](../../wiki/Installation-tutorial-(before-1.6.0)) for versions equal or before 1.6.0.
+
+## :penguin: Python version (Linux or MacOS)
+
+Wiki page [HERE](https://github.com/Rubiksman78/MonikA.I/wiki/Installation-Tutorial-(Linux,MacOS))
+
 # Using the Submod
 
 ## :fire: Features
@@ -43,18 +55,6 @@ Be sure to follow the instructions [here](../../wiki/Install-Pygmalion-locally) 
 ## :warning: How to use after installing
  
 After doing the installation, read the common information for usage on this [page](https://github.com/Rubiksman78/MonikA.I/wiki/Common-information)
-
-# Installation 
-
-## :eight_spoked_asterisk: User version installation (Windows)
-
-This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferable to use them separetely.
-
-To install the user version with executables, I've made a tutorial [HERE](../../wiki/Installation-tutorial-(after-1.6.1)) for versions equal or after 1.6.1 and [here](../../wiki/Installation-tutorial-(before-1.6.0)) for versions equal or before 1.6.0.
-
-## :penguin: Python version (Linux or MacOS)
-
-Wiki page [HERE](https://github.com/Rubiksman78/MonikA.I/wiki/Installation-Tutorial-(Linux,MacOS))
 
 # How to contribute
 
