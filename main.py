@@ -222,6 +222,10 @@ def first_start(context):
     page.wait_for_load_state("networkidle")
     if not page.is_visible('[class="nav-icon-text-desktop text-wrap"]'):
         print("Something is wrong, captcha or wrong ids, try again with debug mode")
+	try:
+	   os.remove("storage.json")
+	except:
+	   pass
     page.wait_for_selector('[class="nav-icon-text-desktop text-wrap"]',timeout=50000)
     page.wait_for_load_state("networkidle")
     context.storage_state(path="storage.json")
