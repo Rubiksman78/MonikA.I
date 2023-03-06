@@ -202,7 +202,7 @@ if not os.path.exists("config.json"):
     use_actions.set(0)
     tts_model.set("Your TTS")
     use_speech_recognition.set(0)
-    voice_sample_tortoise.set("monika_ter")
+    voice_sample_tortoise.set("monika_voice")
     voice_sample_coqui.set("talk_13.wav")
 else:
     with open("config.json", "r") as f:
