@@ -51,13 +51,13 @@ On CPU, it can take 10x more time to generate the voice (Tortoise TTS can have u
 
 # Installation 
 
-## User version installation (Windows)
+## :eight_spoked_asterisk: User version installation (Windows)
 
 This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferable to use them separetely.
 
 To install the user version with executables, I've made a tutorial [HERE](../../wiki/Installation-tutorial-(after-1.6.1)) for versions equal or after 1.6.1 and [here](../../wiki/Installation-tutorial-(before-1.6.0)) for versions equal or before 1.6.0.
 
-## Python version (Linux or MacOS)
+## :penguin: Python version (Linux or MacOS)
 
 Wiki page [HERE](https://github.com/Rubiksman78/MonikA.I/wiki/Installation-Tutorial-(Linux,MacOS))
 
