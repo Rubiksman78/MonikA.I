@@ -266,7 +266,7 @@ USE_SPEECH_RECOGNITION = int(USE_SPEECH_RECOGNITION)
 if TTS_MODEL == "Tortoise TTS":
     voices_tortoise = os.listdir(f"tortoise_audios/{VOICE_SAMPLE_TORTOISE}")
     voices_tortoise = [x for x in voices_tortoise if x.endswith(".wav")]
-    if voices_tortoise:
+    if not voices_tortoise:
         raise AssertionError(f"Tortoise TTS selected but no voice sample is found in tortoise_audios/{VOICE_SAMPLE_TORTOISE}")
 
 #Save model chosen in pygmalion config
