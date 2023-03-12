@@ -11,6 +11,3 @@ tk~=0.1.0
 bitsandbytes~=0.37.0
 numpy==1.23.0
 PyAudio
-TTS
-tortoise-tts-fast
-bfg-1.14.0.jar
