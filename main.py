@@ -257,7 +257,7 @@ def launch(context,pw,browser):
         page = first_start(context)
         queue_already_done = True
     else:
-        context = browser.new_context(storage_state="storage.json")
+        context = browser.new_context(storage_state="storage.json",ignore_https_errors=True)
         page = context.new_page()
     page.goto(char_page)
     queue_and_things(page,queue_already_done)
