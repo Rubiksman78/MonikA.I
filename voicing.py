@@ -78,7 +78,7 @@ async def listenToClient(client):
             msg_audio_play = msg_audio
             #print(msg + "|" + last_sentence + "|" + msg_audio_play)
             with HiddenPrints():
-                audio = model.tts(text=msg_audio_play,speaker_wav='audios/talk_13.wav', language='en')
+                audio = model.tts(text=msg_audio_play,speaker_wav='coquiai_audios/talk_13.wav', language='en')
             audio = ipd.Audio(audio, rate=16000)
             play_obj = sa.play_buffer(audio.data, 1, 2, 16000)
             step += 1
