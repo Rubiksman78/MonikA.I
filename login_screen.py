@@ -208,6 +208,26 @@ if not os.path.exists("config.json"):
 else:
     with open("config.json", "r") as f:
         config = json.load(f)
+    if "USE_LOCAL_CHATBOT" not in config:
+        os.remove("config.json")
+        #Set default values
+        launch_yourself.set(0)
+        time_intervall.set("10")
+        use_character_ai.set(0)
+        use_tts.set(0)
+        debug_mode.set(0)
+        continue_from_last.set(0)
+        choose_character.set("0")
+        use_camera.set(0)
+        use_local_chatbot.set(0)
+        chat_model.set("No model set")
+        use_actions.set(0)
+        tts_model.set("Your TTS")
+        use_speech_recognition.set(0)
+        voice_sample_tortoise.set("Choose a Tortoise voice sample")
+        voice_sample_coqui.set("Choose a YourTTS voice sample")
+        character_json.set("Choose a character")
+    else:
         GAME_PATH = config["GAME_PATH"]
         USERNAME = config["USERNAME"]
         PASSWORD = config["PASSWORD"]
@@ -227,23 +247,23 @@ else:
         VOICE_SAMPLE_TORTOISE = config["VOICE_SAMPLE_TORTOISE"]
         VOICE_SAMPLE_COQUI = config["VOICE_SAMPLE_COQUI"]
         CHARACTER_JSON = config["CHARACTER_JSON"]
-    #Set saved values
-    launch_yourself.set(LAUNCH_YOURSELF)
-    time_intervall.set(TIME_INTERVALL)
-    use_character_ai.set(USE_CHARACTER_AI)
-    use_tts.set(USE_TTS)
-    debug_mode.set(DEBUG_MODE)
-    continue_from_last.set(CONTINUE_FROM_LAST)
-    choose_character.set(CHOOSE_CHARACTER)
-    use_camera.set(USE_CAMERA)
-    use_local_chatbot.set(USE_LOCAL_CHATBOT)
-    chat_model.set(CHAT_MODEL)
-    use_actions.set(USE_ACTIONS)
-    tts_model.set(TTS_MODEL)
-    use_speech_recognition.set(USE_SPEECH_RECOGNITION)
-    voice_sample_tortoise.set(VOICE_SAMPLE_TORTOISE)
-    voice_sample_coqui.set(VOICE_SAMPLE_COQUI)
-    character_json.set(CHARACTER_JSON)
+        #Set saved values
+        launch_yourself.set(LAUNCH_YOURSELF)
+        time_intervall.set(TIME_INTERVALL)
+        use_character_ai.set(USE_CHARACTER_AI)
+        use_tts.set(USE_TTS)
+        debug_mode.set(DEBUG_MODE)
+        continue_from_last.set(CONTINUE_FROM_LAST)
+        choose_character.set(CHOOSE_CHARACTER)
+        use_camera.set(USE_CAMERA)
+        use_local_chatbot.set(USE_LOCAL_CHATBOT)
+        chat_model.set(CHAT_MODEL)
+        use_actions.set(USE_ACTIONS)
+        tts_model.set(TTS_MODEL)
+        use_speech_recognition.set(USE_SPEECH_RECOGNITION)
+        voice_sample_tortoise.set(VOICE_SAMPLE_TORTOISE)
+        voice_sample_coqui.set(VOICE_SAMPLE_COQUI)
+        character_json.set(CHARACTER_JSON)
 
 root.mainloop()
 #Write IDs to file for autofill

@@ -223,9 +223,9 @@ def first_start(context):
     page.wait_for_selector('[id="#AcceptButton"]',timeout=5000000)
     page.click('[id="#AcceptButton"]')
     page.click('[class="btn btn-primary btn-sm"]',timeout=5000)
-    page.click('[class=" btn border"]',timeout=5000)
-    page.fill("input#username",USERNAME,timeout=5000)
-    page.fill("input#password",PASSWORD,timeout=5000)
+    page.click('[class="c2194f447 c00530916"]',timeout=5000)
+    page.fill('[id="username"]',USERNAME,timeout=5000)
+    page.fill('[id="password"]',PASSWORD,timeout=5000)
     page.click("button[type=submit]")
     page.wait_for_load_state("networkidle")
     if not page.is_visible('[class="nav-icon-text-desktop text-wrap"]'):
@@ -273,9 +273,9 @@ def launch(context,pw,browser):
 
 def post_message(page, message):
     if message == "QUIT":
-        page.fill("textarea","I'll be right back")
+        page.fill('[id="user-input"]',"I'll be right back")
     else:
-        page.fill("textarea",message)
+        page.fill('[id="user-input"]',message)
     while True:
         try:
             page.click('[class="btn py-0"]')
@@ -439,7 +439,7 @@ def listenToClient(client):
                         msg = msg.replace("</div>","")
                         msg = msg.replace("<p>","\n")
                         msg = msg.replace("</p>","")
-                       	msg = re.sub(r'<.*?>', '', msg)
+                        msg = re.sub(r'<.*?>', '', msg)
                         msg = msg.replace("&lt;","<")
                         msg = msg.replace("&gt;",">")
                         if received_msg != "QUIT":       
