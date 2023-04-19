@@ -223,7 +223,7 @@ def first_start(context):
     page.wait_for_selector('[id="#AcceptButton"]',timeout=5000000)
     page.click('[id="#AcceptButton"]')
     page.click('[class="btn btn-primary btn-sm"]',timeout=5000)
-    page.click('[class="c2194f447 c00530916"]',timeout=5000)
+    page.get_by_text("Log in").click()
     page.fill('[id="username"]',USERNAME,timeout=5000)
     page.fill('[id="password"]',PASSWORD,timeout=5000)
     page.click("button[type=submit]")
