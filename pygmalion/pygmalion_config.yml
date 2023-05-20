@@ -2,7 +2,7 @@ char_json: monika.json
 context_size: 8
 do_sample: true
 max_new_tokens: 100
-model_name: chatbot_models/No model set
+model_name: chatbot_models/RWKV-4-Pile-3B-20221110-ctx4096.pth
 repetition_penalty: 0.9
 strategy: cuda fp16
 temperature: 0.65
