@@ -226,7 +226,7 @@ def first_start(context):
     page.get_by_text("Log in").click()
     page.fill('[id="username"]',USERNAME,timeout=5000)
     page.fill('[id="password"]',PASSWORD,timeout=5000)
-    page.click("button[type=submit]")
+    page.click('[class="c79fd81e4"]')
     page.wait_for_load_state("networkidle")
     if not page.is_visible('[class="nav-icon-text-desktop text-wrap"]'):
         print("Something is wrong, captcha or wrong ids, try again with debug mode")
