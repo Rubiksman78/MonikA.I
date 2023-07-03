@@ -219,29 +219,22 @@ characters_pages = {
 def first_start(context):
     page = context.new_page()
     page.goto("https://character-ai.us.auth0.com/u/login?state=hKFo2SAxWUlJZGZBR1dSdXo1M2VfQm9qT21KeGJJV2oxcVAwR6Fur3VuaXZlcnNhbC1sb2dpbqN0aWTZIEVwaVNsaGh3YU5MSzJiYXo5ZDg2c09GR05VaGQza3Zvo2NpZNkgZHlEM2dFMjgxTXFnSVNHN0Z1SVhZaEwyV0VrbnFaenY")
+    page.wait_for_load_state("networkidle")
     queue_and_things(page)
     page.wait_for_selector('[id="#AcceptButton"]',timeout=5000000)
-    page.click('[id="#AcceptButton"]')
-    page.click('[class="btn btn-primary btn-sm"]',timeout=5000)
+    page.click('[id="#AcceptButton"]')  
     page.get_by_text("Log in").click()
-    page.fill('[id="username"]',USERNAME,timeout=5000)
-    page.fill('[id="password"]',PASSWORD,timeout=5000)
-    page.click("button[type=submit]")
+    page.fill('[id="username"]',USERNAME,timeout=500) ##put mail here
+    page.fill('[id="password"]',PASSWORD,timeout=500) ##put password here
+    page.click('[data-action-button-primary]')
     page.wait_for_load_state("networkidle")
-    if not page.is_visible('[class="nav-icon-text-desktop text-wrap"]'):
-        print("Something is wrong, captcha or wrong ids, try again with debug mode")
-        try:
-            os.remove("storage.json")
-        except:
-            pass
-    page.wait_for_selector('[class="nav-icon-text-desktop text-wrap"]',timeout=50000)
-    page.wait_for_load_state("networkidle")
+    page.wait_for_selector('[href="/search?"]',timeout=5000)
     context.storage_state(path="storage.json")
     return page
 
 def queue_and_things(page,queue_already_done=False):
     global queued
-    if page.is_visible('[class="waitingrooms-text"]') and not queue_already_done:
+    if page.is_visible('text=Your estimated wait time is 1 minute...') and not queue_already_done:
         print("In queue")
         queued = True
         sendMessage("in_queue/g".encode("utf-8"))
@@ -261,9 +254,9 @@ def launch(context,pw,browser):
         page = context.new_page()
     page.goto(char_page)
     queue_and_things(page,queue_already_done)
+    page.wait_for_selector('[class="col-auto px-2 dropdown"]',timeout=5000000)
     if page.is_visible('[id="#AcceptButton"]'):
         page.click('[id="#AcceptButton"]',timeout=5000)
-    page.wait_for_selector('[class="col-auto px-2 dropdown"]',timeout=5000000)
     context.storage_state(path="storage.json")
     if not CONTINUE_FROM_LAST:
         page.wait_for_timeout(500)
@@ -409,7 +402,7 @@ def listenToClient(client):
                     try:
                         pw = sync_playwright().start()
                         if DEBUG_MODE:
-                            browser =  pw.firefox.launch(headless=False)
+                            browser =  pw.firefox.launch(headless=False,slow_mo=10)
                             context = browser.new_context()
                         else:
                             browser =  pw.firefox.launch()
