@@ -6,8 +6,6 @@ from playwright.sync_api import sync_playwright
 import time
 import simpleaudio as sa
 
-from tts_api import my_TTS
-
 import torch
 import numpy as np
 
@@ -135,13 +133,14 @@ if USE_CAMERA:
 #########Load the TTS model##########
 with HiddenPrints():
     if USE_TTS:
-        from tortoise.api import TextToSpeech,MODELS_DIR
-        from tortoise.utils.audio import load_voices
-        from voicefixer import VoiceFixer
         if TTS_MODEL == "Your TTS":
+            from tts_api import my_TTS
             tts_model = my_TTS(model_name="tts_models/multilingual/multi-dataset/your_tts")
             sampling_rate = 16000
         elif TTS_MODEL == "Tortoise TTS":
+            from tortoise.api import TextToSpeech,MODELS_DIR
+            from tortoise.utils.audio import load_voices
+            from voicefixer import VoiceFixer
             tts_model = TextToSpeech(
                     models_dir=MODELS_DIR,
                     high_vram=False,
@@ -150,8 +149,8 @@ with HiddenPrints():
             voice_samples, conditioning_latents = load_voices([VOICE_SAMPLE_TORTOISE], ["tortoise_audios"])
             vfixer = VoiceFixer()
             sampling_rate = 24000
-        else:
-            print("No TTS model selected")
+    else:
+        print("No TTS model selected")
 
 def play_TTS(step,msg,play_obj):
     if USE_TTS:
