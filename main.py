@@ -218,16 +218,18 @@ characters_pages = {
 def first_start(context):
     page = context.new_page()
     page.goto("https://character-ai.us.auth0.com/u/login?state=hKFo2SAxWUlJZGZBR1dSdXo1M2VfQm9qT21KeGJJV2oxcVAwR6Fur3VuaXZlcnNhbC1sb2dpbqN0aWTZIEVwaVNsaGh3YU5MSzJiYXo5ZDg2c09GR05VaGQza3Zvo2NpZNkgZHlEM2dFMjgxTXFnSVNHN0Z1SVhZaEwyV0VrbnFaenY")
-    page.wait_for_load_state("networkidle")
-    queue_and_things(page)
-    page.wait_for_selector('[id="#AcceptButton"]',timeout=5000000)
-    page.click('[id="#AcceptButton"]')  
-    page.get_by_text("Log in").click()
-    page.fill('[id="username"]',USERNAME,timeout=500) ##put mail here
-    page.fill('[id="password"]',PASSWORD,timeout=500) ##put password here
-    page.click('[data-action-button-primary]')
-    page.wait_for_load_state("networkidle")
-    page.wait_for_selector('[href="/search?"]',timeout=5000)
+    # page.wait_for_load_state("networkidle")
+    #queue_and_things(page)
+    sendMessage("not_in_queue".encode("utf-8"))
+    # page.wait_for_selector('[id="#AcceptButton"]',timeout=5000000)
+    # page.click('[id="#AcceptButton"]')  
+    # page.get_by_text("Log in").click()
+    # page.fill('[id="username"]',USERNAME,timeout=500) ##put mail here
+    # page.fill('[id="password"]',PASSWORD,timeout=500) ##put password here
+    # page.click('[data-action-button-primary]')
+    # page.wait_for_load_state("networkidle")
+    # page.wait_for_selector('[href="/search?"]',timeout=5000)
+    page.wait_for_selector('[href="/search?"]',timeout=50000000)
     context.storage_state(path="storage.json")
     return page
 
@@ -419,6 +421,7 @@ def listenToClient(client):
                 post_message(page,received_msg)
                 while True:
                     if not page.is_disabled('[class="btn py-0"]'):
+                        time.sleep(3)
                         query =  page.query_selector_all(('[class="markdown-wrapper markdown-wrapper-last-msg swiper-no-swiping"]'))
                         if len(query) > 0:
                             msg =  query[0].inner_html()
