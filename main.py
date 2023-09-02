@@ -413,12 +413,14 @@ def listenToClient(client):
                 while True:
                     if not page.is_disabled('[class="btn py-0"]'):
                         time.sleep(3)
-                        query =  page.query_selector_all(('[class="swiper-no-swiping"]'))
+                        query =  page.query_selector_all(('[class="swiper swiper-initialized swiper-horizontal swiper-pointer-events message-slider swiper-backface-hidden"]'))
                         if len(query) > 0:
                             msg =  query[0].inner_html()
                         else:
                             post_message(page,received_msg)
                             continue
+                        msg = msg.split('<div class="swiper-no-swiping">')[1]
+                        msg = msg.split('<div class="annotation-buttons-container">')[0]
                         msg = msg.replace("<em>","{i}")
                         msg = msg.replace("</em>","{/i}")
                         msg = msg.replace("<div>","")
