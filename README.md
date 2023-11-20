@@ -33,7 +33,7 @@ Check the discord [server](https://discord.gg/2RsPuaDxEn) if you have some quest
 
 This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferable to use them separetely.
 
-To install the user version with executables, I've made a tutorial [HERE](../../wiki/Installation-tutorial-(after-1.6.1)) for versions equal or after 1.6.1 and [here](../../wiki/Installation-tutorial-(before-1.6.0)) for versions equal or before 1.6.0.
+To install the user version with executables, I've made a tutorial [HERE](../../wiki/Installation-tutorial-(1.6.1)) for version 1.6.1. Version 2.0 is still in beta-testing phase.
 
 ## :penguin: Python version (Linux or MacOS)
 
