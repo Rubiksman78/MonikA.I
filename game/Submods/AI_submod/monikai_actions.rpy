@@ -1,9 +1,17 @@
 label monikai_play_actions: 
-    #m 1eka "What would you like to do?"
+    # m 1eka "What would you like to do?"
     call mas_pick_a_game
     return 
 
 label monikai_goodbye: 
+    m "Are you sure you want to leave [player]?"
+    menu:
+        "Yes.":
+            m 1eka "Okay, then. I'll see you later, [player]. Bye-bye!"
+            return "quit"
+        "No.":
+            m 1eka "I'm glad you decided to stay with me, [player]."
+            return
     return "quit"
 
 label monikai_greetings:
@@ -18,7 +26,6 @@ label monikai_go_somewhere:
     return
 
 label monikai_change_clothes: 
-    #m 1eka "What would you like to change into?"
     call monika_clothes_select
     return
 
@@ -42,7 +49,8 @@ label monikai_ask_kiss:
         call monika_kissing_motion_short
     else:
         m 1eka "Well with a second thought, I don't think I'm ready for that yet."
-        m 1eka "I'm sorry, [player], maybe when we'll be more advanced in our relationship."
+        m 1eka "I'm sorry, [player], maybe when we'll be more advanced 
+        in our relationship."
     return 
 
 label monikai_normal_chat:
@@ -56,6 +64,5 @@ label monikai_change_weather:
     return
 
 label monikai_compliment: 
-    #m 1eka "Thank you, [player]."
     $ mas_gainAffection()
     return

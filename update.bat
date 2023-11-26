@@ -1,5 +1,4 @@
 @echo off
 git fetch origin
-git reset --hard main
-rm config.json
-"libs/pythonlib/python.exe" -m pip install --force-reinstall -r requirements.txt
+git reset --hard origin/main
+"libs/python.exe" -m pip install -r requirements.txt

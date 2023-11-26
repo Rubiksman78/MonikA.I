@@ -1,4 +1,18 @@
-#Main chatting functions
+define emotion_list = [
+    "anger",
+    "disgust",
+    "fear",
+    "joy",
+    "sadness",
+    "surprise",
+    "neutral"
+]
+
+define negative_emotions = ["anger", "disgust", "fear", "sadness"]
+define positive_emotions = ["joy", "surprise"]
+define neutral_emotions = ["neutral"]
+
+# Main chatting functions
 init 5 python:
     from socket import AF_INET, socket, SOCK_STREAM
     from threading import Thread
@@ -38,7 +52,12 @@ init 5 python:
     def AIVoiceVisible():
         return "monika_voicechat_button" in config.overlay_screens
 
-    def mas_get_player_nickname(capitalize=False, exclude_names=[], _default=None, regex_replace_with_nullstr=None):
+    def mas_get_player_nickname(
+        capitalize=False,
+        exclude_names=[],
+        _default=None,
+        regex_replace_with_nullstr=None
+    ):
         if _default is None:
             _default = player
 
@@ -60,7 +79,11 @@ init 5 python:
         selected_nickname = random.choice(nickname_pool)
 
         if regex_replace_with_nullstr is not None:
-            selected_nickname = re.sub(regex_replace_with_nullstr, "", selected_nickname)
+            selected_nickname = re.sub(
+                regex_replace_with_nullstr,
+                "",
+                selected_nickname
+            )
 
         if capitalize:
             selected_nickname = selected_nickname.capitalize()
@@ -70,7 +93,6 @@ init 5 python:
     PORT = 12346
     BUFSIZ = 1024
     ADDR = (HOST, PORT)
-    queued = False
 
     try:
         clientSocket = socket(AF_INET, SOCK_STREAM)
@@ -92,30 +114,26 @@ init 5 python:
 
 define step = 0
 
-#Label for voice chat from the button in the main screen
+# Label for voice chat from the button in the main screen
 label monika_voice_chat:
     $ mas_RaiseShield_dlg()
     $ useVoice = True
     $ localStep = 0
 
-    #If the game was launched without the python script
+    # If the game was launched without the python script
     if monikai_no_server:
         jump monika_server_crashed
     
-    #If the player has never talked to the chatbot, show the intro
+    # If the player has never talked to the chatbot, show the intro
     if not renpy.seen_label("monika_AI_intro"):
         call monika_AI_intro
     
-    #Put the player in the queue if there is one on the website
-    if queued:
-        call monika_queue_waiting
-
     if step == 0:
         m 5tubfb "Sure [player], talk to me as much as you want."
 
     while True:
         $ send_simple("chatbot/m")
-        #Continue to speak or not
+        # Continue to speak or not
         if localStep > 0:
             m 6wubla "Can I hear your voice again?"
             menu:
@@ -126,20 +144,21 @@ label monika_voice_chat:
                     jump close_AI
                     return
                     
-        #If it is already talking
+        # If it is already talking
         else:
             $ sendAudio("begin_record",str(step))
 
-        #If the server activates microphone, start recording
+        # If the server activates microphone, start recording
         $ begin_speak = receiveMessage()
         if begin_speak == "yes":
             m 1subfb "Okay, I'm listening.{w=0.5}{nw}"
         elif begin_speak == "no":
-            m "Oh, it seems you forgot to activate the speech recognition.{w=0.5}{nw}"
+            m "Oh, it seems you forgot to activate the speech 
+            recognition.{w=0.5}{nw}"
             jump close_AI 
         call monikai_get_actions
 
-#Label for text chat from the button in the main screen
+# Label for text chat from the button in the main screen
 label monika_chatting_text:
     $ mas_RaiseShield_dlg()
     $ useVoice = False
@@ -151,12 +170,10 @@ label monika_chatting_text:
     if not renpy.seen_label("monika_AI_intro"):
         call monika_AI_intro
     
-    if queued:
-        call monika_queue_waiting
-    
     if step == 0:
         m 5tubfb "Sure [player], talk to me as much as you want."
-        m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. I'll understand my love."
+        m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. 
+        I'll understand my love."
 
     while True:
         $ send_simple("chatbot/m")
@@ -169,9 +186,16 @@ label monika_chatting_text:
         call monikai_get_actions
 
         
-#Chatbot Event
+# Chatbot Event
 init 5 python:
-    addEvent(Event(persistent.event_database,eventlabel="monika_chatting",category=['ai'],prompt="Let's chat together",pool=True,unlocked=True))
+    addEvent(Event(
+        persistent.event_database,
+        eventlabel="monika_chatting",
+        category=['ai'],
+        prompt="Let's chat together",
+        pool=True,
+        unlocked=True
+    ))
 
 label monika_chatting():
     $ localStep = 0
@@ -181,13 +205,11 @@ label monika_chatting():
     
     if not renpy.seen_label("monika_AI_intro"):
         call monika_AI_intro
-    
-    if queued:
-        call monika_queue_waiting
 
     if step == 0:
         m 5tubfb "Sure [player], talk to me as much as you want."
-        m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. I'll understand my love."
+        m 4hubfb "Oh and if you have to do something else, just write 
+        'QUIT'. I'll understand my love."
 
     m 4nubfa "Maybe you could allow me to hear your beautiful voice?"
     #Choose to use voice or not
@@ -198,7 +220,8 @@ label monika_chatting():
             $ useVoice = True
         "Sorry, my microphone is broken.":
             m 2eua "Oh, that's okay [player]."
-            m 2eua "I'll just have to wait for you to type something then.{w=0.5}{nw}"
+            m 2eua "I'll just have to wait for you to type something 
+            then.{w=0.5}{nw}"
             $ useVoice = False
 
     while True:
@@ -227,57 +250,37 @@ label monika_chatting():
             if begin_speak == "yes":
                 m 1subfb "Okay, I'm listening.{w=0.5}{nw}"
             elif begin_speak == "no":
-                m "Oh, it seems you forgot to activate the speech recognition.{w=0.5}{nw}"
+                m "Oh, it seems you forgot to activate the speech 
+                recognition.{w=0.5}{nw}"
                 jump close_AI
                 return
         call monikai_get_actions
 
-
-label monika_queue_waiting:
-    $ rlist, wlist, xlist = select.select([clientSocket], [], [], 0.1)
-    if rlist:
-        $ msg = receiveMessage().split("/g")
-        $ ready = msg[0]
-        #If the queue is done, start the chat
-        if ready == "server_ok":
-            $ queued = False
-            $ send_simple("ok_ready")
-            jump monika_voice_chat
-        #If the queue is not done, wait again
-        else:
-            jump monika_in_queue
-    else:
-        jump monika_in_queue
-
-#Common label to receive messages from the chatbot and get the actions
+# Common label to receive messages from the chatbot and get the actions
 label monikai_get_actions:
-    #Wait for the website to respond
     m 1rsc "[monikaNickname] is thinking...{nw}"
     if step == 0:
-        $ queue_received = receiveMessage()
-        $ in_queue = queue_received.split("/g")[0]
         $ send_simple("ok_ready")
-        #If there is a queue, wait
-        if in_queue == "in_queue":
-            $ queued = True
-            m "Oh it seems that there are a lot of people waiting to talk to the chatbots."
-            m "I'll be back in a few seconds."
-            m "Please wait patiently."
-            m "I'm sorry for that my love."
-            jump close_AI
-            return
     $ message_received = receiveMessage().split("/g")
+    $ print(message_received)
     if len(message_received) < 2: #Only one word: server status
         $ server_status = message_received[0]
         if server_status == "server_error":
             jump monika_server_crashed
-        $ send_simple("ok_ready")
         $ new_smg = receiveMessage()
-        $ msg,emotion,action_to_take = new_smg.split("/g")
+        python:
+            try:
+                msg,emotion,action_to_take = new_smg.split("/g")
+            except:
+                print("Error: " + new_smg)
+                msg = new_smg
+                emotion = ""
+                action_to_take = ""
+        # $ msg,emotion,action_to_take = new_smg.split("/g")
     else:
         $ msg,emotion,action_to_take = message_received
     call monika_is_talking
-    #m "You want me to [action_to_take]?" #for debug
+    # m "You want me to [action_to_take]?" #for debug
     if persistent._use_monikai_actions:
         if action_to_take == "compliment":
             call monikai_compliment
@@ -304,7 +307,7 @@ label monikai_get_actions:
     return
 
 
-#Common label for processing the text received from the server
+# Common label for processing the text received from the server
 label monika_is_talking:
     $ player_nickname_ai = mas_get_player_nickname()
     $ msg = msg.replace("<USER>",player_nickname_ai)
@@ -312,7 +315,8 @@ label monika_is_talking:
     $ sentences_list = []
     $ sentences_list = msg.split("\n")
     $ sentences_list = [x for x in sentences_list if x != '']
-    #Divide sentences with more than 180 characters into several sentences (to avoid overflowing the screen)
+    # Divide sentences with more than 180 characters into several sentences 
+    # (to avoid overflowing the screen)
     python:
         new_sentences_list = []
         for sentence in sentences_list:

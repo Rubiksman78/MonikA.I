@@ -16,7 +16,7 @@ init 5 python in mas_voice:
         return os.path.isfile(filename)
 
     HOST = '127.0.0.1'
-    PORT = 12344 #Be sure to have a different port for voicing, no conflict with chat
+    PORT = 12344 # Be sure to have a different port for voicing, no conflict with chat
 
     BUFSIZ = 1024
     ADDR = (HOST, PORT)

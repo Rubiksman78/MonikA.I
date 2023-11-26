@@ -1,7 +1,7 @@
 define persistent._show_monikai_buttons = True
 define persistent._use_monikai_actions = False
 
-#Setting in Menu to enable/disable the buttons
+# Setting in Menu to enable/disable the buttons
 screen monikai_chat_settings:
     $ tooltip = renpy.get_screen("submods", "screens").scope["tooltip"]
 
@@ -16,16 +16,24 @@ screen monikai_chat_settings:
         textbutton "Show buttons":
             selected persistent._show_monikai_buttons
             action ToggleField(persistent, "_show_monikai_buttons")
-            hovered SetField(tooltip, "value", "Enable display of shortcut buttons.")
+            hovered SetField(
+                tooltip,
+                "value",
+                "Enable display of shortcut buttons."
+            )
             unhovered SetField(tooltip, "value", tooltip.default)
 
         textbutton "Use automatic actions":
             selected persistent._use_monikai_actions
             action ToggleField(persistent, "_use_monikai_actions")
-            hovered SetField(tooltip, "value", "Enable Monika to take actions from the chat.")
+            hovered SetField(
+                tooltip,
+                "value",
+                "Enable Monika to take actions from the chat."
+            )
             unhovered SetField(tooltip, "value", tooltip.default)
 
-#Button for textual chat
+# Button for textual chat
 screen monika_chatbot_button():
     zorder 15
     style_prefix "hkb"
@@ -34,16 +42,16 @@ screen monika_chatbot_button():
         ypos 230
         if renpy.get_screen("hkb_overlay"):
             if store.mas_hotkeys.talk_enabled is False:
-                textbutton ("Monika's chatbot"):
+                textbutton ("Chatbot"):
                     xysize (175, 40)
                     text_size 20
             else:
-                textbutton ("Monika's chatbot"):
+                textbutton ("Chatbot"):
                     xysize (175, 40)
                     text_size 20
                     action Jump("monika_chatting_text")
 
-#Button for voice chat
+# Button for voice chat
 screen monika_voicechat_button():
     zorder 15
     style_prefix "hkb"
@@ -52,16 +60,16 @@ screen monika_voicechat_button():
         ypos 280
         if renpy.get_screen("hkb_overlay"):
             if store.mas_hotkeys.talk_enabled is False:
-                textbutton ("Monika's voicechat"):
+                textbutton ("Voicechat"):
                     xysize (190, 40)
                     text_size 20
             else:
-                textbutton ("Monika's voicechat"):
+                textbutton ("Voicechat"):
                     xysize (190, 40)
                     text_size 20
                     action Jump("monika_voice_chat")
 
-#Closing the chat
+# Closing the chat
 label close_AI:
     show monika idle at t11
     jump ch30_visual_skip

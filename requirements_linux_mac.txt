@@ -1,0 +1,30 @@
+PyYAML
+numpy
+playwright
+torch
+torchvision
+torchaudio
+ipython
+
+# For action model
+transformers
+
+# For speech recognition
+OpenAI-whisper
+SpeechRecognition
+pyaudio
+
+# For tortoise TTS
+simpleaudio
+tortoise-tts
+voicefixer
+
+# For CoquiAI TTS
+simpleaudio
+TTS
+
+# For GPU
+# --extra-index-url https://download.pytorch.org/whl/cu121
+# torch
+# torchvision
+# torchaudio
