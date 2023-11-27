@@ -26,7 +26,7 @@ def get_input():
     GAME_PATH = game_path.get()
     WEBUI_PATH = game_path.get()
     LAUNCH_YOURSELF = launch_yourself.get()
-    LAUNCH_YOURSELF_WEBUI = launch_yourself.get()
+    LAUNCH_YOURSELF_WEBUI = launch_yourself_webui.get()
     USE_ACTIONS = use_actions.get()
     TTS_MODEL = tts_model.get()
     USE_SPEECH_RECOGNITION = use_speech_recognition.get()
