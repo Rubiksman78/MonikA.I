@@ -38,16 +38,15 @@ screen monika_chatbot_button():
     zorder 15
     style_prefix "hkb"
     vbox:
-        xpos 0.03
+        xpos 0.05
+        yanchor 1.0
         ypos 230
         if renpy.get_screen("hkb_overlay"):
             if store.mas_hotkeys.talk_enabled is False:
                 textbutton ("Chatbot"):
-                    xysize (175, 40)
                     text_size 20
             else:
                 textbutton ("Chatbot"):
-                    xysize (175, 40)
                     text_size 20
                     action Jump("monika_chatting_text")
 
@@ -56,16 +55,15 @@ screen monika_voicechat_button():
     zorder 15
     style_prefix "hkb"
     vbox:
-        xpos 0.026
+        xpos 0.05
+        yanchor 1.0
         ypos 280
         if renpy.get_screen("hkb_overlay"):
             if store.mas_hotkeys.talk_enabled is False:
                 textbutton ("Voicechat"):
-                    xysize (190, 40)
                     text_size 20
             else:
                 textbutton ("Voicechat"):
-                    xysize (190, 40)
                     text_size 20
                     action Jump("monika_voice_chat")
 
