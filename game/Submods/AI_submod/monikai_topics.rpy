@@ -5,20 +5,20 @@ init 5 python:
     addEvent(Event(persistent.event_database,eventlabel="monika_torch",category=['ai'],prompt="Tell me about Pytorch",pool=True,unlocked=True))
 
 label monika_torch:
-    m "Okay sure love."
-    m "Pytorch is a deep learning framework."
-    m "It's a bit more complicated than Tensorflow."
-    m "But it's also more powerful."
-    m "You can use it to create neural networks."
-    m "And it's also used for reinforcement learning."
-    m "I hope that helps!"
+    m 3eub "Okay sure love."
+    m 2eub "Pytorch is a deep learning framework."
+    m 7eud "It's a bit more complicated than Tensorflow."
+    m 3esa "But it's also more powerful."
+    m 2eub "You can use it to create neural networks."
+    m 5eud "And it's also used for reinforcement learning."
+    m 5hub "I hope that helps!"
     return
 
 # If there is a bug in the submod
 label monika_server_crashed:
-    m "Oh sorry [player], it seems that there is a bug somewhere."
-    m "I will try to fix it as soon as possible."
-    m "Let's talk again later, I'm sorry sweetheart."
+    m 2dkp "Oh sorry [player], it seems that there is a bug somewhere."
+    m 4eka "I will try to fix it as soon as possible."
+    m 1ekb "Let's talk again later, I'm sorry sweetheart."
     jump close_AI
     return
 
