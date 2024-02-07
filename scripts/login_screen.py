@@ -2,6 +2,7 @@ import os
 import sys
 import tkinter as tk
 import json
+from tkinter import *
 # Configuration
 args = sys.argv[1:]
 
@@ -10,6 +11,9 @@ root.title("MonikA.I. Submod")
 root.geometry("900x500")
 root.configure(background='#333333')
 
+bg_image = PhotoImage(file=r"images\login_background.png")
+background_label = tk.Label(root, image=bg_image)
+background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
 def get_input():
     global GAME_PATH
