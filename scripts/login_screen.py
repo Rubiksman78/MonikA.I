@@ -11,7 +11,7 @@ root.title("MonikA.I. Submod")
 root.geometry("900x500")
 root.configure(background='#333333')
 
-bg_image = PhotoImage(file=r"images\login_background.png")
+bg_image = PhotoImage(file=r"images\login\login_background.png")
 background_label = tk.Label(root, image=bg_image)
 background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
@@ -44,7 +44,7 @@ other_frame = tk.LabelFrame(
     bg='#333333',
     text="General Settings",
     fg='white',
-    font=("Helvetica", 16)
+    font=("Helvetica", 16, "bold")
 )
 other_frame.grid(row=5, column=0)
 
@@ -117,8 +117,9 @@ tk.Radiobutton(other_frame, text="No", variable=use_speech_recognition, value=Fa
 tk.Radiobutton(other_frame, text="Yes", variable=launch_yourself_webui, value=True, **aspect_params).grid(row=9, column=4)
 tk.Radiobutton(other_frame, text="No", variable=launch_yourself_webui, value=False, **aspect_params).grid(row=9, column=5)
 
-button = tk.Button(root, text="Submit", command=get_input, bg='#FF3399', fg='white')
-button.place(relx=0.5, rely=0.95, anchor=tk.CENTER)
+button_background = PhotoImage(file = r"images\login\button_background.png")
+button = tk.Button(root, image = button_background, height = 40, width =214, command=get_input, bd = 0)
+button.place(relx=0.5, rely=0.9, anchor=tk.CENTER)
 
 if not os.path.exists("config.json"):
     # Set default values
