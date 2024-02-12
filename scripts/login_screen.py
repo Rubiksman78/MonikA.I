@@ -15,11 +15,21 @@ doki_white = "#F9F3F9"
 doki_dark_pink = '#F9B7DB'
 doki_light_pink = '#F4DCEA'
 doki_purple = '#AB6999'
-menu_background_pink = '#EC9DC8' # bit ab official ddlc color but it's used for better contrast with doki white
+menu_background_pink = '#EC9DC8' # unofficial ddlc color but it's used for better contrast with doki white
 
 bg_image = PhotoImage(file=r"images\login\login_background.png")
 background_label = tk.Label(root, image=bg_image)
 background_label.place(x=0, y=0, relwidth=1, relheight=1)
+
+def load_from_json(variable, entry):
+    try:
+        with open("config.json", "r") as file:
+            config = json.load(file)
+        variable_to_insert = config[variable]
+        entry.delete(0, tk.END)
+        entry.insert(0, variable_to_insert)
+    except FileNotFoundError:
+        pass
 
 def get_input():
     global GAME_PATH
@@ -82,8 +92,13 @@ tk.Label(other_frame, text="WebUI Path", bg=menu_background_pink, fg='white', fo
 tk.Label(other_frame, text="Launch Yourself", bg=menu_background_pink, fg='white', font = bold_font).grid(row=9, column=3)
 
 # Textual Inputs
-tk.Entry(other_frame, textvariable=game_path, width=25, bg = doki_white, fg = 'black').grid(row=1, column=1)
-tk.Entry(other_frame, textvariable=webui_path, width=25, bg= doki_white, fg='black').grid(row=9, column=1)
+game_path_entry = tk.Entry(other_frame, textvariable=game_path, width=25, bg = doki_white, fg = 'black')
+game_path_entry.grid(row=1, column=1)
+webui_path_entry = tk.Entry(other_frame, textvariable=webui_path, width=25, bg=doki_white, fg='black')
+webui_path_entry.grid(row=9, column=1)
+
+load_from_json("GAME_PATH", game_path_entry)
+load_from_json("WEBUI_PATH", webui_path_entry)
 
 tts_menu = tk.OptionMenu(other_frame, tts_model, "Your TTS", "Tortoise TTS")
 tts_menu.config(bg=doki_white, fg='black')
