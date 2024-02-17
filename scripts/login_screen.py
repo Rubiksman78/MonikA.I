@@ -2,7 +2,7 @@ import os
 import sys
 import tkinter as tk
 import json
-from tkinter import *
+from tkinter import PhotoImage
 # Configuration
 args = sys.argv[1:]
 
@@ -142,7 +142,7 @@ tk.Radiobutton(other_frame, text="No", variable=use_speech_recognition, value=Fa
 tk.Radiobutton(other_frame, text="Yes", variable=launch_yourself_webui, value=True, **aspect_params).grid(row=9, column=4)
 tk.Radiobutton(other_frame, text="No", variable=launch_yourself_webui, value=False, **aspect_params).grid(row=9, column=5)
 
-button_background = PhotoImage(file = r"images\login\button_background.png")
+button_background = tk.PhotoImage(file = r"images\login\button_background.png")
 button = tk.Button(root, image = button_background, height = 40, width =214, command=get_input, bd = 0)
 button.place(relx=0.5, rely=0.9, anchor=tk.CENTER)
 
