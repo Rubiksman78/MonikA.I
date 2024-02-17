@@ -17,7 +17,7 @@ doki_light_pink = '#F4DCEA'
 doki_purple = '#AB6999'
 menu_background_pink = '#EC9DC8' # unofficial ddlc color but it's used for better contrast with doki white
 
-bg_image = PhotoImage(file=r"images\login\login_background.png")
+bg_image = tk.PhotoImage(file=r"images\login\login_background.png")
 background_label = tk.Label(root, image=bg_image)
 background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
