@@ -2,7 +2,7 @@ import os
 import sys
 import tkinter as tk
 import json
-from tkinter import PhotoImage
+
 # Configuration
 args = sys.argv[1:]
 
