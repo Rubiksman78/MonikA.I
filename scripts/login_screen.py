@@ -2,14 +2,34 @@ import os
 import sys
 import tkinter as tk
 import json
+
 # Configuration
 args = sys.argv[1:]
 
 root = tk.Tk()
 root.title("MonikA.I. Submod")
 root.geometry("900x500")
-root.configure(background='#333333')
 
+#colors
+doki_white = "#F9F3F9"
+doki_dark_pink = '#F9B7DB'
+doki_light_pink = '#F4DCEA'
+doki_purple = '#AB6999'
+menu_background_pink = '#EC9DC8' # unofficial ddlc color but it's used for better contrast with doki white
+
+bg_image = tk.PhotoImage(file=r"images\login\login_background.png")
+background_label = tk.Label(root, image=bg_image)
+background_label.place(x=0, y=0, relwidth=1, relheight=1)
+
+def load_from_json(variable, entry):
+    try:
+        with open("config.json", "r") as file:
+            config = json.load(file)
+        variable_to_insert = config[variable]
+        entry.delete(0, tk.END)
+        entry.insert(0, variable_to_insert)
+    except FileNotFoundError:
+        pass
 
 def get_input():
     global GAME_PATH
@@ -37,12 +57,13 @@ def get_input():
 
 other_frame = tk.LabelFrame(
     root,
-    bg='#333333',
+    bg=menu_background_pink,
     text="General Settings",
-    fg='white',
-    font=("Helvetica", 16)
+    fg='white', # a bit worried that this lack of contrast might cause some problems
+    font=("Helvetica", 16, "bold"),
+    bd = 5
 )
-other_frame.grid(row=5, column=0)
+other_frame.place(anchor="c", relx=.5, rely=0.21)
 
 use_tts = tk.StringVar()
 game_path = tk.StringVar()
@@ -57,29 +78,36 @@ voice_sample_coqui = tk.StringVar()
 character_json = tk.StringVar()
 
 # General Settings
-tk.Label(other_frame, text="Game Path", bg='#333333', fg='white').grid(row=1, column=0)
-tk.Label(other_frame, text="Launch Yourself", bg='#333333', fg='white').grid(row=1, column=3)
-tk.Label(other_frame, text="Use Actions", bg='#333333', fg='white').grid(row=2, column=0)
-tk.Label(other_frame, text="Use TTS", bg='#333333', fg='white').grid(row=3, column=0)
-tk.Label(other_frame, text="TTS model", bg='#333333', fg='white').grid(row=3, column=3)
-tk.Label(other_frame, text="Use Speech Recognition", bg='#333333', fg='white').grid(row=6, column=0)
-tk.Label(other_frame, text="Voice Sample (Tortoise)", bg='#333333', fg='white').grid(row=7, column=0)
-tk.Label(other_frame, text="Voice Sample (Your TTS)", bg='#333333', fg='white').grid(row=7, column=3)
-tk.Label(other_frame, text="WebUI Path", bg='#333333', fg='white').grid(row=9, column=0)
-tk.Label(other_frame, text="Launch Yourself", bg='#333333', fg='white').grid(row=9, column=3)
+bold_font = ('helvetic', 10, 'bold')
+
+tk.Label(other_frame, text="Game Path", bg=menu_background_pink, fg='white', font = bold_font).grid(row=1, column=0)
+tk.Label(other_frame, text="Launch Yourself", bg=menu_background_pink, fg='white', font = bold_font).grid(row=1, column=3)
+tk.Label(other_frame, text="Use Actions", bg=menu_background_pink, fg='white', font = bold_font).grid(row=2, column=0)
+tk.Label(other_frame, text="Use TTS", bg=menu_background_pink, fg='white', font = bold_font).grid(row=3, column=0)
+tk.Label(other_frame, text="TTS model", bg=menu_background_pink, fg='white', font = bold_font).grid(row=3, column=3)
+tk.Label(other_frame, text="Use Speech Recognition", bg=menu_background_pink, fg='white', font = bold_font).grid(row=6, column=0)
+tk.Label(other_frame, text="Voice Sample (Tortoise)", bg=menu_background_pink, fg='white', font = bold_font).grid(row=7, column=0)
+tk.Label(other_frame, text="Voice Sample (Your TTS)", bg=menu_background_pink, fg='white', font = bold_font).grid(row=7, column=3)
+tk.Label(other_frame, text="WebUI Path", bg=menu_background_pink, fg='white', font = bold_font).grid(row=9, column=0)
+tk.Label(other_frame, text="Launch Yourself", bg=menu_background_pink, fg='white', font = bold_font).grid(row=9, column=3)
 
 # Textual Inputs
-tk.Entry(other_frame, textvariable=game_path, width=25).grid(row=1, column=1)
-tk.Entry(other_frame, textvariable=webui_path, width=25).grid(row=9, column=1)
+game_path_entry = tk.Entry(other_frame, textvariable=game_path, width=25, bg = doki_white, fg = 'black')
+game_path_entry.grid(row=1, column=1)
+webui_path_entry = tk.Entry(other_frame, textvariable=webui_path, width=25, bg=doki_white, fg='black')
+webui_path_entry.grid(row=9, column=1)
+
+load_from_json("GAME_PATH", game_path_entry)
+load_from_json("WEBUI_PATH", webui_path_entry)
 
 tts_menu = tk.OptionMenu(other_frame, tts_model, "Your TTS", "Tortoise TTS")
-tts_menu.config(bg='white', fg='black')
+tts_menu.config(bg=doki_white, fg='black')
 tts_menu.grid(row=3, column=4)
 
 all_voices_tortoise = os.listdir("tortoise_audios")
 all_voices_tortoise = [x for x in all_voices_tortoise if not x.endswith(".txt")]
 voice_menu = tk.OptionMenu(other_frame, voice_sample_tortoise, *all_voices_tortoise)
-voice_menu.config(bg='white', fg='black')
+voice_menu.config(bg=doki_white, fg='black')
 voice_menu.grid(row=8, column=1)
 
 all_voices_coquiai = os.listdir("coquiai_audios")
@@ -87,15 +115,16 @@ all_voices_coquiai = [x for x in all_voices_coquiai if x.endswith(".wav")]
 if len(all_voices_coquiai) == 0:
     all_voices_coquiai = ["No voices found"]
 voice_menu = tk.OptionMenu(other_frame, voice_sample_coqui, *all_voices_coquiai)
-voice_menu.config(bg='white', fg='black')
+voice_menu.config(bg=doki_white, fg='black')
 voice_menu.grid(row=8, column=4)
 
 aspect_params = {
-    "bg": '#333333',
+    "bg": menu_background_pink,
     "activeforeground": 'white',
     "fg": 'white',
-    "activebackground": "#333333",
-    "selectcolor": '#333333'
+    "activebackground": doki_light_pink,
+    "selectcolor": doki_purple,
+    "font" : bold_font
 }
 
 tk.Radiobutton(other_frame, text="Yes", variable=launch_yourself, value=True, **aspect_params).grid(row=1, column=4)
@@ -113,8 +142,9 @@ tk.Radiobutton(other_frame, text="No", variable=use_speech_recognition, value=Fa
 tk.Radiobutton(other_frame, text="Yes", variable=launch_yourself_webui, value=True, **aspect_params).grid(row=9, column=4)
 tk.Radiobutton(other_frame, text="No", variable=launch_yourself_webui, value=False, **aspect_params).grid(row=9, column=5)
 
-button = tk.Button(root, text="Submit", command=get_input, bg='#FF3399', fg='white')
-button.place(relx=0.5, rely=0.95, anchor=tk.CENTER)
+button_background = tk.PhotoImage(file = r"images\login\button_background.png")
+button = tk.Button(root, image = button_background, height = 40, width =214, command=get_input, bd = 0)
+button.place(relx=0.5, rely=0.9, anchor=tk.CENTER)
 
 if not os.path.exists("config.json"):
     # Set default values
