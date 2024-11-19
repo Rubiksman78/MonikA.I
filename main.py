@@ -125,7 +125,6 @@ else:
 def launch(context):
     page = context.new_page()
     page.goto("http://127.0.0.1:7860")
-    page.wait_for_load_state("networkidle")
     context.storage_state(path="storage.json")
     return page
 
