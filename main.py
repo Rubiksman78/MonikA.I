@@ -1,4 +1,5 @@
 import os
+os.environ["COQUI_TOS_AGREED"] = "1"
 import re
 import subprocess
 import torch
@@ -20,8 +21,8 @@ LAUNCH_YOURSELF_WEBUI = CONFIG["LAUNCH_YOURSELF_WEBUI"]
 USE_ACTIONS = CONFIG["USE_ACTIONS"]
 TTS_MODEL = CONFIG["TTS_MODEL"]
 USE_SPEECH_RECOGNITION = CONFIG["USE_SPEECH_RECOGNITION"]
-VOICE_SAMPLE_TORTOISE = CONFIG["VOICE_SAMPLE_TORTOISE"]
 VOICE_SAMPLE_COQUI = CONFIG["VOICE_SAMPLE_COQUI"]
+VOICE_SAMPLE_TORTOISE = CONFIG["VOICE_SAMPLE_TORTOISE"]
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -50,11 +51,16 @@ if USE_ACTIONS:
 # TTS model
 with HiddenPrints():
     if USE_TTS:
-        from scripts.play_tts import play_TTS
+        from scripts.play_tts import play_TTS, initialize_xtts
         if TTS_MODEL == "Your TTS":
             from scripts.tts_api import my_TTS
             tts_model = my_TTS(model_name="tts_models/multilingual/multi-dataset/your_tts")
             sampling_rate = 16000
+            voice_samples = None
+            conditioning_latents = None
+        elif TTS_MODEL == "XTTS":
+            tts_model = initialize_xtts()
+            sampling_rate = 24000
             voice_samples = None
             conditioning_latents = None
         elif TTS_MODEL == "Tortoise TTS":
@@ -71,6 +77,7 @@ with HiddenPrints():
             voice_samples, conditioning_latents = load_voices([VOICE_SAMPLE_TORTOISE], ["tortoise_audios"])
             vfixer = VoiceFixer()
             sampling_rate = 24000
+        
     else:
         print("No TTS model selected")
 
@@ -123,8 +130,16 @@ else:
     input()
     
 def launch(context):
+    print("Launching new browser page...")
     page = context.new_page()
     page.goto("http://127.0.0.1:7860")
+    # Wait for both network and DOM to be ready
+    page.wait_for_load_state("load")
+    page.wait_for_load_state("domcontentloaded")
+    print("Waiting for chat interface to be ready...")
+    # Wait for the chat interface to be visible
+    page.wait_for_selector("[class='svelte-1f354aw pretty_scrollbar']", timeout=60000)
+    print("Page loaded successfully")
     context.storage_state(path="storage.json")
     return page
 
