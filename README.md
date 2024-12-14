@@ -104,6 +104,8 @@ The features are available in a specific `AI` Talk menu in the game.
 There is also the possibility of using buttons on the main screen to directly chat. These can be disabled in the Settings Submods if you don't like them.
 ![Talk buttons](images/buttons_mas.png)
 
+## 📖 Written tutorial
+https://www.reddit.com/user/Sylphar/comments/1f91nsf/streamlined_new_monikai_guide/
 ## :cinema: Video Demonstration
 
 https://user-images.githubusercontent.com/66365083/209359921-a4fdad5e-abbd-4550-a1fb-62d695e76c51.mp4
