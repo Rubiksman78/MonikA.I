@@ -33,7 +33,7 @@ if /i "%useSpeech%" EQU "y" (
 if /i "%installYourTTS%" EQU "y" (
     echo Installing yourTTS...
     "libs/python.exe" -m pip install simpleaudio-1.0.4-cp39-cp39-win_amd64.whl
-    "libs/python.exe" -m pip install TTS
+    "libs/python.exe" -m pip install coqui-tss
 )
 
 :: Install tortoise tts
