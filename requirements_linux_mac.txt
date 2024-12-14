@@ -19,9 +19,9 @@ simpleaudio
 tortoise-tts
 voicefixer
 
-# For CoquiAI TTS
+# For CoquiAI TTS and XTTS
 simpleaudio
-TTS
+coqui-tts
 
 # For GPU
 # --extra-index-url https://download.pytorch.org/whl/cu121
