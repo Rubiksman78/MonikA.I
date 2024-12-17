@@ -54,12 +54,11 @@ def get_input():
     VOICE_SAMPLE_COQUI = voice_sample_coqui.get()
     root.destroy()
 
-
 other_frame = tk.LabelFrame(
     root,
     bg=menu_background_pink,
     text="General Settings",
-    fg='white', # a bit worried that this lack of contrast might cause some problems
+    fg='white',
     font=("Helvetica", 16, "bold"),
     bd = 5
 )
@@ -73,26 +72,26 @@ launch_yourself_webui = tk.StringVar()
 use_actions = tk.StringVar()
 tts_model = tk.StringVar()
 use_speech_recognition = tk.StringVar()
-voice_sample_tortoise = tk.StringVar()
+voice_sample_tortoise = tk.StringVar()  
 voice_sample_coqui = tk.StringVar()
 character_json = tk.StringVar()
 
 # General Settings
 bold_font = ('helvetic', 10, 'bold')
 
-tk.Label(other_frame, text="Game Path", bg=menu_background_pink, fg='white', font = bold_font).grid(row=1, column=0)
-tk.Label(other_frame, text="Launch Yourself", bg=menu_background_pink, fg='white', font = bold_font).grid(row=1, column=3)
-tk.Label(other_frame, text="Use Actions", bg=menu_background_pink, fg='white', font = bold_font).grid(row=2, column=0)
-tk.Label(other_frame, text="Use TTS", bg=menu_background_pink, fg='white', font = bold_font).grid(row=3, column=0)
-tk.Label(other_frame, text="TTS model", bg=menu_background_pink, fg='white', font = bold_font).grid(row=3, column=3)
-tk.Label(other_frame, text="Use Speech Recognition", bg=menu_background_pink, fg='white', font = bold_font).grid(row=6, column=0)
-tk.Label(other_frame, text="Voice Sample (Tortoise)", bg=menu_background_pink, fg='white', font = bold_font).grid(row=7, column=0)
-tk.Label(other_frame, text="Voice Sample (Your TTS)", bg=menu_background_pink, fg='white', font = bold_font).grid(row=7, column=3)
-tk.Label(other_frame, text="WebUI Path", bg=menu_background_pink, fg='white', font = bold_font).grid(row=9, column=0)
-tk.Label(other_frame, text="Launch Yourself", bg=menu_background_pink, fg='white', font = bold_font).grid(row=9, column=3)
+tk.Label(other_frame, text="Game Path", bg=menu_background_pink, fg='white', font=bold_font).grid(row=1, column=0)
+tk.Label(other_frame, text="Launch Yourself", bg=menu_background_pink, fg='white', font=bold_font).grid(row=1, column=3)
+tk.Label(other_frame, text="Use Actions", bg=menu_background_pink, fg='white', font=bold_font).grid(row=2, column=0)
+tk.Label(other_frame, text="Use TTS", bg=menu_background_pink, fg='white', font=bold_font).grid(row=3, column=0)
+tk.Label(other_frame, text="TTS model", bg=menu_background_pink, fg='white', font=bold_font).grid(row=3, column=3)
+tk.Label(other_frame, text="Use Speech Recognition", bg=menu_background_pink, fg='white', font=bold_font).grid(row=6, column=0)
+tk.Label(other_frame, text="Tortoise Voice Sample", bg=menu_background_pink, fg='white', font=bold_font).grid(row=7, column=0)
+tk.Label(other_frame, text="Voice Sample", bg=menu_background_pink, fg='white', font=bold_font).grid(row=7, column=3)
+tk.Label(other_frame, text="WebUI Path", bg=menu_background_pink, fg='white', font=bold_font).grid(row=9, column=0)
+tk.Label(other_frame, text="Launch Yourself", bg=menu_background_pink, fg='white', font=bold_font).grid(row=9, column=3)
 
 # Textual Inputs
-game_path_entry = tk.Entry(other_frame, textvariable=game_path, width=25, bg = doki_white, fg = 'black')
+game_path_entry = tk.Entry(other_frame, textvariable=game_path, width=25, bg=doki_white, fg='black')
 game_path_entry.grid(row=1, column=1)
 webui_path_entry = tk.Entry(other_frame, textvariable=webui_path, width=25, bg=doki_white, fg='black')
 webui_path_entry.grid(row=9, column=1)
@@ -100,10 +99,11 @@ webui_path_entry.grid(row=9, column=1)
 load_from_json("GAME_PATH", game_path_entry)
 load_from_json("WEBUI_PATH", webui_path_entry)
 
-tts_menu = tk.OptionMenu(other_frame, tts_model, "Your TTS", "Tortoise TTS")
+tts_menu = tk.OptionMenu(other_frame, tts_model, "Your TTS", "XTTS", "Tortoise TTS")
 tts_menu.config(bg=doki_white, fg='black')
 tts_menu.grid(row=3, column=4)
 
+# Voice sample selections
 all_voices_tortoise = os.listdir("tortoise_audios")
 all_voices_tortoise = [x for x in all_voices_tortoise if not x.endswith(".txt")]
 voice_menu = tk.OptionMenu(other_frame, voice_sample_tortoise, *all_voices_tortoise)
@@ -124,7 +124,7 @@ aspect_params = {
     "fg": 'white',
     "activebackground": doki_light_pink,
     "selectcolor": doki_purple,
-    "font" : bold_font
+    "font": bold_font
 }
 
 tk.Radiobutton(other_frame, text="Yes", variable=launch_yourself, value=True, **aspect_params).grid(row=1, column=4)
@@ -142,8 +142,8 @@ tk.Radiobutton(other_frame, text="No", variable=use_speech_recognition, value=Fa
 tk.Radiobutton(other_frame, text="Yes", variable=launch_yourself_webui, value=True, **aspect_params).grid(row=9, column=4)
 tk.Radiobutton(other_frame, text="No", variable=launch_yourself_webui, value=False, **aspect_params).grid(row=9, column=5)
 
-button_background = tk.PhotoImage(file = r"images\login\button_background.png")
-button = tk.Button(root, image = button_background, height = 40, width =214, command=get_input, bd = 0)
+button_background = tk.PhotoImage(file=r"images\login\button_background.png")
+button = tk.Button(root, image=button_background, height=40, width=214, command=get_input, bd=0)
 button.place(relx=0.5, rely=0.9, anchor=tk.CENTER)
 
 if not os.path.exists("config.json"):
@@ -155,7 +155,8 @@ if not os.path.exists("config.json"):
     tts_model.set("Your TTS")
     use_speech_recognition.set(0)
     voice_sample_tortoise.set("Choose a Tortoise voice sample")
-    voice_sample_coqui.set("Choose a YourTTS voice sample")
+    voice_sample_coqui.set("Choose a voice sample")
+
 else:
     with open("config.json", "r") as f:
         config = json.load(f)
@@ -167,8 +168,8 @@ else:
     USE_ACTIONS = config["USE_ACTIONS"]
     TTS_MODEL = config["TTS_MODEL"]
     USE_SPEECH_RECOGNITION = config["USE_SPEECH_RECOGNITION"]
-    VOICE_SAMPLE_TORTOISE = config["VOICE_SAMPLE_TORTOISE"]
     VOICE_SAMPLE_COQUI = config["VOICE_SAMPLE_COQUI"]
+    VOICE_SAMPLE_TORTOISE = config["VOICE_SAMPLE_TORTOISE"]
     # Set saved values
     launch_yourself.set(LAUNCH_YOURSELF)
     launch_yourself_webui.set(LAUNCH_YOURSELF_WEBUI)
@@ -179,11 +180,9 @@ else:
     voice_sample_tortoise.set(VOICE_SAMPLE_TORTOISE)
     voice_sample_coqui.set(VOICE_SAMPLE_COQUI)
 
-
 def on_closing():
     root.destroy()
     raise SystemExit
-
 
 root.protocol("WM_DELETE_WINDOW", on_closing)
 root.mainloop()

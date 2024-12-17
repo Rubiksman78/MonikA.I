@@ -1,7 +1,7 @@
 @echo off
 :: Ask for the user if they want to install tortoise tts, yourTTS, playwright and if they want to use GPU
 set /p installTortoiseTTS=Do you want to install Tortoise TTS? [y/n]
-set /p installYourTTS=Do you want to install yourTTS? [y/n]
+set /p installYourTTS=Do you want to install yourTTS and XTTS? [y/n]
 set /p installPlaywright=Do you want to install local chatbot? [y/n]
 set /p useActions=Do you want to use actions? [y/n]
 set /p useSpeech=Do you want to use speech recognition? [y/n]
@@ -29,11 +29,11 @@ if /i "%useSpeech%" EQU "y" (
     "libs/python.exe" -m pip install pyaudio
 )
 
-:: Install yourTTS
+:: Install yourTTS and XTTS
 if /i "%installYourTTS%" EQU "y" (
-    echo Installing yourTTS...
+    echo Installing yourTTS and XTTS...
     "libs/python.exe" -m pip install simpleaudio-1.0.4-cp39-cp39-win_amd64.whl
-    "libs/python.exe" -m pip install TTS
+    "libs/python.exe" -m pip install coqui-tts
 )
 
 :: Install tortoise tts
