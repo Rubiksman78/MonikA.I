@@ -1,8 +1,8 @@
 from IPython import display as ipd
+import simpleaudio as sa
 from scripts.utils import HiddenPrints
 import torch
 from TTS.api import TTS
-import numpy as np
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
