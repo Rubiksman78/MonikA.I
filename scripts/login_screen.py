@@ -85,7 +85,8 @@ tk.Label(other_frame, text="Use Actions", bg=menu_background_pink, fg='white', f
 tk.Label(other_frame, text="Use TTS", bg=menu_background_pink, fg='white', font=bold_font).grid(row=3, column=0)
 tk.Label(other_frame, text="TTS model", bg=menu_background_pink, fg='white', font=bold_font).grid(row=3, column=3)
 tk.Label(other_frame, text="Use Speech Recognition", bg=menu_background_pink, fg='white', font=bold_font).grid(row=6, column=0)
-tk.Label(other_frame, text="Voice Sample", bg=menu_background_pink, fg='white', font=bold_font).grid(row=7, column=0)
+tk.Label(other_frame, text="Tortoise Voice Sample", bg=menu_background_pink, fg='white', font=bold_font).grid(row=7, column=0)
+tk.Label(other_frame, text="Voice Sample", bg=menu_background_pink, fg='white', font=bold_font).grid(row=7, column=3)
 tk.Label(other_frame, text="WebUI Path", bg=menu_background_pink, fg='white', font=bold_font).grid(row=9, column=0)
 tk.Label(other_frame, text="Launch Yourself", bg=menu_background_pink, fg='white', font=bold_font).grid(row=9, column=3)
 
