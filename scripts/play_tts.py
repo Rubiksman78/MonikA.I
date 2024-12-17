@@ -1,5 +1,4 @@
 from IPython import display as ipd
-import simpleaudio as sa
 from scripts.utils import HiddenPrints
 import torch
 from TTS.api import TTS
