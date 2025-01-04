@@ -5,6 +5,7 @@ import subprocess
 import torch
 import yaml
 import numpy as np
+import time
 
 from playwright.sync_api import sync_playwright
 from socket import AF_INET, socket, SOCK_STREAM
@@ -153,15 +154,11 @@ def launch(context):
     
     if BACKEND_TYPE == "Text-gen-webui":
         page.goto("http://127.0.0.1:7860")
-        page.wait_for_load_state("load")
-        page.wait_for_load_state("domcontentloaded")
-        print("Waiting for chat interface to be ready...")
         page.wait_for_selector("[class='svelte-1f354aw pretty_scrollbar']", timeout=60000)
+        time.sleep(1)
     else:  # SillyTavern
         page.goto("http://127.0.0.1:8000")
         page.wait_for_load_state("networkidle")
-        print("Waiting for chat interface to be ready...")
-        page.wait_for_selector("#send_textarea", timeout=60000)
     
     print("Page loaded successfully")
     context.storage_state(path="storage.json")
@@ -173,6 +170,7 @@ def post_message(page, message):
             page.fill("[class='svelte-1f354aw pretty_scrollbar']", "I'll be right back")
         else:
             page.fill("[class='svelte-1f354aw pretty_scrollbar']", message)
+        time.sleep(0.2)
         page.click('[id="Generate"]')
         page.wait_for_selector('[id="stop"]')
     else:  # SillyTavern
