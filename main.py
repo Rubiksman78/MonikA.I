@@ -5,6 +5,7 @@ import subprocess
 import torch
 import yaml
 import numpy as np
+import time
 
 from playwright.sync_api import sync_playwright
 from socket import AF_INET, socket, SOCK_STREAM
@@ -13,11 +14,15 @@ from threading import Thread
 from scripts.login_screen import CONFIG
 from scripts.utils import HiddenPrints
 
+# Configuration variables
 GAME_PATH = CONFIG["GAME_PATH"]
 WEBUI_PATH = CONFIG["WEBUI_PATH"]
+ST_PATH = CONFIG.get("ST_PATH", "")  # Add SillyTavern path
+BACKEND_TYPE = CONFIG.get("BACKEND_TYPE", "Text-gen-webui")  # Default to text-gen-webui for compatibility
 USE_TTS = CONFIG["USE_TTS"]
 LAUNCH_YOURSELF = CONFIG["LAUNCH_YOURSELF"]
 LAUNCH_YOURSELF_WEBUI = CONFIG["LAUNCH_YOURSELF_WEBUI"]
+LAUNCH_YOURSELF_ST = CONFIG.get("LAUNCH_YOURSELF_ST", False)  # Add SillyTavern launch flag
 USE_ACTIONS = CONFIG["USE_ACTIONS"]
 TTS_MODEL = CONFIG["TTS_MODEL"]
 USE_SPEECH_RECOGNITION = CONFIG["USE_SPEECH_RECOGNITION"]
@@ -121,36 +126,74 @@ if USE_SPEECH_RECOGNITION:
 
 
 # Chatbot connection
-WEBUI_PATH = WEBUI_PATH.replace("\\", "/")
-if not LAUNCH_YOURSELF_WEBUI:
-    subprocess.Popen(WEBUI_PATH)
-else:
-    print("Please launch text-generation_webui manually.")
-    print("Press enter to continue.")
-    input()
-    
+def launch_backend():
+    global WEBUI_PATH
+    global ST_PATH
+    if BACKEND_TYPE == "Text-gen-webui":
+        WEBUI_PATH = WEBUI_PATH.replace("\\", "/")
+        if not LAUNCH_YOURSELF_WEBUI:
+            subprocess.Popen(WEBUI_PATH)
+        else:
+            print("Please launch text-generation_webui manually.")
+            print("Press enter to continue.")
+            input()
+    else:  # SillyTavern
+        st_path_normalized = ST_PATH.replace("\\", "/")
+        if not LAUNCH_YOURSELF_ST:
+            subprocess.Popen(st_path_normalized)
+        else:
+            print("Please launch SillyTavern manually.")
+            print("Press enter to continue.")
+            input()
+
+launch_backend()
+
 def launch(context):
     print("Launching new browser page...")
     page = context.new_page()
-    page.goto("http://127.0.0.1:7860")
-    # Wait for both network and DOM to be ready
-    page.wait_for_load_state("load")
-    page.wait_for_load_state("domcontentloaded")
-    print("Waiting for chat interface to be ready...")
-    # Wait for the chat interface to be visible
-    page.wait_for_selector("[class='svelte-1f354aw pretty_scrollbar']", timeout=60000)
+    
+    if BACKEND_TYPE == "Text-gen-webui":
+        page.goto("http://127.0.0.1:7860")
+        page.wait_for_selector("[class='svelte-1f354aw pretty_scrollbar']", timeout=60000)
+        time.sleep(1)
+    else:  # SillyTavern
+        page.goto("http://127.0.0.1:8000")
+        page.wait_for_load_state("networkidle")
+    
     print("Page loaded successfully")
     context.storage_state(path="storage.json")
     return page
 
-
 def post_message(page, message):
-    if message == "QUIT":
-        page.fill("[class='svelte-1f354aw pretty_scrollbar']", "I'll be right back")
-    else:
-        page.fill("[class='svelte-1f354aw pretty_scrollbar']", message)
-    page.click('[id="Generate"]')
-    page.wait_for_selector('[id="stop"]')
+    if BACKEND_TYPE == "Text-gen-webui":
+        if message == "QUIT":
+            page.fill("[class='svelte-1f354aw pretty_scrollbar']", "I'll be right back")
+        else:
+            page.fill("[class='svelte-1f354aw pretty_scrollbar']", message)
+        time.sleep(0.2)
+        page.click('[id="Generate"]')
+        page.wait_for_selector('[id="stop"]')
+    else:  # SillyTavern
+        if message == "QUIT":
+            page.fill("#send_textarea", "I'll be right back")
+        else:
+            page.fill("#send_textarea", message)
+        page.press("#send_textarea", "Enter")
+
+def check_generation_complete(page):
+    if BACKEND_TYPE == "Text-gen-webui":
+        stop_buttons = page.locator('[id="stop"]').all()
+        return not any(button.is_visible() for button in stop_buttons)
+    else:  # SillyTavern
+        stop_button = page.locator(".mes_stop")
+        return not stop_button.is_visible()
+
+def get_last_message(page):
+    if BACKEND_TYPE == "Text-gen-webui":
+        user = page.locator('[class="message-body"]').locator("nth=-1")
+        return user.inner_html()
+    else:  # SillyTavern
+        return page.locator(".mes.last_mes .mes_text p").inner_text()
 
 
 # Main
@@ -230,7 +273,7 @@ def listenToClient(client):
             if '/g' in rest_msg:
                 received_msg, step = rest_msg.split("/g")
             else:
-                received_msg = client.recv(BUFSIZE).decode("utf-8")  # Message containing the user input
+                received_msg = client.recv(BUFSIZE).decode("utf-8")
                 received_msg, step = received_msg.split("/g")
             step = int(step)
             if received_msg == "begin_record":
@@ -261,7 +304,7 @@ def listenToClient(client):
                     context = browser.new_context()
                     page = launch(context)
                 except:
-                    print("Launch failed. Please check if text-generation_webui is running.")
+                    print(f"Launch failed. Please check if {BACKEND_TYPE} is running.")
                     _ = client.recv(BUFSIZE).decode("utf-8")
                     sendMessage("server_error".encode("utf-8"))
                     launched = False
@@ -272,8 +315,8 @@ def listenToClient(client):
                 sendMessage("server_ok".encode("utf-8"))
             try:
                 post_message(page, received_msg)
-            except:
-                print("Error while sending message. Please check if text-generation_webui is running or if the model is loaded.")
+            except Exception as e:
+                print(f"Error while sending message. Please check if {BACKEND_TYPE} is running: {str(e)}")
                 _ = client.recv(BUFSIZE).decode("utf-8")
                 sendMessage("server_error".encode("utf-8"))
                 launched = False
@@ -281,13 +324,8 @@ def listenToClient(client):
                 continue
             while True:
                 try:
-                    # Get all stop buttons and check their visibility
-                    stop_buttons = page.locator('[id="stop"]').all()
-                    is_generating = any(button.is_visible() for button in stop_buttons)
-                    
-                    if not is_generating:
-                        user = page.locator('[class="message-body"]').locator("nth=-1")
-                        text = user.inner_html()
+                    if check_generation_complete(page):
+                        text = get_last_message(page)
                         if len(text) > 0:
                             msg = text
                             msg = re.sub(r'<[^>]+>', '', msg)
@@ -320,7 +358,6 @@ def listenToClient(client):
                     launched = False
                     pw.stop()
                     break
-
 
 if __name__ == "__main__":
     SERVER.listen(5)
