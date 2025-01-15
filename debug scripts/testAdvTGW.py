@@ -1,13 +1,16 @@
 import os
+import sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 import warnings
+
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 os.environ["COQUI_TOS_AGREED"] = "1"
-
-# Suppress specific warnings
-warnings.filterwarnings("ignore", category=UserWarning, module="transformers.generation.utils")
-warnings.filterwarnings("ignore", category=FutureWarning, module="huggingface_hub.file_download")
-warnings.filterwarnings("ignore", category=UserWarning, module="transformers.modeling_utils")
-
-
 import time
 import torch
 import yaml
