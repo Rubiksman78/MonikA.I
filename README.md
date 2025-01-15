@@ -63,7 +63,7 @@ The submod is compatible with the latest version of MAS (v0.12.15). It has been 
 
 This version includes conversing with chatbots or full voicing of the game, the two modes might not be compatible so it is preferable to use them separetely.
 
-To install the user version with executables, a tutorial is avilable [here](https://github.com/Rubiksman78/MonikA.I/wiki/Installation-tutorial-(after-2.0)) after version 2.0.
+To install the user version with executables, a tutorial is available [here](https://github.com/Rubiksman78/MonikA.I/wiki/Installation-tutorial-(after-2.0)) after version 2.0.
 
 ### :penguin: Python version (Linux or MacOS)
 
