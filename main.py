@@ -6,6 +6,10 @@ import torch
 import yaml
 import numpy as np
 import time
+import warnings
+
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 from playwright.sync_api import sync_playwright
 from socket import AF_INET, socket, SOCK_STREAM
