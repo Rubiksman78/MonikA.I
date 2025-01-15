@@ -193,7 +193,10 @@ def get_last_message(page):
         user = page.locator('[class="message-body"]').locator("nth=-1")
         return user.inner_html()
     else:  # SillyTavern
-        return page.locator(".mes.last_mes .mes_text p").inner_text()
+        # Get all paragraph elements from the last message
+        paragraphs = page.locator(".mes.last_mes .mes_text p").all()
+        # Combine all paragraphs with /n between them. This avoids the code getting confused by multi-paragraphs answers... something I didn't encounter in my tests.
+        return "\n".join(p.inner_text() for p in paragraphs)
 
 
 # Main
