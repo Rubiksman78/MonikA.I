@@ -52,7 +52,8 @@ def main():
         
         # Get the last message
         print("Retrieving last message...")
-        last_message = page.locator(".mes.last_mes .mes_text p").inner_text()
+        paragraphs = page.locator(".mes.last_mes .mes_text p").all()
+        last_message = "\n".join(p.inner_text() for p in paragraphs)
         print(f"Last message received: {last_message}")
         
         # Keep browser open for a moment to verify
