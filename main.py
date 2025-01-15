@@ -183,6 +183,8 @@ def post_message(page, message):
         else:
             page.fill("#send_textarea", message)
         page.press("#send_textarea", "Enter")
+        page.wait_for_selector(".mes_stop", state="visible")
+        time.sleep(1) #small delay to be SURE the script won't see the generate button before it has had time to change state
 
 def check_generation_complete(page):
     if BACKEND_TYPE == "Text-gen-webui":
@@ -197,7 +199,6 @@ def get_last_message(page):
         user = page.locator('[class="message-body"]').locator("nth=-1")
         return user.inner_html()
     else:  # SillyTavern
-        # Get all paragraph elements from the last message
         paragraphs = page.locator(".mes.last_mes .mes_text p").all()
         # Combine all paragraphs with /n between them. This avoids the code getting confused by multi-paragraphs answers... something I didn't encounter in my tests.
         return "\n".join(p.inner_text() for p in paragraphs)
