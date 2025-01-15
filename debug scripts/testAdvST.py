@@ -1,5 +1,12 @@
 import os
+import sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 os.environ["COQUI_TOS_AGREED"] = "1"
+
 import time
 import warnings
 import torch
@@ -19,8 +26,8 @@ CONFIG = {
     "USE_ACTIONS": True,
     "USE_SPEECH_RECOGNITION": True,
     "TTS_MODEL": "XTTS",  # Options: "Your TTS", "XTTS", "Tortoise TTS"
-    "VOICE_SAMPLE_COQUI": "Monika2.wav",  # Only needed for XTTS
-    "VOICE_SAMPLE_TORTOISE": "path/to/your/voice_sample.wav"  # Only needed for Tortoise
+    "VOICE_SAMPLE_COQUI": "MonikaTest.wav",  # Only needed for XTTS
+    "VOICE_SAMPLE_TORTOISE": "monika_voice"  # Only needed for Tortoise
 }
 
 # Initialize device
@@ -220,7 +227,8 @@ def main():
                 time.sleep(0.1)
             
             # Get and process response
-            response = page.locator(".mes.last_mes .mes_text p").inner_text()
+            paragraphs = page.locator(".mes.last_mes .mes_text p").all()
+            response = "\n".join(p.inner_text() for p in paragraphs)
             print(f"Response received: {response}")
             
             # Process actions
