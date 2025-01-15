@@ -40,6 +40,8 @@ def main():
             page.press("#send_textarea", "Enter")
         except Exception as e:
             print(f"Enter key press failed: {e}")
+        page.wait_for_selector(".mes_stop", state="visible") #so that it doesn't see the generate button before it is clicked
+        print("Stop button seen !")
         
         # Wait for generation to complete by monitoring the stop button visibility
         print("Waiting for generation to complete...")
