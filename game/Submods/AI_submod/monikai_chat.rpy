@@ -91,7 +91,7 @@ init 5 python:
 
     HOST = "127.0.0.1"
     PORT = 12346
-    BUFSIZ = 1024
+    BUFSIZ = 2048
     ADDR = (HOST, PORT)
 
     try:

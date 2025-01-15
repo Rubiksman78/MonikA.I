@@ -1,5 +1,12 @@
 import os
+import sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 os.environ["COQUI_TOS_AGREED"] = "1"
+
 import time
 import warnings
 import torch
@@ -19,8 +26,8 @@ CONFIG = {
     "USE_ACTIONS": True,
     "USE_SPEECH_RECOGNITION": True,
     "TTS_MODEL": "XTTS",  # Options: "Your TTS", "XTTS", "Tortoise TTS"
-    "VOICE_SAMPLE_COQUI": "Monika2.wav",  # Only needed for XTTS
-    "VOICE_SAMPLE_TORTOISE": "path/to/your/voice_sample.wav"  # Only needed for Tortoise
+    "VOICE_SAMPLE_COQUI": "MonikaTest.wav",  # Only needed for XTTS
+    "VOICE_SAMPLE_TORTOISE": "monika_voice"  # Only needed for Tortoise
 }
 
 # Initialize device
@@ -117,8 +124,9 @@ if CONFIG["USE_SPEECH_RECOGNITION"]:
 def get_speech_input():
     """Record and transcribe speech input"""
     if not CONFIG["USE_SPEECH_RECOGNITION"]:
-        return "test"  # Default fallback
-        
+        print("Enter your message (type 'empty' to send an empty message, to just continue):")
+        text_input = input().strip()
+        return text_input
     try:
         with sr.Microphone(sample_rate=16000) as source:
             print("Listening... Speak now!")
@@ -180,6 +188,45 @@ def play_tts_response(message, step=0):
         import traceback
         traceback.print_exc()
 
+def check_generation_complete(page):
+    """Check if message generation is complete. Multiple failure states included for debugging. Usually, only the first and 3rd ones are ever relevant."""
+    # First check if the stop button is still visible
+    stop_button = page.locator(".mes_stop")
+    if stop_button.is_visible():
+        print("Generation still in progress...")
+        return False
+        
+    # Then verify we're looking at the last message
+    last_message = page.locator(".mes").last
+    if not last_message.is_visible():
+        print("Waiting for message to appear...")
+        return False
+        
+    # Make sure it's not a user message by checking the is_user attribute
+    if last_message.get_attribute("is_user") == "true":
+        print("Last message is from user, waiting for response...")
+        return False
+        
+    # Check if the message has content
+    message_text = last_message.locator(".mes_text p")
+    has_content = message_text.count() > 0
+    if has_content:
+        print("Response received!")
+    return has_content
+
+def get_last_message(page):
+    """Get the last message from the chat"""
+    try:
+        # Get the last message that isn't from the user
+        last_message = page.locator(".mes").last
+        # Get all paragraph elements from the message
+        paragraphs = last_message.locator(".mes_text p").all()
+        # Combine all paragraphs with newlines between them
+        return "\n".join(p.inner_text() for p in paragraphs)
+    except Exception as e:
+        print(f"Error getting message from SillyTavern: {e}")
+        return ""
+
 def main():
     print("Starting enhanced test script...")
     
@@ -194,8 +241,7 @@ def main():
         print("Waiting for chat interface...")
         page.wait_for_load_state("networkidle")
         
-        
-        print("Press Enter to record your voice message (or type 'quit' to exit)...")
+        print("Press Enter to record your voice message or to begin writing your text message (or type 'quit' to exit)...")
         while True:
             user_input = input()
             if user_input.lower() == 'quit':
@@ -208,19 +254,21 @@ def main():
                 
             # Send message
             print(f"Sending message: {message}")
-            page.fill("#send_textarea", message)
+            if message == "empty":
+                page.fill("#send_textarea", "")
+            else:
+                page.fill("#send_textarea", message)
             page.press("#send_textarea", "Enter")
+            page.wait_for_selector(".mes_stop", state="visible") #so that it doesn't see the generate button before it is clicked
+            print("Stop button seen !")
             
-            # Wait for response
-            print("Waiting for response...")
-            while True:
-                stop_button = page.locator(".mes_stop")
-                if not stop_button.is_visible():
-                    break
-                time.sleep(0.1)
+            # Wait for generation to complete
+            print("Waiting for generation to complete...")
+            while not check_generation_complete(page):
+                time.sleep(0.1)  # Small delay to prevent CPU overuse
             
-            # Get and process response
-            response = page.locator(".mes.last_mes .mes_text p").inner_text()
+            # Get the response
+            response = get_last_message(page)
             print(f"Response received: {response}")
             
             # Process actions

@@ -40,6 +40,8 @@ def main():
             page.press("#send_textarea", "Enter")
         except Exception as e:
             print(f"Enter key press failed: {e}")
+        page.wait_for_selector(".mes_stop", state="visible") #so that it doesn't see the generate button before it is clicked
+        print("Stop button seen !")
         
         # Wait for generation to complete by monitoring the stop button visibility
         print("Waiting for generation to complete...")
@@ -52,7 +54,8 @@ def main():
         
         # Get the last message
         print("Retrieving last message...")
-        last_message = page.locator(".mes.last_mes .mes_text p").inner_text()
+        paragraphs = page.locator(".mes.last_mes .mes_text p").all()
+        last_message = "\n".join(p.inner_text() for p in paragraphs)
         print(f"Last message received: {last_message}")
         
         # Keep browser open for a moment to verify
