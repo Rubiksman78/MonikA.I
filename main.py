@@ -55,7 +55,9 @@ if USE_ACTIONS:
 
     action_classifier = pipeline(
         "zero-shot-classification",
-        model="sileod/deberta-v3-base-tasksource-nli")
+        model="sileod/deberta-v3-base-tasksource-nli",
+        device=device
+    )
 
 # TTS model
 with HiddenPrints():
