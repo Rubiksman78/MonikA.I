@@ -182,7 +182,7 @@ def post_message(page, message):
             page.fill("#send_textarea", "I'll be right back")
         else:
             page.fill("#send_textarea", message)
-        page.press("#send_textarea", "Enter")
+        page.locator("#send_but").click()
         page.wait_for_selector(".mes_stop", state="visible")
         time.sleep(1) #small delay to be SURE the script won't see the generate button before it has had time to change state
 
