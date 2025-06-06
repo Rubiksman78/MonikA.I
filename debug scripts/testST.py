@@ -35,11 +35,11 @@ def main():
         page.fill("#send_textarea", "test")
         
         #Start gen
-        print("Trying Enter key press...")
+        print("Trying to click the button...")
         try:
-            page.press("#send_textarea", "Enter")
+            page.locator("#send_but").click()
         except Exception as e:
-            print(f"Enter key press failed: {e}")
+            print(f"Button press failed: {e}")
         page.wait_for_selector(".mes_stop", state="visible") #so that it doesn't see the generate button before it is clicked
         print("Stop button seen !")
         

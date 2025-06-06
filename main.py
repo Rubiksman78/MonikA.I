@@ -55,7 +55,9 @@ if USE_ACTIONS:
 
     action_classifier = pipeline(
         "zero-shot-classification",
-        model="sileod/deberta-v3-base-tasksource-nli")
+        model="sileod/deberta-v3-base-tasksource-nli",
+        device=device
+    )
 
 # TTS model
 with HiddenPrints():
@@ -146,7 +148,7 @@ def launch_backend():
         if not LAUNCH_YOURSELF_ST:
             subprocess.Popen(st_path_normalized)
         else:
-            print("Please launch SillyTavern manually.")
+            print("Please launch SillyTavern manually. Make sure to have, in another ST instance, pressed the 'Auto-connect to Last Server' button in the API (plug) menu and 'Auto-load last chat' in the user parameters (man with cog) menu ")
             print("Press enter to continue.")
             input()
 
@@ -182,7 +184,7 @@ def post_message(page, message):
             page.fill("#send_textarea", "I'll be right back")
         else:
             page.fill("#send_textarea", message)
-        page.press("#send_textarea", "Enter")
+        page.locator("#send_but").click()
         page.wait_for_selector(".mes_stop", state="visible")
         time.sleep(1) #small delay to be SURE the script won't see the generate button before it has had time to change state
 
