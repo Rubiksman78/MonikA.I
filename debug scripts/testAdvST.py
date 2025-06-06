@@ -124,7 +124,7 @@ if CONFIG["USE_SPEECH_RECOGNITION"]:
 def get_speech_input():
     """Record and transcribe speech input"""
     if not CONFIG["USE_SPEECH_RECOGNITION"]:
-        print("Enter your message (type 'empty' to send an empty message, to just continue):")
+        print("Enter your message (or press Enter without text to send empty input):")
         text_input = input().strip()
         return text_input
     try:
@@ -189,7 +189,7 @@ def play_tts_response(message, step=0):
         traceback.print_exc()
 
 def check_generation_complete(page):
-    """Check if message generation is complete. Multiple failure states included for debugging. Usually, only the first and 3rd ones are ever relevant."""
+    """Check if message generation is complete"""
     # First check if the stop button is still visible
     stop_button = page.locator(".mes_stop")
     if stop_button.is_visible():
@@ -236,7 +236,7 @@ def main():
         page = browser.new_page()
         
         print("Navigating to SillyTavern...")
-        page.goto("http://127.0.0.1:8000")
+        page.goto("http://127.0.0.1:8000/")
         
         print("Waiting for chat interface...")
         page.wait_for_load_state("networkidle")
@@ -258,7 +258,7 @@ def main():
                 page.fill("#send_textarea", "")
             else:
                 page.fill("#send_textarea", message)
-            page.press("#send_textarea", "Enter")
+            page.locator("#send_but").click()       # New, more reliable method
             page.wait_for_selector(".mes_stop", state="visible") #so that it doesn't see the generate button before it is clicked
             print("Stop button seen !")
             
