@@ -146,7 +146,7 @@ def launch_backend():
         if not LAUNCH_YOURSELF_ST:
             subprocess.Popen(st_path_normalized)
         else:
-            print("Please launch SillyTavern manually. Make sure to have pressed the 'Auto-connect to Last Server' button in the API (plug) menu and 'Auto-load last chat' in the user parameters (man with cog) menu ")
+            print("Please launch SillyTavern manually. Make sure to have, in another ST instance, pressed the 'Auto-connect to Last Server' button in the API (plug) menu and 'Auto-load last chat' in the user parameters (man with cog) menu ")
             print("Press enter to continue.")
             input()
 
