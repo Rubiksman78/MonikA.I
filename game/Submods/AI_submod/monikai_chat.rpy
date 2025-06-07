@@ -20,6 +20,21 @@ init 5 python:
     from time import sleep
     import random
 
+    # NEW: Dictionary to map emotions from the AI to MAS sprite codes.
+    # The keys MUST match the EMOTION_LABELS from main.py
+    emotion_sprite_map = {
+        "joy": "4sub",          # User specified sprite code
+        "sadness": "6dsc",        # User specified sprite code
+        "anger": "4esd",        # Default from plan
+        "surprise": "1esa",       # Default from plan
+        "disgust": "4esd",       # Default from plan
+        "fear": "2esc",         # Default from plan
+        "neutral": "1esc"        # Default from plan
+    }
+    # A default sprite to use if an unknown emotion is received
+    default_sprite = "1esa"
+
+
     def receiveMessage():
         msg = clientSocket.recv(BUFSIZ).decode("utf8")
         return msg
@@ -91,7 +106,7 @@ init 5 python:
 
     HOST = "127.0.0.1"
     PORT = 12346
-    BUFSIZ = 2048
+    BUFSIZ = 8096
     ADDR = (HOST, PORT)
 
     try:
@@ -99,15 +114,15 @@ init 5 python:
         clientSocket.connect(ADDR)
         monikai_no_server = False
     except:
-        monikai_no_server = True        
+        monikai_no_server = True
     monikaNickname = store.persistent._mas_monika_nickname
-    
+
     if persistent._show_monikai_buttons == None:
         persistent._show_monikai_buttons = True
 
     if persistent._use_monikai_actions == None:
         persistent._use_monikai_actions = True
-    
+
     if persistent._show_monikai_buttons:
         AIButton()
         AIVoiceButton()
@@ -123,11 +138,11 @@ label monika_voice_chat:
     # If the game was launched without the python script
     if monikai_no_server:
         jump monika_server_crashed
-    
+
     # If the player has never talked to the chatbot, show the intro
     if not renpy.seen_label("monika_AI_intro"):
         call monika_AI_intro
-    
+
     if step == 0:
         m 5tubfb "Sure [player], talk to me as much as you want."
 
@@ -143,7 +158,7 @@ label monika_voice_chat:
                     $ my_msg = sendAudio("QUIT",str(step))
                     jump close_AI
                     return
-                    
+
         # If it is already talking
         else:
             $ sendAudio("begin_record",str(step))
@@ -153,9 +168,8 @@ label monika_voice_chat:
         if begin_speak == "yes":
             m 1subfb "Okay, I'm listening.{w=0.5}{nw}"
         elif begin_speak == "no":
-            m "Oh, it seems you forgot to activate the speech 
-            recognition.{w=0.5}{nw}"
-            jump close_AI 
+            m "Oh, it seems you forgot to activate the speech recognition.{w=0.5}{nw}"
+            jump close_AI
         call monikai_get_actions
 
 # Label for text chat from the button in the main screen
@@ -166,18 +180,17 @@ label monika_chatting_text:
 
     if monikai_no_server:
         jump monika_server_crashed
-    
+
     if not renpy.seen_label("monika_AI_intro"):
         call monika_AI_intro
-    
+
     if step == 0:
         m 5tubfb "Sure [player], talk to me as much as you want."
-        m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. 
-        I'll understand my love."
+        m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. I'll understand my love."
 
     while True:
         $ send_simple("chatbot/m")
-        $ my_msg = sendMessage("Chat with [monikaNickname]:",str(step)) 
+        $ my_msg = sendMessage("Chat with [monikaNickname]:",str(step))
         if my_msg == "QUIT":
             $ step += 1
             jump close_AI
@@ -185,7 +198,7 @@ label monika_chatting_text:
 
         call monikai_get_actions
 
-        
+
 # Chatbot Event
 init 5 python:
     addEvent(Event(
@@ -202,14 +215,13 @@ label monika_chatting():
 
     if monikai_no_server:
         jump monika_server_crashed
-    
+
     if not renpy.seen_label("monika_AI_intro"):
         call monika_AI_intro
 
     if step == 0:
         m 5tubfb "Sure [player], talk to me as much as you want."
-        m 4hubfb "Oh and if you have to do something else, just write 
-        'QUIT'. I'll understand my love."
+        m 4hubfb "Oh and if you have to do something else, just write 'QUIT'. I'll understand my love."
 
     m 4nubfa "Maybe you could allow me to hear your beautiful voice?"
     #Choose to use voice or not
@@ -220,8 +232,7 @@ label monika_chatting():
             $ useVoice = True
         "Sorry, my microphone is broken.":
             m 2eua "Oh, that's okay [player]."
-            m 2eua "I'll just have to wait for you to type something 
-            then.{w=0.5}{nw}"
+            m 2eua "I'll just have to wait for you to type something then.{w=0.5}{nw}"
             $ useVoice = False
 
     while True:
@@ -239,7 +250,7 @@ label monika_chatting():
             else:
                 $ sendAudio("begin_record",str(step))
         else:
-            $ my_msg = sendMessage("Chat with [monikaNickname]:",str(step)) 
+            $ my_msg = sendMessage("Chat with [monikaNickname]:",str(step))
             if my_msg == "QUIT":
                 $ step += 1
                 jump close_AI
@@ -250,8 +261,7 @@ label monika_chatting():
             if begin_speak == "yes":
                 m 1subfb "Okay, I'm listening.{w=0.5}{nw}"
             elif begin_speak == "no":
-                m "Oh, it seems you forgot to activate the speech 
-                recognition.{w=0.5}{nw}"
+                m "Oh, it seems you forgot to activate the speech recognition.{w=0.5}{nw}"
                 jump close_AI
                 return
         call monikai_get_actions
@@ -259,28 +269,28 @@ label monika_chatting():
 # Common label to receive messages from the chatbot and get the actions
 label monikai_get_actions:
     m 1rsc "[monikaNickname] is thinking...{nw}"
+
+    # If this is the first message, tell the server we're ready for the response.
     if step == 0:
         $ send_simple("ok_ready")
-    $ message_received = receiveMessage().split("/g")
-    $ print(message_received)
-    if len(message_received) < 2: #Only one word: server status
-        $ server_status = message_received[0]
-        if server_status == "server_error":
-            jump monika_server_crashed
-        $ new_smg = receiveMessage()
-        python:
-            try:
-                msg,emotion,action_to_take = new_smg.split("/g")
-            except:
-                print("Error: " + new_smg)
-                msg = new_smg
-                emotion = ""
-                action_to_take = ""
-        # $ msg,emotion,action_to_take = new_smg.split("/g")
-    else:
-        $ msg,emotion,action_to_take = message_received
+
+    # 1. Receive the message from the server.
+    $ message_received = receiveMessage()
+
+    # 2. Check for a server error message first.
+    if message_received == "server_error":
+        jump monika_server_crashed
+
+    # 3. Split the message into the main payload (msg) and the action.
+    $ message_parts = message_received.split("/g")
+    $ msg = message_parts[0]
+    # Provide a fallback for action_to_take if it's missing
+    $ action_to_take = message_parts[1] if len(message_parts) > 1 else "normal_chat"
+
+    # 4. Call the label that handles displaying the dialogue.
     call monika_is_talking
-    # m "You want me to [action_to_take]?" #for debug
+
+    # 5. Handle the action part of the message.
     if persistent._use_monikai_actions:
         if action_to_take == "compliment":
             call monikai_compliment
@@ -307,42 +317,50 @@ label monikai_get_actions:
     return
 
 
-# Common label for processing the text received from the server
 label monika_is_talking:
+    # Replace <USER> placeholder, same as before.
     $ player_nickname_ai = mas_get_player_nickname()
-    $ msg = msg.replace("<USER>",player_nickname_ai)
-    #Split the text into a list of words
-    $ sentences_list = []
-    $ sentences_list = msg.split("\n")
-    $ sentences_list = [x for x in sentences_list if x != '']
-    # Divide sentences with more than 180 characters into several sentences 
-    # (to avoid overflowing the screen)
-    python:
-        new_sentences_list = []
-        for sentence in sentences_list:
-            if len(sentence) > 180:
-                words = sentence.split(" ")
-                new_sentence = ""
-                for word in words:
-                    if len(new_sentence) + len(word) > 180:
-                        new_sentences_list.append(new_sentence)
-                        new_sentence = ""
-                    new_sentence += word + " "
-                new_sentences_list.append(new_sentence)
-            else:
-                new_sentences_list.append(sentence)
-        sentences_list = new_sentences_list
+    $ msg = msg.replace("<USER>", player_nickname_ai)
 
-    if sentences_list[0] == "server_ok":
-        $ sentences_list.pop(0)
-    while len(sentences_list) > 0:
-        $ sentence = sentences_list[0]
-        $ sentences_list.pop(0)
-        m 1esa "[sentence]"
-    if emotion != "":
-        m 1esa "I was feeling [emotion]."
-    if emotion in positive_emotions:
-        $ mas_gainAffection()
-    $ step += 1
-    $ localStep += 1
+    # Split the payload into a list of dialogues to show.
+    $ chunk_pairs = msg.split('&&&')
+
+    # Use a Ren'Py-level 'while' loop to iterate through the dialogues.
+    # This is the safest way to loop in old versions of Ren'Py.
+    while chunk_pairs:
+        python:
+            # Take the first dialogue chunk from the list for this iteration.
+            current_pair = chunk_pairs.pop(0)
+
+            # Split the chunk into the sentence and its emotion.
+            pair_parts = current_pair.split('|||')
+            store.current_sentence = pair_parts[0]
+
+            # Store the emotion, with "neutral" as a safe fallback.
+            if len(pair_parts) > 1:
+                store.current_emotion = pair_parts[1]
+            else:
+                store.current_emotion = "neutral"
+
+        # This is the "big elif tower" you know works, using the variables
+        # we prepared in the python block above. This is 100% safe.
+        if store.current_emotion == "joy":
+            m 4sub "[current_sentence]"
+        elif store.current_emotion == "sadness":
+            m 6dsc "[current_sentence]"
+        elif store.current_emotion == "anger":
+            m 4esd "[current_sentence]"
+        elif store.current_emotion == "surprise":
+            m 1esa "[current_sentence]"
+        elif store.current_emotion == "disgust":
+            m 4esd "[current_sentence]"
+        elif store.current_emotion == "fear":
+            m 2esc "[current_sentence]"
+        elif store.current_emotion == "neutral":
+            m 1esc "[current_sentence]"
+        else:
+            # Fallback to the default sprite if the emotion is somehow unknown.
+            m 1esa "[current_sentence]"
+
+    # After the loop finishes, return to the calling label.
     return
