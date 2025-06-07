@@ -8,9 +8,6 @@ import numpy as np
 import time
 import warnings
 
-warnings.filterwarnings("ignore", category=UserWarning)
-warnings.filterwarnings("ignore", category=FutureWarning)
-
 from playwright.sync_api import sync_playwright
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
@@ -18,50 +15,81 @@ from threading import Thread
 from scripts.login_screen import CONFIG
 from scripts.utils import HiddenPrints
 
-# Configuration variables
+# --- CONFIGURATION ---
+# Note: Ensure USE_EMOTIONS is added to your config in scripts/login_screen.py
 GAME_PATH = CONFIG["GAME_PATH"]
 WEBUI_PATH = CONFIG["WEBUI_PATH"]
-ST_PATH = CONFIG.get("ST_PATH", "")  # Add SillyTavern path
-BACKEND_TYPE = CONFIG.get("BACKEND_TYPE", "Text-gen-webui")  # Default to text-gen-webui for compatibility
+ST_PATH = CONFIG.get("ST_PATH", "")
+BACKEND_TYPE = CONFIG.get("BACKEND_TYPE", "Text-gen-webui")
 USE_TTS = CONFIG["USE_TTS"]
 LAUNCH_YOURSELF = CONFIG["LAUNCH_YOURSELF"]
 LAUNCH_YOURSELF_WEBUI = CONFIG["LAUNCH_YOURSELF_WEBUI"]
-LAUNCH_YOURSELF_ST = CONFIG.get("LAUNCH_YOURSELF_ST", False)  # Add SillyTavern launch flag
+LAUNCH_YOURSELF_ST = CONFIG.get("LAUNCH_YOURSELF_ST", False)
 USE_ACTIONS = CONFIG["USE_ACTIONS"]
+USE_EMOTIONS = CONFIG.get("USE_EMOTIONS", True) # Added emotion flag
 TTS_MODEL = CONFIG["TTS_MODEL"]
 USE_SPEECH_RECOGNITION = CONFIG["USE_SPEECH_RECOGNITION"]
 VOICE_SAMPLE_COQUI = CONFIG["VOICE_SAMPLE_COQUI"]
 VOICE_SAMPLE_TORTOISE = CONFIG["VOICE_SAMPLE_TORTOISE"]
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
 
-# Actions model
-if USE_ACTIONS:
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
+
+uni_chr_re = re.compile(r'\\u[0-9a-fA-F]{4}')
+
+# --- UNIFIED CLASSIFIER INITIALIZATION ---
+# Initialize the model only if actions or emotions are enabled.
+classifier = None
+if USE_ACTIONS or USE_EMOTIONS:
     try:
         from transformers import pipeline
-    except ModuleNotFoundError:
-        print("Please install transformers to use actions.")
+        print("Initializing action/emotion classifier: 'tasksource/deberta-small-long-nli'...")
+        # This single classifier will be used for both tasks.
+        classifier = pipeline(
+            "zero-shot-classification",
+            model="tasksource/deberta-small-long-nli",
+            device=device
+        )
+        print("Classifier initialized successfully.")
+    except Exception as e:
+        print(f"FATAL: Failed to initialize classifier model: {e}")
+        # Disable both features if the model fails to load.
         USE_ACTIONS = False
-    with open("actions.yml", "r") as f:
-        ACTIONS = yaml.safe_load(f)
+        USE_EMOTIONS = False
+        classifier = None
 
-    REVERT_ACTION_DICT = {}
-    for key in ACTIONS:
-        for action in ACTIONS[key]:
-            REVERT_ACTION_DICT[action] = key
-    ALL_ACTIONS = []
-    for key in ACTIONS:
-        ALL_ACTIONS += ACTIONS[key]
+# Initialize Action Classification if enabled
+if USE_ACTIONS and classifier:
+    print("Action classification is enabled.")
+    action_classifier = classifier
+    try:
+        with open("actions.yml", "r") as f:
+            ACTIONS = yaml.safe_load(f)
+        REVERT_ACTION_DICT = {action: key for key, action_list in ACTIONS.items() for action in action_list}
+        ALL_ACTIONS = list(REVERT_ACTION_DICT.keys())
+        print("Action configuration loaded.")
+    except Exception as e:
+        print(f"Failed to initialize action classifier: {e}")
+        USE_ACTIONS = False
+else:
+     print("Action classification is disabled.")
 
-    action_classifier = pipeline(
-        "zero-shot-classification",
-        model="sileod/deberta-v3-base-tasksource-nli",
-        device=device
-    )
+# Initialize Emotion Classification if enabled
+if USE_EMOTIONS and classifier:
+    emotion_classifier = classifier
+    EMOTION_LABELS = ["joy", "anger", "sadness", "surprise", "disgust", "fear", "neutral"]
+    print("Emotion classification is enabled.")
+else:
+    print("Emotion classification is disabled.")
 
-# TTS model
+
+# --- TTS MODEL INITIALIZATION ---
 with HiddenPrints():
     if USE_TTS:
+        print(f"Initializing TTS model: {TTS_MODEL}...")
         from scripts.play_tts import play_TTS, initialize_xtts
         if TTS_MODEL == "Your TTS":
             from scripts.tts_api import my_TTS
@@ -88,50 +116,63 @@ with HiddenPrints():
             voice_samples, conditioning_latents = load_voices([VOICE_SAMPLE_TORTOISE], ["tortoise_audios"])
             vfixer = VoiceFixer()
             sampling_rate = 24000
-        
+        print("TTS model initialized successfully")
     else:
         print("No TTS model selected")
 
 
-# Speech recognition model
+# --- SPEECH RECOGNITION MODEL INITIALIZATION ---
 if USE_SPEECH_RECOGNITION:
     try:
         import torch
-    except ModuleNotFoundError:
-        print("Please install torch to use speech recognition.")
-        USE_SPEECH_RECOGNITION = False
-    try:
         import speech_recognition as sr
-    except ModuleNotFoundError:
-        print("Please install SpeechRecognition to use speech recognition.")
-        USE_SPEECH_RECOGNITION = False
-    try:
         import whisper
-    except ModuleNotFoundError:
-        print("Please install whisper to use speech recognition.")
-        USE_SPEECH_RECOGNITION = False
-    try:
         import pyaudio
-    except ModuleNotFoundError:
-        print("Please install pyaudio to use speech recognition.")
+        print("Initializing speech recognition...")
+
+        english = True
+
+        def init_stt(model="base", english=True, energy=300, pause=0.8, dynamic_energy=False):
+            if model != "large" and english:
+                model = model + ".en"
+            audio_model = whisper.load_model(model)
+            r = sr.Recognizer()
+            r.energy_threshold = energy
+            r.pause_threshold = pause
+            r.dynamic_energy_threshold = dynamic_energy
+            return r, audio_model
+
+        r, audio_model = init_stt()
+        print("Speech recognition initialized successfully")
+    except Exception as e:
+        print(f"Failed to initialize speech recognition: {e}")
         USE_SPEECH_RECOGNITION = False
 
-    english = True
+# --- HELPER FUNCTIONS ---
+def split_text_like_renpy(text):
+    """
+    Splits text into chunks to simulate Ren'Py dialogue boxes.
+    This is essential for assigning emotions to the correct dialogue lines.
+    """
+    sentences_list = [s.strip() for s in text.split('\n') if s.strip()]
+    final_chunks = []
+    for sentence in sentences_list:
+        if len(sentence) > 180:
+            words = sentence.split(' ')
+            current_chunk = ""
+            for word in words:
+                if len(current_chunk) + len(word) + 1 > 180:
+                    final_chunks.append(current_chunk.strip())
+                    current_chunk = word + " "
+                else:
+                    current_chunk += word + " "
+            if current_chunk.strip():
+                final_chunks.append(current_chunk.strip())
+        else:
+            final_chunks.append(sentence)
+    return final_chunks
 
-    def init_stt(model="base", english=True, energy=300, pause=0.8, dynamic_energy=False):
-        if model != "large" and english:
-            model = model + ".en"
-        audio_model = whisper.load_model(model)
-        r = sr.Recognizer()
-        r.energy_threshold = energy
-        r.pause_threshold = pause
-        r.dynamic_energy_threshold = dynamic_energy
-        return r, audio_model
-
-    r, audio_model = init_stt()
-
-
-# Chatbot connection
+# --- BACKEND INTERACTION ---
 def launch_backend():
     global WEBUI_PATH
     global ST_PATH
@@ -148,7 +189,7 @@ def launch_backend():
         if not LAUNCH_YOURSELF_ST:
             subprocess.Popen(st_path_normalized)
         else:
-            print("Please launch SillyTavern manually. Make sure to have, in another ST instance, pressed the 'Auto-connect to Last Server' button in the API (plug) menu and 'Auto-load last chat' in the user parameters (man with cog) menu ")
+            print("Please launch SillyTavern manually.")
             print("Press enter to continue.")
             input()
 
@@ -163,8 +204,9 @@ def launch(context):
         page.wait_for_selector("[class='svelte-1f354aw pretty_scrollbar']", timeout=60000)
         time.sleep(1)
     else:  # SillyTavern
-        page.goto("http://127.0.0.1:8000")
-        page.wait_for_load_state("networkidle")
+        # The URL from your test script is used here.
+        page.goto("http://192.168.0.3:8001/") 
+        page.wait_for_load_state("networkidle", timeout=60000)
     
     print("Page loaded successfully")
     context.storage_state(path="storage.json")
@@ -185,29 +227,43 @@ def post_message(page, message):
         else:
             page.fill("#send_textarea", message)
         page.locator("#send_but").click()
-        page.wait_for_selector(".mes_stop", state="visible")
-        time.sleep(1) #small delay to be SURE the script won't see the generate button before it has had time to change state
+        try:
+            page.wait_for_selector(".mes_stop", state="visible", timeout=5000)
+        except Exception:
+            print("Warning: Stop button did not appear instantly.")
+
 
 def check_generation_complete(page):
+    """Check if message generation is complete in SillyTavern."""
     if BACKEND_TYPE == "Text-gen-webui":
         stop_buttons = page.locator('[id="stop"]').all()
         return not any(button.is_visible() for button in stop_buttons)
-    else:  # SillyTavern
+    else: # SillyTavern - updated logic from test script
         stop_button = page.locator(".mes_stop")
-        return not stop_button.is_visible()
+        if stop_button.is_visible():
+            return False
+        last_message = page.locator(".mes").last
+        if last_message.get_attribute("is_user") == "true":
+            return False
+        if last_message.locator(".mes_text p").count() > 0:
+            return True
+        return False
 
 def get_last_message(page):
+    """Get the last message from the chat, handling multiple paragraphs."""
     if BACKEND_TYPE == "Text-gen-webui":
         user = page.locator('[class="message-body"]').locator("nth=-1")
         return user.inner_html()
-    else:  # SillyTavern
-        paragraphs = page.locator(".mes.last_mes .mes_text p").all()
-        # Combine all paragraphs with /n between them. This avoids the code getting confused by multi-paragraphs answers... something I didn't encounter in my tests.
-        return "\n".join(p.inner_text() for p in paragraphs)
+    else:  # SillyTavern - updated logic from test script
+        try:
+            last_message = page.locator(".mes").last
+            paragraphs = last_message.locator(".mes_text p").all()
+            return "\n".join(p.inner_text() for p in paragraphs)
+        except Exception as e:
+            print(f"Error getting message from SillyTavern: {e}")
+            return ""
 
-
-# Main
-GAME_PATH = GAME_PATH.replace("\\", "/")
+# --- MAIN SERVER LOGIC ---
 clients = {}
 addresses = {}
 HOST = '127.0.0.1'
@@ -219,12 +275,9 @@ SERVER.bind(ADDRESS)
 queued = False
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-uni_chr_re = re.compile(r'\\u[0-9a-fA-F]{4}')
-
 # Launch the game
 if not LAUNCH_YOURSELF:
     subprocess.Popen(GAME_PATH+'/DDLC.exe')
-
 
 def listen():
     print("Waiting for connection...")
@@ -234,11 +287,9 @@ def listen():
         addresses[client] = client_address
         Thread(target=call, args=(client,)).start()
 
-
 def call(client):
     thread = Thread(target=listenToClient, args=(client,), daemon=True)
     thread.start()
-
 
 def sendMessage(msg, name=""):
     """ send message to all users present in
@@ -246,21 +297,23 @@ def sendMessage(msg, name=""):
     for client in clients:
         client.send(bytes(name, "utf8") + msg)
 
-
-def send_answer(received_msg, msg):
-    if received_msg != "" and USE_ACTIONS:
+def send_answer(received_msg, processed_message):
+    """
+    Processes actions and sends the final payload to the game.
+    The processed_message contains either the raw text or the text with emotion tags.
+    """
+    if received_msg != "" and USE_ACTIONS and action_classifier:
         sequence_to_classify = f"The player is speaking with Monika, his virtual \
             girlfriend. Now he says: {received_msg}. What is the label of this sentence?"
-        action_to_take = action_classifier(sequence_to_classify, ALL_ACTIONS)
-        action_to_take = action_to_take["labels"][0]
+        result = action_classifier(sequence_to_classify, candidate_labels=ALL_ACTIONS)
+        action_to_take = result["labels"][0]
         print("Action: " + action_to_take)
         action_to_take = REVERT_ACTION_DICT[action_to_take]
     else:
         action_to_take = "none"
-    action_to_take = action_to_take.encode("utf-8")
-    emotion = "".encode("utf-8")
-    msg = msg.encode("utf-8")
-    msg_to_send = msg + b"/g" + emotion + b"/g" + action_to_take
+
+    # The format is: message_with_emotions/gaction_name
+    msg_to_send = processed_message.encode("utf-8") + b"/g" + action_to_take.encode("utf-8")
     sendMessage(msg_to_send)
 
 
@@ -290,18 +343,17 @@ def listenToClient(client):
                 if USE_SPEECH_RECOGNITION:
                     with sr.Microphone(sample_rate=16000) as source:
                         sendMessage("yes".encode("utf-8"))
+                        print("Listening... Speak now!")
                         audio = r.listen(source)
+                        print("Processing speech...")
                         torch_audio = torch.from_numpy(
                             np.frombuffer(
                                 audio.get_raw_data(),
                                 np.int16
                             ).flatten().astype(np.float32) / 32768.0)
-                        audio_data = torch_audio
-                        if english:
-                            result = audio_model.transcribe(audio_data, language='english')
-                        else:
-                            result = audio_model.transcribe(audio_data)
-                        received_msg = result['text']
+                        
+                        result = audio_model.transcribe(torch_audio, language='english')
+                        received_msg = result['text'].strip()
                 else:
                     sendMessage("no".encode("utf-8"))
                     continue
@@ -313,8 +365,8 @@ def listenToClient(client):
                     browser = pw.firefox.launch(headless=False)
                     context = browser.new_context()
                     page = launch(context)
-                except:
-                    print(f"Launch failed. Please check if {BACKEND_TYPE} is running.")
+                except Exception as e:
+                    print(f"Launch failed. Please check if {BACKEND_TYPE} is running. Error: {e}")
                     _ = client.recv(BUFSIZE).decode("utf-8")
                     sendMessage("server_error".encode("utf-8"))
                     launched = False
@@ -332,26 +384,57 @@ def listenToClient(client):
                 launched = False
                 pw.stop()
                 continue
+            
             while True:
+                time.sleep(0.2) # Small delay to prevent busy-waiting
                 try:
                     if check_generation_complete(page):
-                        text = get_last_message(page)
-                        if len(text) > 0:
-                            msg = text
-                            msg = re.sub(r'<[^>]+>', '', msg)
-                            msg = msg.replace('\n', '')
-                            msg = os.linesep.join([s for s in msg.splitlines() if s])
-                            msg = re.sub(' +', ' ', msg)
-                            msg = re.sub(r'&[^;]+;', '', msg)
-                            msg = msg.replace("END", "")
-                        else:
+                        # --- RESPONSE PROCESSING ---
+                        response_text = get_last_message(page)
+                        if not response_text:
+                            print("Could not retrieve a valid response.")
                             continue
+
+                        # Clean up the raw text
+                        response_text = re.sub(r'<[^>]+>', '', response_text)
+                        response_text = os.linesep.join([s for s in response_text.splitlines() if s])
+                        response_text = re.sub(' +', ' ', response_text)
+                        response_text = re.sub(r'&[^;]+;', '', response_text)
+                        response_text = response_text.replace("END", "")
+                        
+                        print("-" * 50)
+                        print(f"Raw Response Received:\n{response_text}")
+                        print("-" * 50)
+
+                        processed_message_for_game = response_text # Default to raw text
+
+                        # --- Process Emotions to create the game payload ---
+                        if USE_EMOTIONS and classifier:
+                            message_chunks = split_text_like_renpy(response_text)
+                            analyzed_chunks = []
+                            for chunk in message_chunks:
+                                if not chunk.strip(): continue
+                                classification = emotion_classifier(chunk, candidate_labels=EMOTION_LABELS)
+                                detected_emotion = classification["labels"][0]
+                                analyzed_chunks.append(f"{chunk}|||{detected_emotion}")
+
+                            # This is the final string that will be sent to the game
+                            final_payload = "&&&".join(analyzed_chunks)
+                            processed_message_for_game = final_payload
+                            
+                            print("\n--- FINAL GAME PAYLOAD (EMOTIONS) ---")
+                            print(final_payload)
+                            print("-------------------------------------\n")
+                        else:
+                             print("\n--- Emotion processing disabled. Skipping payload generation. ---\n")
+
                         if received_msg != "QUIT":
+                            # --- TTS (uses the clean, raw text) ---
                             if USE_TTS:
-                                print("Using TTS")
+                                print("--- Sending to TTS ---")
                                 play_obj = play_TTS(
                                     step,
-                                    msg,
+                                    response_text,
                                     play_obj,
                                     sampling_rate,
                                     tts_model,
@@ -360,11 +443,15 @@ def listenToClient(client):
                                     TTS_MODEL,
                                     VOICE_SAMPLE_COQUI,
                                     uni_chr_re)
-                            print("Sent: " + msg)
-                            send_answer(received_msg, msg)
+                            
+                            # --- Send final payload to game ---
+                            print("Sent: " + processed_message_for_game)
+                            send_answer(received_msg, processed_message_for_game)
                         break
                 except Exception as e:
-                    print("Error checking generation status:", e)
+                    print(f"Error checking generation status or processing response: {e}")
+                    import traceback
+                    traceback.print_exc()
                     launched = False
                     pw.stop()
                     break
