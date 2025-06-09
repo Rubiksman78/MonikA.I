@@ -16,7 +16,6 @@ from scripts.login_screen import CONFIG
 from scripts.utils import HiddenPrints
 
 # --- CONFIGURATION ---
-# Note: Ensure USE_EMOTIONS is added to your config in scripts/login_screen.py
 GAME_PATH = CONFIG["GAME_PATH"]
 WEBUI_PATH = CONFIG["WEBUI_PATH"]
 ST_PATH = CONFIG.get("ST_PATH", "")
@@ -41,7 +40,6 @@ print(f"Using device: {device}")
 uni_chr_re = re.compile(r'\\u[0-9a-fA-F]{4}')
 
 # --- UNIFIED CLASSIFIER INITIALIZATION ---
-# Initialize the model only if actions or emotions are enabled.
 classifier = None
 if USE_ACTIONS or USE_EMOTIONS:
     try:
@@ -53,9 +51,10 @@ if USE_ACTIONS or USE_EMOTIONS:
             model="tasksource/deberta-small-long-nli",
             device=device
         )
-        print("Classifier initialized successfully.")
+        #print("Classifier initialized successfully.")
     except Exception as e:
         print(f"FATAL: Failed to initialize classifier model: {e}")
+        print(f"Actions and emotions disabled.")
         # Disable both features if the model fails to load.
         USE_ACTIONS = False
         USE_EMOTIONS = False
@@ -63,14 +62,14 @@ if USE_ACTIONS or USE_EMOTIONS:
 
 # Initialize Action Classification if enabled
 if USE_ACTIONS and classifier:
-    print("Action classification is enabled.")
+    #print("Action classification is enabled.")
     action_classifier = classifier
     try:
         with open("actions.yml", "r") as f:
             ACTIONS = yaml.safe_load(f)
         REVERT_ACTION_DICT = {action: key for key, action_list in ACTIONS.items() for action in action_list}
         ALL_ACTIONS = list(REVERT_ACTION_DICT.keys())
-        print("Action configuration loaded.")
+        print("Action configuration is enabled.")
     except Exception as e:
         print(f"Failed to initialize action classifier: {e}")
         USE_ACTIONS = False
@@ -152,7 +151,7 @@ if USE_SPEECH_RECOGNITION:
 def split_text_like_renpy(text):
     """
     Splits text into chunks to simulate Ren'Py dialogue boxes.
-    This is essential for assigning emotions to the correct dialogue lines.
+    We do this here to assign one emotion per dialogue box. Couldn't be done with Ren'py-side processing.
     """
     sentences_list = [s.strip() for s in text.split('\n') if s.strip()]
     final_chunks = []
@@ -182,6 +181,7 @@ def launch_backend():
             subprocess.Popen(WEBUI_PATH)
         else:
             print("Please launch text-generation_webui manually.")
+            print("Don't forget to have a model loaded and be on the right character card")
             print("Press enter to continue.")
             input()
     else:  # SillyTavern
@@ -189,7 +189,8 @@ def launch_backend():
         if not LAUNCH_YOURSELF_ST:
             subprocess.Popen(st_path_normalized)
         else:
-            print("Please launch SillyTavern manually.")
+            print("Please launch SillyTavern manually.") 
+            print("Make sure to have, in another ST instance, pressed the 'Auto-connect to Last Server' button in the API (plug) menu and 'Auto-load last chat' in the user parameters (man with cog) menu")
             print("Press enter to continue.")
             input()
 
@@ -199,13 +200,12 @@ def launch(context):
     print("Launching new browser page...")
     page = context.new_page()
     
-    if BACKEND_TYPE == "Text-gen-webui":
+    if BACKEND_TYPE == "Text-gen-webui": #Change your TGW url here if you have a non-default one
         page.goto("http://127.0.0.1:7860")
         page.wait_for_selector("[class='svelte-1f354aw pretty_scrollbar']", timeout=60000)
         time.sleep(1)
-    else:  # SillyTavern
-        # The URL from your test script is used here.
-        page.goto("http://192.168.0.3:8001/") 
+    else:  # SillyTavern, change your URL here if you have a non-default one
+        page.goto("http://127.0.0.1:8000") 
         page.wait_for_load_state("networkidle", timeout=60000)
     
     print("Page loaded successfully")
@@ -238,7 +238,7 @@ def check_generation_complete(page):
     if BACKEND_TYPE == "Text-gen-webui":
         stop_buttons = page.locator('[id="stop"]').all()
         return not any(button.is_visible() for button in stop_buttons)
-    else: # SillyTavern - updated logic from test script
+    else: # SillyTavern - should do the same, slightly more robust I think. It's what the test script does and it works.
         stop_button = page.locator(".mes_stop")
         if stop_button.is_visible():
             return False
@@ -254,10 +254,9 @@ def get_last_message(page):
     if BACKEND_TYPE == "Text-gen-webui":
         user = page.locator('[class="message-body"]').locator("nth=-1")
         return user.inner_html()
-    else:  # SillyTavern - updated logic from test script
+    else:  # SillyTavern. try-except for error tracking purposes.
         try:
-            last_message = page.locator(".mes").last
-            paragraphs = last_message.locator(".mes_text p").all()
+            paragraphs = page.locator(".mes.last_mes .mes_text p").all()
             return "\n".join(p.inner_text() for p in paragraphs)
         except Exception as e:
             print(f"Error getting message from SillyTavern: {e}")
@@ -268,7 +267,7 @@ clients = {}
 addresses = {}
 HOST = '127.0.0.1'
 PORT = 12346
-BUFSIZE = 1024
+BUFSIZE = 8096
 ADDRESS = (HOST, PORT)
 SERVER = socket(AF_INET, SOCK_STREAM)
 SERVER.bind(ADDRESS)
@@ -395,7 +394,8 @@ def listenToClient(client):
                             print("Could not retrieve a valid response.")
                             continue
 
-                        # Clean up the raw text
+                        # We process text for ren'py here now to add our emotional tags. One per dialogue box.
+                        #This is the "raw text" that is sent for TTS and shown, as it's readable.
                         response_text = re.sub(r'<[^>]+>', '', response_text)
                         response_text = os.linesep.join([s for s in response_text.splitlines() if s])
                         response_text = re.sub(' +', ' ', response_text)
@@ -403,10 +403,10 @@ def listenToClient(client):
                         response_text = response_text.replace("END", "")
                         
                         print("-" * 50)
-                        print(f"Raw Response Received:\n{response_text}")
+                        print(f"Response Received:\n{response_text}") #Remove?
                         print("-" * 50)
 
-                        processed_message_for_game = response_text # Default to raw text
+                        processed_message_for_game = response_text
 
                         # --- Process Emotions to create the game payload ---
                         if USE_EMOTIONS and classifier:
@@ -418,20 +418,20 @@ def listenToClient(client):
                                 detected_emotion = classification["labels"][0]
                                 analyzed_chunks.append(f"{chunk}|||{detected_emotion}")
 
-                            # This is the final string that will be sent to the game
+                            # This is the final string that will be sent to the game. It has emotional tags every 180 characters max.
                             final_payload = "&&&".join(analyzed_chunks)
                             processed_message_for_game = final_payload
                             
-                            print("\n--- FINAL GAME PAYLOAD (EMOTIONS) ---")
-                            print(final_payload)
-                            print("-------------------------------------\n")
-                        else:
-                             print("\n--- Emotion processing disabled. Skipping payload generation. ---\n")
+                            #print("\n--- FINAL GAME PAYLOAD (EMOTIONS) ---")
+                            #print(final_payload)
+                            #print("-------------------------------------\n")
+                        #else:
+                             #print("\n--- Emotion processing disabled. Skipping payload generation. ---\n")
 
                         if received_msg != "QUIT":
-                            # --- TTS (uses the clean, raw text) ---
+                            # --- TTS (uses the clean text) ---
                             if USE_TTS:
-                                print("--- Sending to TTS ---")
+                                print("--- TTS is processing... ---")
                                 play_obj = play_TTS(
                                     step,
                                     response_text,
@@ -445,7 +445,7 @@ def listenToClient(client):
                                     uni_chr_re)
                             
                             # --- Send final payload to game ---
-                            print("Sent: " + processed_message_for_game)
+                            #print("Sent: " + processed_message_for_game)
                             send_answer(received_msg, processed_message_for_game)
                         break
                 except Exception as e:
