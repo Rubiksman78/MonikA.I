@@ -79,7 +79,32 @@ else:
 # Initialize Emotion Classification if enabled
 if USE_EMOTIONS and classifier:
     emotion_classifier = classifier
-    EMOTION_LABELS = ["joy", "anger", "sadness", "surprise", "disgust", "fear", "neutral", "extreme_sadness", "smug"]
+    EMOTION_LABELS = [
+    "triumphant",
+    "smug",
+    "teasing",
+    "outraged",
+    "annoyed",
+    "pouty",
+    "ecstatic",
+    "pleased",
+    "passionate",
+    "flirtatious",
+    "affectionate",
+    "revolted",
+    "disgusted",
+    "displeased",
+    "terrified",
+    "afraid",
+    "anxious",
+    "devastated",
+    "saddened",
+    "disappointed",
+    "shocked",
+    "surprised",
+    "startled",
+    "neutral"
+    ]
     print("Emotion classification is enabled.")
 else:
     print("Emotion classification is disabled.")
