@@ -1,16 +1,33 @@
 define emotion_list = [
-    "anger",
-    "disgust",
-    "fear",
-    "joy",
-    "sadness",
-    "surprise",
+    "triumphant",
+    "smug",
+    "teasing",
+    "outraged",
+    "annoyed",
+    "pouty",
+    "ecstatic",
+    "pleased",
+    "passionate",
+    "flirtatious",
+    "affectionate",
+    "revolted",
+    "disgusted",
+    "displeased",
+    "terrified",
+    "afraid",
+    "anxious",
+    "devastated",
+    "saddened",
+    "disappointed",
+    "shocked",
+    "surprised",
+    "startled",
     "neutral"
 ]
 
-define negative_emotions = ["anger", "disgust", "fear", "sadness"]
-define positive_emotions = ["joy", "surprise"]
-define neutral_emotions = ["neutral"]
+define negative_emotions = ["outraged", "annoyed", "revolted", "disgusted", "displeased", "terrified", "afraid", "anxious", "devastated", "saddened", "disappointed"]
+define positive_emotions = ["triumphant", "smug", "teasing", "passionate", "flirtatious", "affectionate", "shocked", "surprised", "startled"]
+define neutral_emotions = ["neutral", "pouty"]
 
 # Main chatting functions
 init 5 python:
@@ -22,15 +39,15 @@ init 5 python:
 
     # NEW: Dictionary to map emotions from the AI to MAS sprite codes.
     # The keys MUST match the EMOTION_LABELS from main.py
-    emotion_sprite_map = {
-        "joy": "4sub",          # User specified sprite code
-        "sadness": "6dsc",        # User specified sprite code
-        "anger": "4esd",        # Default from plan
-        "surprise": "1esa",       # Default from plan
-        "disgust": "4esd",       # Default from plan
-        "fear": "2esc",         # Default from plan
-        "neutral": "1esc"        # Default from plan
-    }
+    #emotion_sprite_map = {
+    #    "joy": "4sub",          # User specified sprite code
+    #    "sadness": "6dsc",        # User specified sprite code
+    #    "anger": "4esd",        # Default from plan
+    #    "surprise": "1esa",       # Default from plan
+    #    "disgust": "4esd",       # Default from plan
+    #    "fear": "2esc",         # Default from plan
+    #    "neutral": "1esc"        # Default from plan
+    #}
     # A default sprite to use if an unknown emotion is received
     default_sprite = "1esa"
 
@@ -344,18 +361,52 @@ label monika_is_talking:
 
         # This is the "big elif tower" you know works, using the variables
         # we prepared in the python block above. This is 100% safe.
-        if store.current_emotion == "joy":
-            m 4sub "[current_sentence]"
-        elif store.current_emotion == "sadness":
-            m 6dsc "[current_sentence]"
-        elif store.current_emotion == "anger":
-            m 4esd "[current_sentence]"
-        elif store.current_emotion == "surprise":
-            m 1esa "[current_sentence]"
-        elif store.current_emotion == "disgust":
-            m 4esd "[current_sentence]"
-        elif store.current_emotion == "fear":
-            m 2esc "[current_sentence]"
+        if store.current_emotion == "triumphant":
+            m 7tfu "[current_sentence]"
+        elif store.current_emotion == "smug":
+            m 6sfu "[current_sentence]"
+        elif store.current_emotion == "teasing":
+            m 4ksa "[current_sentence]"
+        elif store.current_emotion == "outraged":
+            m 4wfbsw "[current_sentence]"
+        elif store.current_emotion == "annoyed":
+            m 2efx "[current_sentence]"
+        elif store.current_emotion == "pouty":
+            m 1gssdrp "[current_sentence]"
+        elif store.current_emotion == "ecstatic":
+            m 4sublb "[current_sentence]"
+        elif store.current_emotion == "pleased":
+            m 5hua "[current_sentence]"
+        elif store.current_emotion == "passionate":
+            m 5msbfb "[current_sentence]"
+        elif store.current_emotion == "flirtatious":
+            m 6fubsa "[current_sentence]"
+        elif store.current_emotion == "affectionate":
+            m 6hsb "[current_sentence]"
+        elif store.current_emotion == "revolted":
+            m 2wksdrx "[current_sentence]"
+        elif store.current_emotion == "disgusted":
+            m 2fksdra "[current_sentence]"
+        elif store.current_emotion == "displeased":
+            m 2tusdrt "[current_sentence]"
+        elif store.current_emotion == "terrified":
+            m 6cktpd "[current_sentence]"
+        elif store.current_emotion == "afraid":
+            m 6wksdrc "[current_sentence]"
+        elif store.current_emotion == "anxious":
+            m 6eusdrd "[current_sentence]"
+        elif store.current_emotion == "devastated":
+            m 6dktsc "[current_sentence]"
+        elif store.current_emotion == "saddened":
+            m 5ektdc "[current_sentence]"
+        elif store.current_emotion == "disappointed":
+            m 1eku "[current_sentence]"
+        elif store.current_emotion == "shocked":
+            m 4wuo "[current_sentence]"
+        elif store.current_emotion == "surprised":
+            m 3wud "[current_sentence]"
+        elif store.current_emotion == "startled":
+            m 3etu "[current_sentence]"
         elif store.current_emotion == "neutral":
             m 1esc "[current_sentence]"
         else:
