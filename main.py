@@ -241,7 +241,7 @@ def launch(context):
         time.sleep(1)
     else:  # SillyTavern
         # The URL from your test script is used here.
-        page.goto("http://192.168.0.3:8000/") 
+        page.goto("http://127.0.0.1:8000/") 
         page.wait_for_load_state("networkidle", timeout=60000)
     
     if DEBUG: print("[DEBUG] Page loaded successfully")
