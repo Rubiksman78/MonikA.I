@@ -16,6 +16,9 @@ from scripts.login_screen import CONFIG
 from scripts.utils import HiddenPrints
 
 # --- CONFIGURATION ---
+#Debug mode
+DEBUG = False
+#File config
 GAME_PATH = CONFIG["GAME_PATH"]
 WEBUI_PATH = CONFIG["WEBUI_PATH"]
 ST_PATH = CONFIG.get("ST_PATH", "")
@@ -40,6 +43,7 @@ print(f"Using device: {device}")
 uni_chr_re = re.compile(r'\\u[0-9a-fA-F]{4}')
 
 # --- UNIFIED CLASSIFIER INITIALIZATION ---
+# Initialize the model only if actions or emotions are enabled.
 classifier = None
 if USE_ACTIONS or USE_EMOTIONS:
     try:
@@ -51,10 +55,9 @@ if USE_ACTIONS or USE_EMOTIONS:
             model="tasksource/deberta-small-long-nli",
             device=device
         )
-        #print("Classifier initialized successfully.")
+        print("Classifier initialized successfully.")
     except Exception as e:
         print(f"FATAL: Failed to initialize classifier model: {e}")
-        print(f"Actions and emotions disabled.")
         # Disable both features if the model fails to load.
         USE_ACTIONS = False
         USE_EMOTIONS = False
@@ -62,14 +65,14 @@ if USE_ACTIONS or USE_EMOTIONS:
 
 # Initialize Action Classification if enabled
 if USE_ACTIONS and classifier:
-    #print("Action classification is enabled.")
+    print("Action classification is enabled.")
     action_classifier = classifier
     try:
         with open("actions.yml", "r") as f:
             ACTIONS = yaml.safe_load(f)
         REVERT_ACTION_DICT = {action: key for key, action_list in ACTIONS.items() for action in action_list}
         ALL_ACTIONS = list(REVERT_ACTION_DICT.keys())
-        print("Action configuration is enabled.")
+        print("Action configuration loaded.")
     except Exception as e:
         print(f"Failed to initialize action classifier: {e}")
         USE_ACTIONS = False
@@ -87,7 +90,7 @@ if USE_EMOTIONS and classifier:
     "annoyed",
     "pouty",
     "ecstatic",
-    "pleased",
+    "happy",
     "passionate",
     "flirtatious",
     "affectionate",
@@ -176,24 +179,33 @@ if USE_SPEECH_RECOGNITION:
 def split_text_like_renpy(text):
     """
     Splits text into chunks to simulate Ren'Py dialogue boxes.
-    We do this here to assign one emotion per dialogue box. Couldn't be done with Ren'py-side processing.
+    Each sentence gets its own dialogue box. If a sentence is too long, split it
     """
-    sentences_list = [s.strip() for s in text.split('\n') if s.strip()]
     final_chunks = []
-    for sentence in sentences_list:
-        if len(sentence) > 180:
-            words = sentence.split(' ')
-            current_chunk = ""
-            for word in words:
-                if len(current_chunk) + len(word) + 1 > 180:
-                    final_chunks.append(current_chunk.strip())
-                    current_chunk = word + " "
-                else:
-                    current_chunk += word + " "
-            if current_chunk.strip():
-                final_chunks.append(current_chunk.strip())
-        else:
-            final_chunks.append(sentence)
+    paragraphs = [p.strip() for p in text.split('\n') if p.strip()]
+    for paragraph in paragraphs:
+        sentences = re.split(r'(?<=[.!?])\s+', paragraph)
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if not sentence:
+                continue
+            if len(sentence) <= 180:
+                final_chunks.append(sentence)
+            else:
+                #Sentence too long, split it.
+                words = sentence.split(' ')
+                temp_chunk = ""
+                for word in words:
+                    if len(temp_chunk) + len(word) + 1 > 180:
+                        final_chunks.append(temp_chunk.strip())
+                        temp_chunk = word
+                    else:
+                        if temp_chunk:
+                            temp_chunk += " " + word
+                        else:
+                            temp_chunk = word
+                if temp_chunk.strip():
+                    final_chunks.append(temp_chunk.strip())
     return final_chunks
 
 # --- BACKEND INTERACTION ---
@@ -206,7 +218,6 @@ def launch_backend():
             subprocess.Popen(WEBUI_PATH)
         else:
             print("Please launch text-generation_webui manually.")
-            print("Don't forget to have a model loaded and be on the right character card")
             print("Press enter to continue.")
             input()
     else:  # SillyTavern
@@ -214,26 +225,26 @@ def launch_backend():
         if not LAUNCH_YOURSELF_ST:
             subprocess.Popen(st_path_normalized)
         else:
-            print("Please launch SillyTavern manually.") 
-            print("Make sure to have, in another ST instance, pressed the 'Auto-connect to Last Server' button in the API (plug) menu and 'Auto-load last chat' in the user parameters (man with cog) menu")
+            print("Please launch SillyTavern manually.")
             print("Press enter to continue.")
             input()
 
 launch_backend()
 
 def launch(context):
-    print("Launching new browser page...")
+    if DEBUG: print("[DEBUG] Launching new browser page...")
     page = context.new_page()
     
-    if BACKEND_TYPE == "Text-gen-webui": #Change your TGW url here if you have a non-default one
+    if BACKEND_TYPE == "Text-gen-webui":
         page.goto("http://127.0.0.1:7860")
         page.wait_for_selector("[class='svelte-1f354aw pretty_scrollbar']", timeout=60000)
         time.sleep(1)
-    else:  # SillyTavern, change your URL here if you have a non-default one
-        page.goto("http://127.0.0.1:8000") 
+    else:  # SillyTavern
+        # The URL from your test script is used here.
+        page.goto("http://192.168.0.3:8000/") 
         page.wait_for_load_state("networkidle", timeout=60000)
     
-    print("Page loaded successfully")
+    if DEBUG: print("[DEBUG] Page loaded successfully")
     context.storage_state(path="storage.json")
     return page
 
@@ -263,7 +274,7 @@ def check_generation_complete(page):
     if BACKEND_TYPE == "Text-gen-webui":
         stop_buttons = page.locator('[id="stop"]').all()
         return not any(button.is_visible() for button in stop_buttons)
-    else: # SillyTavern - should do the same, slightly more robust I think. It's what the test script does and it works.
+    else: # SillyTavern - updated logic from test script
         stop_button = page.locator(".mes_stop")
         if stop_button.is_visible():
             return False
@@ -279,9 +290,10 @@ def get_last_message(page):
     if BACKEND_TYPE == "Text-gen-webui":
         user = page.locator('[class="message-body"]').locator("nth=-1")
         return user.inner_html()
-    else:  # SillyTavern. try-except for error tracking purposes.
+    else:  # SillyTavern - updated logic from test script
         try:
-            paragraphs = page.locator(".mes.last_mes .mes_text p").all()
+            last_message = page.locator(".mes").last
+            paragraphs = last_message.locator(".mes_text p").all()
             return "\n".join(p.inner_text() for p in paragraphs)
         except Exception as e:
             print(f"Error getting message from SillyTavern: {e}")
@@ -292,7 +304,7 @@ clients = {}
 addresses = {}
 HOST = '127.0.0.1'
 PORT = 12346
-BUFSIZE = 8096
+BUFSIZE = 1024
 ADDRESS = (HOST, PORT)
 SERVER = socket(AF_INET, SOCK_STREAM)
 SERVER.bind(ADDRESS)
@@ -343,31 +355,64 @@ def send_answer(received_msg, processed_message):
 
 def listenToClient(client):
     """ Get client username """
+    if DEBUG: print("[DEBUG] New listener thread started for a client.")
     name = "User"
     clients[client] = name
     launched = False
     play_obj = None
+
     while True:
+        if DEBUG: print("\n[DEBUG] --- Top of main loop. Waiting for new message from client. ---")
         try:
-            received_msg = client.recv(BUFSIZE).decode("utf-8")
-        except:
-            print("Connection lost.")
+            raw_data = client.recv(BUFSIZE).decode("utf-8")
+            if DEBUG: print(f"[DEBUG] Raw data received from client: \"{raw_data}\"")
+        except Exception as e:
+            if DEBUG: print(f"[DEBUG] Connection lost. Error: {e}")
             os._exit(0)
-        received_msg = received_msg.split("/m")
-        rest_msg = received_msg[1]
-        received_msg = received_msg[0]
+
+        # Splitting the initial "chatbot/m" identifier
+        message_parts = raw_data.split("/m", 1)
+        received_msg = message_parts[0]
+        rest_msg = message_parts[1] if len(message_parts) > 1 else ""
+        if DEBUG: print(f"[DEBUG] After splitting '/m': received_msg is \"{received_msg}\", rest_msg is \"{rest_msg}\"")
+
+
         if received_msg == "chatbot":
-            if '/g' in rest_msg:
-                received_msg, step = rest_msg.split("/g")
-            else:
-                received_msg = client.recv(BUFSIZE).decode("utf-8")
-                received_msg, step = received_msg.split("/g")
-            step = int(step)
-            if received_msg == "begin_record":
+            if DEBUG: print("[DEBUG] 'chatbot' identifier found. Entering chatbot logic.")
+            main_message_body = rest_msg
+            
+            # This loop ensures we get the part of the message with the user input
+            if DEBUG: print("[DEBUG] Entering loop to find the main message containing '/g'.")
+            while "/g" not in main_message_body:
+                if DEBUG: print(f"[DEBUG] Current message part \"{main_message_body}\" does not contain '/g'. Waiting for next part.")
+                try:
+                    main_message_body = client.recv(BUFSIZE).decode("utf-8")
+                    if DEBUG: print(f"[DEBUG] Received next message part: \"{main_message_body}\"")
+                except Exception as e:
+                    if DEBUG: print(f"[DEBUG] Connection lost while waiting for '/g' part. Error: {e}")
+                    os._exit(0)
+            
+            if DEBUG: print("[DEBUG] Found message part with '/g'. Exiting loop.")
+
+            # Splitting the user message from the step count
+            user_input, step_str = main_message_body.split("/g", 1)
+            if DEBUG: print(f"[DEBUG] After splitting '/g': user_input is \"{user_input}\", step_str is \"{step_str}\"")
+
+            # Safely extracting the step number
+            numeric_step = "".join(filter(str.isdigit, step_str))
+            if DEBUG: print(f"[DEBUG] Extracted numeric digits for step: \"{numeric_step}\"")
+            
+            step = int(numeric_step) if numeric_step else 0
+            if DEBUG: print(f"[DEBUG] Final step value is: {step}")
+
+            # --- SPEECH-TO-TEXT (STT) LOGIC ---
+            if user_input == "begin_record":
+                if DEBUG: print("[DEBUG] 'begin_record' command received. Initializing STT.")
                 if USE_SPEECH_RECOGNITION:
                     with sr.Microphone(sample_rate=16000) as source:
+                        if DEBUG: print("[DEBUG] Sending 'yes' to client to confirm microphone is ready.")
                         sendMessage("yes".encode("utf-8"))
-                        print("Listening... Speak now!")
+                        if DEBUG: print("[DEBUG] Listening for speech...")
                         audio = r.listen(source)
                         print("Processing speech...")
                         torch_audio = torch.from_numpy(
@@ -377,64 +422,84 @@ def listenToClient(client):
                             ).flatten().astype(np.float32) / 32768.0)
                         
                         result = audio_model.transcribe(torch_audio, language='english')
-                        received_msg = result['text'].strip()
+                        user_input = result['text'].strip()
                 else:
+                    if DEBUG: print("[DEBUG] STT is disabled in config. Sending 'no' to client.")
                     sendMessage("no".encode("utf-8"))
-                    continue
-            print("User: "+received_msg)
-
+                    continue # Skip this turn if STT is disabled but was requested
+            print("User: "+user_input)
+            
+            # This part handles the initial browser launch if needed
             if not launched:
+                if DEBUG: print("[DEBUG] Browser not launched yet. Attempting to launch.")
                 pw = sync_playwright().start()
                 try:
                     browser = pw.firefox.launch(headless=False)
                     context = browser.new_context()
                     page = launch(context)
                 except Exception as e:
-                    print(f"Launch failed. Please check if {BACKEND_TYPE} is running. Error: {e}")
-                    _ = client.recv(BUFSIZE).decode("utf-8")
+                    print(f"FATAL: Browser launch failed. Error: {e}")
                     sendMessage("server_error".encode("utf-8"))
                     launched = False
                     pw.stop()
                     continue
                 launched = True
-                _ = client.recv(BUFSIZE).decode("utf-8")
-                sendMessage("server_ok".encode("utf-8"))
+                if DEBUG: print("[DEBUG] Browser launched successfully.")
+                
+                # This block now safely absorbs the optional 'ok_ready' without freezing.
+                print("[DEBUG] Setting socket to non-blocking to safely absorb optional pings")
+                client.setblocking(False)
+                try:
+                    client.recv(BUFSIZE)
+                    if DEBUG: print("[DEBUG] Absorbed an optional message.")
+                except BlockingIOError:
+                    if DEBUG: print("[DEBUG] No optional message was waiting to be absorbed. Continuing normally.")
+                    pass
+                except Exception as e:
+                    if DEBUG: print(f"[DEBUG] An unexpected error occurred while absorbing message: {e}")
+                    pass
+                if DEBUG: print("[DEBUG] Setting socket back to blocking mode for normal operation.")
+                client.setblocking(True) # IMPORTANT: Return to blocking mode
+
+            # Sending the message to the AI frontend
             try:
-                post_message(page, received_msg)
+                if DEBUG: print(f"Sending to AI: \"{user_input}\"")
+                post_message(page, user_input)
             except Exception as e:
-                print(f"Error while sending message. Please check if {BACKEND_TYPE} is running: {str(e)}")
-                _ = client.recv(BUFSIZE).decode("utf-8")
+                if DEBUG: print(f"[DEBUG] FATAL: Error while sending message to AI. Error: {e}")
                 sendMessage("server_error".encode("utf-8"))
                 launched = False
                 pw.stop()
                 continue
             
+            # Waiting for the AI to finish generating a response
+            if DEBUG: print("[DEBUG] Waiting for AI response generation to complete...")
             while True:
-                time.sleep(0.2) # Small delay to prevent busy-waiting
+                time.sleep(0.2)
                 try:
                     if check_generation_complete(page):
+                        if DEBUG: print("[DEBUG] AI generation is complete.")
                         # --- RESPONSE PROCESSING ---
                         response_text = get_last_message(page)
+                        if DEBUG: print(f"[DEBUG] Raw response from AI: \"{response_text}\"")
+
                         if not response_text:
-                            print("Could not retrieve a valid response.")
+                            if DEBUG: print("[DEBUG] WARNING: AI response was empty. Skipping.")
                             continue
 
-                        # We process text for ren'py here now to add our emotional tags. One per dialogue box.
-                        #This is the "raw text" that is sent for TTS and shown, as it's readable.
+                        # Clean up the raw text
                         response_text = re.sub(r'<[^>]+>', '', response_text)
                         response_text = os.linesep.join([s for s in response_text.splitlines() if s])
                         response_text = re.sub(' +', ' ', response_text)
                         response_text = re.sub(r'&[^;]+;', '', response_text)
                         response_text = response_text.replace("END", "")
+                        if DEBUG: print(f"[DEBUG] Cleaned response text: \"{response_text}\"")
                         
-                        print("-" * 50)
-                        print(f"Response Received:\n{response_text}") #Remove?
-                        print("-" * 50)
-
                         processed_message_for_game = response_text
 
-                        # --- Process Emotions to create the game payload ---
+                        # --- Process Emotions ---
                         if USE_EMOTIONS and classifier:
+                            print(f"Processing emotions...")
                             message_chunks = split_text_like_renpy(response_text)
                             analyzed_chunks = []
                             for chunk in message_chunks:
@@ -443,20 +508,21 @@ def listenToClient(client):
                                 detected_emotion = classification["labels"][0]
                                 analyzed_chunks.append(f"{chunk}|||{detected_emotion}")
 
-                            # This is the final string that will be sent to the game. It has emotional tags every 180 characters max.
+                            # This is the final string that will be sent to the game
                             final_payload = "&&&".join(analyzed_chunks)
                             processed_message_for_game = final_payload
                             
-                            #print("\n--- FINAL GAME PAYLOAD (EMOTIONS) ---")
-                            #print(final_payload)
-                            #print("-------------------------------------\n")
-                        #else:
-                             #print("\n--- Emotion processing disabled. Skipping payload generation. ---\n")
-
-                        if received_msg != "QUIT":
-                            # --- TTS (uses the clean text) ---
+                            if DEBUG: print("[DEBUG] \n--- FINAL GAME PAYLOAD (EMOTIONS) ---")
+                            print(final_payload)
+                            if DEBUG: print("-------------------------------------\n")
+                        else:
+                            if DEBUG: print("\n--- Emotion processing disabled. Skipping payload generation. ---\n")
+                        
+                        # --- Send final payload to game ---
+                        if user_input != "QUIT":
+                            # --- TEXT-TO-SPEECH (TTS) LOGIC ---
                             if USE_TTS:
-                                print("--- TTS is processing... ---")
+                                if DEBUG: print("[DEBUG] TTS is enabled. Sending text to TTS function.")
                                 play_obj = play_TTS(
                                     step,
                                     response_text,
@@ -469,17 +535,20 @@ def listenToClient(client):
                                     VOICE_SAMPLE_COQUI,
                                     uni_chr_re)
                             
-                            # --- Send final payload to game ---
-                            #print("Sent: " + processed_message_for_game)
-                            send_answer(received_msg, processed_message_for_game)
-                        break
+                            if DEBUG: print(f"[DEBUG] Sending final payload to game.")
+                            send_answer(user_input, processed_message_for_game)
+                            print(f"TTS sent:" + response_text)
+                        
+                        # Break out of the "check_generation_complete" loop
+                        break 
                 except Exception as e:
-                    print(f"Error checking generation status or processing response: {e}")
+                    print(f"FATAL: Error during AI response processing. Error: {e}")
                     import traceback
                     traceback.print_exc()
                     launched = False
                     pw.stop()
-                    break
+                    break # Break from the inner loop on error
+
 
 if __name__ == "__main__":
     SERVER.listen(5)
