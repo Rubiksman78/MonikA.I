@@ -266,7 +266,7 @@ def main():
     with sync_playwright() as p:
         browser = p.firefox.launch(headless=False)
         page = browser.new_page()
-        page.goto("http://192.168.0.3:8001/") # Your SillyTavern URL
+        page.goto("http://127.0.0.1:8000/") # Your SillyTavern URL
         page.wait_for_load_state("networkidle", timeout=60000)
 
         while True:
