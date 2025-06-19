@@ -9,7 +9,7 @@ PORT = 12346
 # --- The predictable, hardcoded response ---
 # This is built from three parts, just like in the real main.py
 # Part 1: The message payload with per-paragraph emotions
-payload = "This is a happy message|||joy&&&This is a sad message|||sadness"
+payload = "This is a happy message|||happy&&&This is a sad message|||displeased"
 # Part 2: The action to be taken
 action = "play_game"
 
