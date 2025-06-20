@@ -18,6 +18,10 @@ from scripts.utils import HiddenPrints
 # --- CONFIGURATION ---
 #Debug mode
 DEBUG = False
+def log(x)
+    if DEBUG = True
+        print x
+        
 #File config
 GAME_PATH = CONFIG["GAME_PATH"]
 WEBUI_PATH = CONFIG["WEBUI_PATH"]
@@ -232,7 +236,7 @@ def launch_backend():
 launch_backend()
 
 def launch(context):
-    if DEBUG: print("[DEBUG] Launching new browser page...")
+    log("[DEBUG] Launching new browser page...")
     page = context.new_page()
     
     if BACKEND_TYPE == "Text-gen-webui":
@@ -244,7 +248,7 @@ def launch(context):
         page.goto("http://127.0.0.1:8000/") 
         page.wait_for_load_state("networkidle", timeout=60000)
     
-    if DEBUG: print("[DEBUG] Page loaded successfully")
+    log("[DEBUG] Page loaded successfully")
     context.storage_state(path="storage.json")
     return page
 
@@ -355,64 +359,64 @@ def send_answer(received_msg, processed_message):
 
 def listenToClient(client):
     """ Get client username """
-    if DEBUG: print("[DEBUG] New listener thread started for a client.")
+    log("[DEBUG] New listener thread started for a client.")
     name = "User"
     clients[client] = name
     launched = False
     play_obj = None
 
     while True:
-        if DEBUG: print("\n[DEBUG] --- Top of main loop. Waiting for new message from client. ---")
+        log("\n[DEBUG] --- Top of main loop. Waiting for new message from client. ---")
         try:
             raw_data = client.recv(BUFSIZE).decode("utf-8")
-            if DEBUG: print(f"[DEBUG] Raw data received from client: \"{raw_data}\"")
+            log(f"[DEBUG] Raw data received from client: \"{raw_data}\"")
         except Exception as e:
-            if DEBUG: print(f"[DEBUG] Connection lost. Error: {e}")
+            log(f"[DEBUG] Connection lost. Error: {e}")
             os._exit(0)
 
         # Splitting the initial "chatbot/m" identifier
         message_parts = raw_data.split("/m", 1)
         received_msg = message_parts[0]
         rest_msg = message_parts[1] if len(message_parts) > 1 else ""
-        if DEBUG: print(f"[DEBUG] After splitting '/m': received_msg is \"{received_msg}\", rest_msg is \"{rest_msg}\"")
+        log(f"[DEBUG] After splitting '/m': received_msg is \"{received_msg}\", rest_msg is \"{rest_msg}\"")
 
 
         if received_msg == "chatbot":
-            if DEBUG: print("[DEBUG] 'chatbot' identifier found. Entering chatbot logic.")
+            log("[DEBUG] 'chatbot' identifier found. Entering chatbot logic.")
             main_message_body = rest_msg
             
             # This loop ensures we get the part of the message with the user input
-            if DEBUG: print("[DEBUG] Entering loop to find the main message containing '/g'.")
+            log("[DEBUG] Entering loop to find the main message containing '/g'.")
             while "/g" not in main_message_body:
-                if DEBUG: print(f"[DEBUG] Current message part \"{main_message_body}\" does not contain '/g'. Waiting for next part.")
+                log(f"[DEBUG] Current message part \"{main_message_body}\" does not contain '/g'. Waiting for next part.")
                 try:
                     main_message_body = client.recv(BUFSIZE).decode("utf-8")
-                    if DEBUG: print(f"[DEBUG] Received next message part: \"{main_message_body}\"")
+                    log(f"[DEBUG] Received next message part: \"{main_message_body}\"")
                 except Exception as e:
-                    if DEBUG: print(f"[DEBUG] Connection lost while waiting for '/g' part. Error: {e}")
+                    log(f"[DEBUG] Connection lost while waiting for '/g' part. Error: {e}")
                     os._exit(0)
             
-            if DEBUG: print("[DEBUG] Found message part with '/g'. Exiting loop.")
+            log("[DEBUG] Found message part with '/g'. Exiting loop.")
 
             # Splitting the user message from the step count
             user_input, step_str = main_message_body.split("/g", 1)
-            if DEBUG: print(f"[DEBUG] After splitting '/g': user_input is \"{user_input}\", step_str is \"{step_str}\"")
+            log(f"[DEBUG] After splitting '/g': user_input is \"{user_input}\", step_str is \"{step_str}\"")
 
             # Safely extracting the step number
             numeric_step = "".join(filter(str.isdigit, step_str))
-            if DEBUG: print(f"[DEBUG] Extracted numeric digits for step: \"{numeric_step}\"")
+            log(f"[DEBUG] Extracted numeric digits for step: \"{numeric_step}\"")
             
             step = int(numeric_step) if numeric_step else 0
-            if DEBUG: print(f"[DEBUG] Final step value is: {step}")
+            log(f"[DEBUG] Final step value is: {step}")
 
             # --- SPEECH-TO-TEXT (STT) LOGIC ---
             if user_input == "begin_record":
-                if DEBUG: print("[DEBUG] 'begin_record' command received. Initializing STT.")
+                log("[DEBUG] 'begin_record' command received. Initializing STT.")
                 if USE_SPEECH_RECOGNITION:
                     with sr.Microphone(sample_rate=16000) as source:
-                        if DEBUG: print("[DEBUG] Sending 'yes' to client to confirm microphone is ready.")
+                        log("[DEBUG] Sending 'yes' to client to confirm microphone is ready.")
                         sendMessage("yes".encode("utf-8"))
-                        if DEBUG: print("[DEBUG] Listening for speech...")
+                        log("[DEBUG] Listening for speech...")
                         audio = r.listen(source)
                         print("Processing speech...")
                         torch_audio = torch.from_numpy(
@@ -424,14 +428,14 @@ def listenToClient(client):
                         result = audio_model.transcribe(torch_audio, language='english')
                         user_input = result['text'].strip()
                 else:
-                    if DEBUG: print("[DEBUG] STT is disabled in config. Sending 'no' to client.")
+                    log("[DEBUG] STT is disabled in config. Sending 'no' to client.")
                     sendMessage("no".encode("utf-8"))
                     continue # Skip this turn if STT is disabled but was requested
             print("User: "+user_input)
             
             # This part handles the initial browser launch if needed
             if not launched:
-                if DEBUG: print("[DEBUG] Browser not launched yet. Attempting to launch.")
+                log("[DEBUG] Browser not launched yet. Attempting to launch.")
                 pw = sync_playwright().start()
                 try:
                     browser = pw.firefox.launch(headless=False)
@@ -444,47 +448,47 @@ def listenToClient(client):
                     pw.stop()
                     continue
                 launched = True
-                if DEBUG: print("[DEBUG] Browser launched successfully.")
+                log("[DEBUG] Browser launched successfully.")
                 
                 # This block now safely absorbs the optional 'ok_ready' without freezing.
                 print("[DEBUG] Setting socket to non-blocking to safely absorb optional pings")
                 client.setblocking(False)
                 try:
                     client.recv(BUFSIZE)
-                    if DEBUG: print("[DEBUG] Absorbed an optional message.")
+                    log("[DEBUG] Absorbed an optional message.")
                 except BlockingIOError:
-                    if DEBUG: print("[DEBUG] No optional message was waiting to be absorbed. Continuing normally.")
+                    log("[DEBUG] No optional message was waiting to be absorbed. Continuing normally.")
                     pass
                 except Exception as e:
-                    if DEBUG: print(f"[DEBUG] An unexpected error occurred while absorbing message: {e}")
+                    log(f"[DEBUG] An unexpected error occurred while absorbing message: {e}")
                     pass
-                if DEBUG: print("[DEBUG] Setting socket back to blocking mode for normal operation.")
+                log("[DEBUG] Setting socket back to blocking mode for normal operation.")
                 client.setblocking(True) # IMPORTANT: Return to blocking mode
 
             # Sending the message to the AI frontend
             try:
-                if DEBUG: print(f"Sending to AI: \"{user_input}\"")
+                log(f"Sending to AI: \"{user_input}\"")
                 post_message(page, user_input)
             except Exception as e:
-                if DEBUG: print(f"[DEBUG] FATAL: Error while sending message to AI. Error: {e}")
+                log(f"[DEBUG] FATAL: Error while sending message to AI. Error: {e}")
                 sendMessage("server_error".encode("utf-8"))
                 launched = False
                 pw.stop()
                 continue
             
             # Waiting for the AI to finish generating a response
-            if DEBUG: print("[DEBUG] Waiting for AI response generation to complete...")
+            log("[DEBUG] Waiting for AI response generation to complete...")
             while True:
                 time.sleep(0.2)
                 try:
                     if check_generation_complete(page):
-                        if DEBUG: print("[DEBUG] AI generation is complete.")
+                        log("[DEBUG] AI generation is complete.")
                         # --- RESPONSE PROCESSING ---
                         response_text = get_last_message(page)
-                        if DEBUG: print(f"[DEBUG] Raw response from AI: \"{response_text}\"")
+                        log(f"[DEBUG] Raw response from AI: \"{response_text}\"")
 
                         if not response_text:
-                            if DEBUG: print("[DEBUG] WARNING: AI response was empty. Skipping.")
+                            log("[DEBUG] WARNING: AI response was empty. Skipping.")
                             continue
 
                         # Clean up the raw text
@@ -493,7 +497,7 @@ def listenToClient(client):
                         response_text = re.sub(' +', ' ', response_text)
                         response_text = re.sub(r'&[^;]+;', '', response_text)
                         response_text = response_text.replace("END", "")
-                        if DEBUG: print(f"[DEBUG] Cleaned response text: \"{response_text}\"")
+                        log(f"[DEBUG] Cleaned response text: \"{response_text}\"")
                         
                         processed_message_for_game = response_text
 
@@ -512,17 +516,17 @@ def listenToClient(client):
                             final_payload = "&&&".join(analyzed_chunks)
                             processed_message_for_game = final_payload
                             
-                            if DEBUG: print("[DEBUG] \n--- FINAL GAME PAYLOAD (EMOTIONS) ---")
+                            log("[DEBUG] \n--- FINAL GAME PAYLOAD (EMOTIONS) ---")
                             print(final_payload)
-                            if DEBUG: print("-------------------------------------\n")
+                            log("-------------------------------------\n")
                         else:
-                            if DEBUG: print("\n--- Emotion processing disabled. Skipping payload generation. ---\n")
+                            log("\n--- Emotion processing disabled. Skipping payload generation. ---\n")
                         
                         # --- Send final payload to game ---
                         if user_input != "QUIT":
                             # --- TEXT-TO-SPEECH (TTS) LOGIC ---
                             if USE_TTS:
-                                if DEBUG: print("[DEBUG] TTS is enabled. Sending text to TTS function.")
+                                log("[DEBUG] TTS is enabled. Sending text to TTS function.")
                                 play_obj = play_TTS(
                                     step,
                                     response_text,
@@ -535,7 +539,7 @@ def listenToClient(client):
                                     VOICE_SAMPLE_COQUI,
                                     uni_chr_re)
                             
-                            if DEBUG: print(f"[DEBUG] Sending final payload to game.")
+                            log(f"[DEBUG] Sending final payload to game.")
                             send_answer(user_input, processed_message_for_game)
                             print(f"TTS sent:" + response_text)
                         
