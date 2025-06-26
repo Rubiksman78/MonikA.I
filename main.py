@@ -18,9 +18,9 @@ from scripts.utils import HiddenPrints
 # --- CONFIGURATION ---
 #Debug mode
 DEBUG = False
-def log(x)
-    if DEBUG = True
-        print x
+def log(x):
+    if DEBUG == True:
+        print(x)
         
 #File config
 GAME_PATH = CONFIG["GAME_PATH"]
