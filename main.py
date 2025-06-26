@@ -20,7 +20,7 @@ from scripts.utils import HiddenPrints
 DEBUG = False
 def log(x):
     if DEBUG == True:
-        print (x)
+        print(x)
         
 #File config
 GAME_PATH = CONFIG["GAME_PATH"]
