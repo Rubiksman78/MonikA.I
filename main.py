@@ -241,7 +241,7 @@ def launch(context):
     
     if BACKEND_TYPE == "Text-gen-webui":
         page.goto("http://127.0.0.1:7860")
-        page.wait_for_selector("[class='svelte-1f354aw pretty_scrollbar']", timeout=60000)
+        page.wait_for_selector("[class='svelte-it7283 pretty_scrollbar']", timeout=60000)
         time.sleep(1)
     else:  # SillyTavern
         # The URL from your test script is used here.
@@ -255,9 +255,9 @@ def launch(context):
 def post_message(page, message):
     if BACKEND_TYPE == "Text-gen-webui":
         if message == "QUIT":
-            page.fill("[class='svelte-1f354aw pretty_scrollbar']", "I'll be right back")
+            page.fill("[class='svelte-it7283 pretty_scrollbar']", "I'll be right back")
         else:
-            page.fill("[class='svelte-1f354aw pretty_scrollbar']", message)
+            page.fill("[class='svelte-it7283 pretty_scrollbar']", message)
         time.sleep(0.2)
         page.click('[id="Generate"]')
         page.wait_for_selector('[id="stop"]')
