@@ -31,63 +31,22 @@ def load_from_json(variable, entry):
     except (FileNotFoundError, KeyError):
         pass
 
-def update_visible_options(*args):
-    if backend_choice.get() == "SillyTavern":
-        # Hide text-gen-webui specific options, show SillyTavern options
-        webui_path_entry.grid_remove()
-        webui_path_label.grid_remove()
-        launch_yourself_webui_yes.grid_remove()
-        launch_yourself_webui_no.grid_remove()
-        launch_yourself_webui_label.grid_remove()
-        ST_path_entry.grid()
-        ST_path_label.grid()
-        launch_yourself_ST_yes.grid()
-        launch_yourself_ST_no.grid()
-        launch_yourself_ST_label.grid()
-    else:
-        # Show text-gen-webui specific options
-        webui_path_entry.grid()
-        webui_path_label.grid()
-        launch_yourself_webui_yes.grid()
-        launch_yourself_webui_no.grid()
-        launch_yourself_webui_label.grid()
-        ST_path_entry.grid_remove()
-        ST_path_label.grid_remove()
-        launch_yourself_ST_yes.grid_remove()
-        launch_yourself_ST_no.grid_remove()
-        launch_yourself_ST_label.grid_remove()
-
 def get_input():
-    global GAME_PATH, WEBUI_PATH, USE_TTS, LAUNCH_YOURSELF, LAUNCH_YOURSELF_WEBUI
+    global GAME_PATH, USE_TTS, LAUNCH_YOURSELF, OLLAMA_MODEL
     global USE_ACTIONS, USE_EMOTIONS, TTS_MODEL, USE_SPEECH_RECOGNITION
-    global VOICE_SAMPLE_TORTOISE, VOICE_SAMPLE_COQUI, BACKEND_TYPE, ST_PATH, LAUNCH_YOURSELF_ST
+    global VOICE_SAMPLE_TORTOISE, VOICE_SAMPLE_COQUI
     
     USE_TTS = use_tts.get()
     GAME_PATH = game_path.get()
-    WEBUI_PATH = webui_path.get() if backend_choice.get() == "Text-gen-webui" else ""
-    ST_PATH = ST_path.get() if backend_choice.get() == "SillyTavern" else ""
     LAUNCH_YOURSELF = launch_yourself.get()
-    LAUNCH_YOURSELF_WEBUI = launch_yourself_webui.get() if backend_choice.get() == "Text-gen-webui" else False
-    LAUNCH_YOURSELF_ST = launch_yourself_ST.get() if backend_choice.get() == "SillyTavern" else False
+    OLLAMA_MODEL = ollama_model.get()
     USE_ACTIONS = use_actions.get()
     USE_EMOTIONS = use_emotions.get() # Capture the new value
     TTS_MODEL = tts_model.get()
     USE_SPEECH_RECOGNITION = use_speech_recognition.get()
     VOICE_SAMPLE_TORTOISE = voice_sample_tortoise.get()
     VOICE_SAMPLE_COQUI = voice_sample_coqui.get()
-    BACKEND_TYPE = backend_choice.get()
     root.destroy()
-
-# Create frames
-backend_frame = tk.LabelFrame(
-    root,
-    bg=menu_background_pink,
-    text="Backend Selection",
-    fg='white',
-    font=("Helvetica", 16, "bold"),
-    bd=5
-)
-backend_frame.place(anchor="c", relx=.5, rely=0.1)
 
 other_frame = tk.LabelFrame(
     root,
@@ -99,10 +58,6 @@ other_frame = tk.LabelFrame(
 )
 other_frame.place(anchor="c", relx=.5, rely=0.4)
 
-# Backend selection
-backend_choice = tk.StringVar()
-backend_choice.trace('w', update_visible_options)
-
 bold_font = ('helvetic', 10, 'bold')
 aspect_params = {
     "bg": menu_background_pink,
@@ -112,18 +67,12 @@ aspect_params = {
     "selectcolor": doki_purple,
     "font": bold_font
 }
-tk.Label(backend_frame, text="Choose Backend:", bg=menu_background_pink, fg='white', font=bold_font).grid(row=0, column=0)
-tk.Radiobutton(backend_frame, text="SillyTavern", variable=backend_choice, value="SillyTavern", **aspect_params).grid(row=0, column=1)
-tk.Radiobutton(backend_frame, text="Text-gen-webui", variable=backend_choice, value="Text-gen-webui", **aspect_params).grid(row=0, column=2)
 
 # Variables for other settings
 use_tts = tk.StringVar()
 game_path = tk.StringVar()
-webui_path = tk.StringVar()
-ST_path = tk.StringVar()
 launch_yourself = tk.StringVar()
-launch_yourself_webui = tk.StringVar()
-launch_yourself_ST = tk.StringVar()
+ollama_model = tk.StringVar()
 use_actions = tk.StringVar()
 use_emotions = tk.StringVar() # Variable for the new option
 tts_model = tk.StringVar()
@@ -133,6 +82,7 @@ voice_sample_coqui = tk.StringVar()
 
 # General Settings Labels and Inputs
 tk.Label(other_frame, text="Game Path", bg=menu_background_pink, fg='white', font=bold_font).grid(row=1, column=0)
+tk.Label(other_frame, text="Ollama Model", bg=menu_background_pink, fg='white', font=bold_font).grid(row=2, column=0)
 tk.Label(other_frame, text="Launch Yourself", bg=menu_background_pink, fg='white', font=bold_font).grid(row=1, column=3)
 tk.Label(other_frame, text="Use Actions", bg=menu_background_pink, fg='white', font=bold_font).grid(row=3, column=0)
 tk.Label(other_frame, text="Use Emotions", bg=menu_background_pink, fg='white', font=bold_font).grid(row=4, column=0) # New Label
@@ -158,37 +108,16 @@ tk.Radiobutton(other_frame, text="No", variable=use_tts, value=False, **aspect_p
 tk.Radiobutton(other_frame, text="Yes", variable=use_speech_recognition, value=True, **aspect_params).grid(row=6, column=1)
 tk.Radiobutton(other_frame, text="No", variable=use_speech_recognition, value=False, **aspect_params).grid(row=6, column=2)
 
-# Text-gen-webui specific options
-webui_path_label = tk.Label(other_frame, text="WebUI Path", bg=menu_background_pink, fg='white', font=bold_font)
-webui_path_label.grid(row=2, column=0)
-launch_yourself_webui_label = tk.Label(other_frame, text="Launch WebUI Yourself", bg=menu_background_pink, fg='white', font=bold_font)
-launch_yourself_webui_label.grid(row=2, column=3)
-launch_yourself_webui_yes = tk.Radiobutton(other_frame, text="Yes", variable=launch_yourself_webui, value=True, **aspect_params)
-launch_yourself_webui_no = tk.Radiobutton(other_frame, text="No", variable=launch_yourself_webui, value=False, **aspect_params)
-launch_yourself_webui_yes.grid(row=2, column=4)
-launch_yourself_webui_no.grid(row=2, column=5)
-
-# SillyTavern specific options
-ST_path_label = tk.Label(other_frame, text="ST Path", bg=menu_background_pink, fg='white', font=bold_font)
-ST_path_label.grid(row=2, column=0)
-launch_yourself_ST_label = tk.Label(other_frame, text="Launch ST Yourself", bg=menu_background_pink, fg='white', font=bold_font)
-launch_yourself_ST_label.grid(row=2, column=3)
-launch_yourself_ST_yes = tk.Radiobutton(other_frame, text="Yes", variable=launch_yourself_ST, value=True, **aspect_params)
-launch_yourself_ST_no = tk.Radiobutton(other_frame, text="No", variable=launch_yourself_ST, value=False, **aspect_params)
-launch_yourself_ST_yes.grid(row=2, column=4)
-launch_yourself_ST_no.grid(row=2, column=5)
-
 # Textual Inputs
 game_path_entry = tk.Entry(other_frame, textvariable=game_path, width=25, bg=doki_white, fg='black')
 game_path_entry.grid(row=1, column=1)
-webui_path_entry = tk.Entry(other_frame, textvariable=webui_path, width=25, bg=doki_white, fg='black')
-webui_path_entry.grid(row=2, column=1)
-ST_path_entry = tk.Entry(other_frame, textvariable=ST_path, width=25, bg=doki_white, fg='black')
-ST_path_entry.grid(row=2, column=1)
 
 load_from_json("GAME_PATH", game_path_entry)
-load_from_json("WEBUI_PATH", webui_path_entry)
-load_from_json("ST_PATH", ST_path_entry)
+
+ollama_model_entry = tk.Entry(other_frame, textvariable=ollama_model, width=25, bg=doki_white, fg='black')
+ollama_model_entry.grid(row=2, column=1)
+
+load_from_json("OLLAMA_MODEL", ollama_model_entry)
 
 tts_menu = tk.OptionMenu(other_frame, tts_model, "Your TTS", "XTTS", "Tortoise TTS")
 tts_menu.config(bg=doki_white, fg='black')
@@ -225,10 +154,7 @@ button.place(relx=0.5, rely=0.9, anchor=tk.CENTER)
 
 if not os.path.exists("config.json"):
     # Set default values
-    backend_choice.set("Text-gen-webui")
     launch_yourself.set(False)
-    launch_yourself_webui.set(False)
-    launch_yourself_ST.set(False)
     use_tts.set(False)
     use_actions.set(False)
     use_emotions.set(False) # Default for new option
@@ -240,14 +166,10 @@ else:
     with open("config.json", "r") as f:
         config = json.load(f)
     # Load existing settings
-    BACKEND_TYPE = config.get("BACKEND_TYPE", "Text-gen-webui")
     GAME_PATH = config.get("GAME_PATH", "")
-    WEBUI_PATH = config.get("WEBUI_PATH", "")
-    ST_PATH = config.get("ST_PATH", "")
+    OLLAMA_MODEL = config.get("OLLAMA_MODEL", "")
     USE_TTS = config.get("USE_TTS", False)
     LAUNCH_YOURSELF = config.get("LAUNCH_YOURSELF", False)
-    LAUNCH_YOURSELF_WEBUI = config.get("LAUNCH_YOURSELF_WEBUI", False)
-    LAUNCH_YOURSELF_ST = config.get("LAUNCH_YOURSELF_ST", False)
     USE_ACTIONS = config.get("USE_ACTIONS", False)
     USE_EMOTIONS = config.get("USE_EMOTIONS", False) # Load new option
     TTS_MODEL = config.get("TTS_MODEL", "Your TTS")
@@ -255,10 +177,7 @@ else:
     VOICE_SAMPLE_COQUI = config.get("VOICE_SAMPLE_COQUI", "Choose a voice sample")
     VOICE_SAMPLE_TORTOISE = config.get("VOICE_SAMPLE_TORTOISE", "Choose a Tortoise voice sample")
     # Set saved values
-    backend_choice.set(BACKEND_TYPE)
     launch_yourself.set(LAUNCH_YOURSELF)
-    launch_yourself_webui.set(LAUNCH_YOURSELF_WEBUI)
-    launch_yourself_ST.set(LAUNCH_YOURSELF_ST)
     use_tts.set(USE_TTS)
     use_actions.set(USE_ACTIONS)
     use_emotions.set(USE_EMOTIONS) # Set GUI for new option
@@ -277,21 +196,15 @@ root.mainloop()
 # Convert string from radio buttons to boolean-like integers
 USE_TTS = int(eval(str(USE_TTS)))
 LAUNCH_YOURSELF = int(eval(str(LAUNCH_YOURSELF)))
-LAUNCH_YOURSELF_WEBUI = int(eval(str(LAUNCH_YOURSELF_WEBUI)))
-LAUNCH_YOURSELF_ST = int(eval(str(LAUNCH_YOURSELF_ST)))
 USE_ACTIONS = int(eval(str(USE_ACTIONS)))
 USE_EMOTIONS = int(eval(str(USE_EMOTIONS))) # Convert new option
 USE_SPEECH_RECOGNITION = int(eval(str(USE_SPEECH_RECOGNITION)))
 
 CONFIG = {
-    "BACKEND_TYPE": BACKEND_TYPE,
     "GAME_PATH": GAME_PATH,
-    "WEBUI_PATH": WEBUI_PATH,
-    "ST_PATH": ST_PATH,
+    "OLLAMA_MODEL": OLLAMA_MODEL,
     "USE_TTS": USE_TTS,
     "LAUNCH_YOURSELF": LAUNCH_YOURSELF,
-    "LAUNCH_YOURSELF_WEBUI": LAUNCH_YOURSELF_WEBUI,
-    "LAUNCH_YOURSELF_ST" : LAUNCH_YOURSELF_ST,
     "USE_ACTIONS": USE_ACTIONS,
     "USE_EMOTIONS": USE_EMOTIONS, # Add to config dict
     "TTS_MODEL": TTS_MODEL,
